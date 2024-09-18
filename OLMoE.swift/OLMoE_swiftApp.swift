@@ -12,6 +12,7 @@ struct OLMoE_swiftApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .font(.manrope()) // Uses regular weight and dynamic body text size
         }
     }
 }

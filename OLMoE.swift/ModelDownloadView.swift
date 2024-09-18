@@ -10,31 +10,42 @@ struct ModelDownloadView: View {
     private let modelURL = URL(string: "https://dolma-artifacts.org/app/olmoe-1b-7b-0924-instruct-q4_k_m.gguf")!
 
     var body: some View {
-        VStack {
-            if isModelReady {
-                Text("Model is ready to use!")
-                Button("Flush Model", action: flushModel)
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            } else if isDownloading {
-                ProgressView("Downloading...", value: downloadProgress, total: 1.0)
-                    .progressViewStyle(LinearProgressViewStyle())
-                    .padding()
-                Text("\(Int(downloadProgress * 100))%")
-            } else {
-                Button("Download Model", action: startDownload)
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }
+        ZStack {
+            Color("BackgroundColor")  // Use your custom color asset here
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack {
+                if isModelReady {
+                    Text("Model is ready to use!")
+                        .foregroundColor(Color("TextColor"))  // Use your custom text color
+                    Button("Flush Model", action: flushModel)
+                        .padding()
+                        .background(Color.accentColor)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                        .font(.manrope())
+                } else if isDownloading {
+                    ProgressView("Downloading...", value: downloadProgress, total: 1.0)
+                        .progressViewStyle(LinearProgressViewStyle())
+                        .padding()
+                        .foregroundColor(Color("TextColor"))  // Use your custom text color
+                    Text("\(Int(downloadProgress * 100))%")
+                        .foregroundColor(Color("TextColor"))  // Use your custom text color
+                        .font(.manrope())
+                } else {
+                    Button("Download Model", action: startDownload)
+                        .padding()
+                        .background(Color.accentColor)
+                        .foregroundColor(Color.textColorButton)
+                        .cornerRadius(8)
+                        .font(.manrope(.bold))
+                }
 
-            if let error = downloadError {
-                Text(error)
-                    .foregroundColor(.red)
-                    .padding()
+                if let error = downloadError {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .padding()
+                }
             }
         }
         .onAppear(perform: checkModelExists)

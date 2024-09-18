@@ -1,7 +1,31 @@
 {
   "images" : [
     {
-      "filename" : "OLMoE.png",
+      "filename" : "App Store@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "App Store Dark@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "tinted"
+        }
+      ],
+      "filename" : "App Store Tinted@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

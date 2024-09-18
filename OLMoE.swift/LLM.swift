@@ -213,38 +213,20 @@ open class LLM: ObservableObject {
         return token
     }
     
-//    @InferenceActor
-//    private func predictNextToken() async -> Token {
-//        guard shouldContinuePredicting else { return model.endToken }
-//        let logits = llama_get_logits_ith(context.pointer, batch.n_tokens - 1)!
-//        var candidates = (0..<totalTokenCount).map { token in
-//            llama_token_data(id: Int32(token), logit: logits[token], p: 0.0)
-//        }
-//        var token: llama_token!
-//        candidates.withUnsafeMutableBufferPointer { pointer in
-//            var candidates = llama_token_data_array(
-//                data: pointer.baseAddress,
-//                size: totalTokenCount,
-//                selected: 0,
-//                sorted: false
-//            )
-//            
-//            llama_sample_top_k(context.pointer, &candidates, topK, 1)
-//            llama_sample_top_p(context.pointer, &candidates, topP, 1)
-//            llama_sample_temp(context.pointer, &candidates, temp)
-//            token = llama_sample_token(context.pointer, &candidates)
-//        }
-//        batch.clear()
-//        batch.add(token, currentCount, [0], true)
-//        context.decode(batch)
-//        return token
-//    }
-    
     private var currentCount: Int32!
     private var decoded = ""
     
     open func recoverFromLengthy(_ input: borrowing String, to output:  borrowing AsyncStream<String>.Continuation) {
         output.yield("tl;dr")
+    }
+    
+    @InferenceActor
+    public func clearHistory() async {
+        history.removeAll()
+        await setOutput(to: "")
+        // Reset any other state variables if necessary
+        // For example, if you have a variable tracking the current conversation context:
+        // currentContext = nil
     }
     
     private func prepare(from input: borrowing String, to output: borrowing AsyncStream<String>.Continuation) -> Bool {
@@ -450,6 +432,9 @@ extension Model {
         let cTokens = UnsafeMutablePointer<llama_token>.allocate(capacity: Int(tokenCount)); defer { cTokens.deallocate() }
         tokenCount = llama_tokenize(self, text, count, cTokens, tokenCount, addBOS, false)
         let tokens = (0..<Int(tokenCount)).map { cTokens[$0] }
+        
+        print("Encoded tokens: \(tokens)")  // Add this line to log the resulting tokens
+        
         return tokens
     }
 }
@@ -561,13 +546,15 @@ public struct Template {
     }
     
     
-    public static let OLMoE = Template(
-        system: ("", ""),
-        user: ("<|im_start|>user\n", "<|im_end|>\n"),
-        bot: ("<|im_start|>assistant\n", "<|im_end|>\n"),
-        stopSequence: "<|im_end|>",
-        systemPrompt: "<|endoftext|>"
-    )
+    public static func OLMoE(_ systemPrompt: String? = nil) -> Template {
+        return Template(
+            system: ("<|system|>\n", "\n"),
+            user: ("<|user|>\n", "\n"),
+            bot: ("<|assistant|>\n", "\n"),
+            stopSequence: "<|endoftext|>",
+            systemPrompt: systemPrompt
+        )
+    }
     
     public static func chatML(_ systemPrompt: String? = nil) -> Template {
         return Template(

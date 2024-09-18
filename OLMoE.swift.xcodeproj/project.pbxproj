@@ -14,6 +14,8 @@
 		A0117FFF2C990F5600035007 /* llama in Frameworks */ = {isa = PBXBuildFile; productRef = A0117FFE2C990F5600035007 /* llama */; };
 		A01180012C990F7600035007 /* LLM.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01180002C990F7600035007 /* LLM.swift */; };
 		A011800C2C9A919D00035007 /* ModelDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A011800B2C9A919D00035007 /* ModelDownloadView.swift */; };
+		A0ADA4522C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A0ADA4512C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf */; };
+		A0ADA4542C9B83E9007BB509 /* ManropeFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADA4532C9B83E6007BB509 /* ManropeFont.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,8 @@
 		A0117FF32C990EAC00035007 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A01180002C990F7600035007 /* LLM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLM.swift; sourceTree = "<group>"; };
 		A011800B2C9A919D00035007 /* ModelDownloadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelDownloadView.swift; sourceTree = "<group>"; };
+		A0ADA4512C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Manrope-VariableFont_wght.ttf"; sourceTree = "<group>"; };
+		A0ADA4532C9B83E6007BB509 /* ManropeFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManropeFont.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +62,7 @@
 		A0117FEA2C990EAB00035007 /* OLMoE.swift */ = {
 			isa = PBXGroup;
 			children = (
+				A0ADA4532C9B83E6007BB509 /* ManropeFont.swift */,
 				A011800B2C9A919D00035007 /* ModelDownloadView.swift */,
 				A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */,
 				A0117FED2C990EAB00035007 /* ContentView.swift */,
@@ -65,6 +70,7 @@
 				A0117FF12C990EAC00035007 /* OLMoE_swift.entitlements */,
 				A0117FF22C990EAC00035007 /* Preview Content */,
 				A01180002C990F7600035007 /* LLM.swift */,
+				A0ADA4512C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf */,
 			);
 			path = OLMoE.swift;
 			sourceTree = "<group>";
@@ -146,6 +152,7 @@
 			files = (
 				A0117FF42C990EAC00035007 /* Preview Assets.xcassets in Resources */,
 				A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */,
+				A0ADA4522C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +167,7 @@
 				A01180012C990F7600035007 /* LLM.swift in Sources */,
 				A011800C2C9A919D00035007 /* ModelDownloadView.swift in Sources */,
 				A0117FEC2C990EAB00035007 /* OLMoE_swiftApp.swift in Sources */,
+				A0ADA4542C9B83E9007BB509 /* ManropeFont.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

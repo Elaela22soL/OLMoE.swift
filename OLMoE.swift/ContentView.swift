@@ -21,52 +21,82 @@ class Bot: LLM {
         timeFormatter.dateFormat = "h:mm a"
         let currentTime = timeFormatter.string(from: Date())
         
-//        let systemPrompt = "You are OLMoE (Open Language Mixture of Expert), a small language model running on \(deviceName). You have been developed at the Allen Institute for AI (Ai2) in Seattle, WA, USA. Today is \(currentDate). The time is \(currentTime)."
-        
-        
+        let systemPrompt = "You are OLMoE (Open Language Mixture of Expert), a small language model running on \(deviceName). You have been developed at the Allen Institute for AI (Ai2) in Seattle, WA, USA. Today is \(currentDate). The time is \(currentTime)."
+    
         guard FileManager.default.fileExists(atPath: Bot.modelFileURL.path) else {
             fatalError("Model file not found. Please download it first.")
         }
         
-//        self.init(from: Bot.modelFileURL, template: .chatML(systemPrompt))
-        self.init(from: Bot.modelFileURL, template: .chatML())
+//        self.init(from: Bot.modelFileURL, template: .OLMoE(systemPrompt))
+        self.init(from: Bot.modelFileURL, template: .OLMoE())
     }
 }
 
-import SwiftUI
 
 struct BotView: View {
     @StateObject var bot: Bot
     @State var input = ""
     @State private var textEditorHeight: CGFloat = 40
+    @State private var isGenerating = false
     
     init(_ bot: Bot) {
         _bot = StateObject(wrappedValue: bot)
     }
     
-    func respond() { Task { await bot.respond(to: input) } }
+    func respond() {
+        isGenerating = true
+        Task {
+            await bot.respond(to: input)
+        }
+        isGenerating = false
+    }
     
     func stop() {
         bot.stop()
         input = "" // Clear the input
+        isGenerating = false
         Task { @MainActor in
-            await bot.setOutput(to: "") // Clear the bot's output
+            await bot.clearHistory()
+            bot.setOutput(to: "")
         }
     }
     
     var body: some View {
+        GeometryReader { geometry in
+            contentView(in: geometry)
+        }
+    }
+    
+    private func contentView(in geometry: GeometryProxy) -> some View {
         ZStack {
             Color("BackgroundColor")
                 .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading) {
-                ScrollView {
-                    Text(bot.output)
-                        .monospaced()
-                        .foregroundColor(Color("TextColor"))
+                if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
+                    ScrollView {
+                        Text(bot.output)
+                            .monospaced()
+                            .foregroundColor(Color("TextColor"))
+                    }
+                } else {
+                    ZStack {
+                        VStack{
+                            Spacer()
+                                .frame(height: geometry.size.height * 0.1)
+                            Image("Splash")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: min(geometry.size.width - 160, 290))
+                            Spacer()
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 Spacer()
-                HStack(alignment: .bottom) {
+                
+                ///
+                HStack(alignment: .bottom, spacing: 8) {
                     ZStack(alignment: .leading) {
                         TextEditor(text: $input)
                             .frame(height: max(40, textEditorHeight))
@@ -81,6 +111,7 @@ struct BotView: View {
                             )
                             .padding(8)
                             .foregroundColor(Color("TextColor"))
+                            .font(.manrope())
                     }
                     .background(
                         GeometryReader { geometry in
@@ -90,31 +121,38 @@ struct BotView: View {
                     .onPreferenceChange(ViewHeightKey.self) { height in
                         self.textEditorHeight = min(max(40, height), 120)
                     }
-                    
                     VStack {
                         Button(action: respond) {
                             Image(systemName: "paperplane.fill")
                                 .foregroundColor(Color("AccentColor"))
-                                .font(.system(size: 24))  // Increase icon size
-                                .frame(width: 40, height: 40)  // Set a larger frame
+                                .font(.system(size: 24))
+                                .frame(width: 40, height: 40)
                         }
-                        .padding(.bottom, 8)  // Increase spacing between buttons
-                        
+                        .disabled(isGenerating)
                         Button(action: stop) {
-                            Image(systemName: "xmark")
+                            Image(systemName: "trash.fill")
                                 .foregroundColor(Color("TextColor"))
-                                .font(.system(size: 24))  // Increase icon size
-                                .frame(width: 40, height: 40)  // Set a larger frame
+                                .font(.system(size: 24))
+                                .frame(width: 40, height: 40)
                         }
+                        .disabled(!isGenerating)
                     }
-                    .padding(.leading, 8)
                 }
+                .padding(.horizontal)
+                .frame(maxWidth: .infinity)
+            
+            
+            
+            
+            ///
+            
             }
-            .frame(maxWidth: .infinity)
             .padding()
         }
     }
 }
+
+
 struct ViewHeightKey: PreferenceKey {
     static var defaultValue: CGFloat { 0 }
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
