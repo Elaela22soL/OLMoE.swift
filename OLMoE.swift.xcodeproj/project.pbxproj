@@ -11,6 +11,9 @@
 		A0117FEE2C990EAB00035007 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0117FED2C990EAB00035007 /* ContentView.swift */; };
 		A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0117FEF2C990EAC00035007 /* Assets.xcassets */; };
 		A0117FF42C990EAC00035007 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0117FF32C990EAC00035007 /* Preview Assets.xcassets */; };
+		A0117FFF2C990F5600035007 /* llama in Frameworks */ = {isa = PBXBuildFile; productRef = A0117FFE2C990F5600035007 /* llama */; };
+		A01180012C990F7600035007 /* LLM.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01180002C990F7600035007 /* LLM.swift */; };
+		A011800C2C9A919D00035007 /* ModelDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A011800B2C9A919D00035007 /* ModelDownloadView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +23,8 @@
 		A0117FEF2C990EAC00035007 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A0117FF12C990EAC00035007 /* OLMoE_swift.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OLMoE_swift.entitlements; sourceTree = "<group>"; };
 		A0117FF32C990EAC00035007 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A01180002C990F7600035007 /* LLM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLM.swift; sourceTree = "<group>"; };
+		A011800B2C9A919D00035007 /* ModelDownloadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelDownloadView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -27,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0117FFF2C990F5600035007 /* llama in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -52,11 +58,13 @@
 		A0117FEA2C990EAB00035007 /* OLMoE.swift */ = {
 			isa = PBXGroup;
 			children = (
+				A011800B2C9A919D00035007 /* ModelDownloadView.swift */,
 				A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */,
 				A0117FED2C990EAB00035007 /* ContentView.swift */,
 				A0117FEF2C990EAC00035007 /* Assets.xcassets */,
 				A0117FF12C990EAC00035007 /* OLMoE_swift.entitlements */,
 				A0117FF22C990EAC00035007 /* Preview Content */,
+				A01180002C990F7600035007 /* LLM.swift */,
 			);
 			path = OLMoE.swift;
 			sourceTree = "<group>";
@@ -85,6 +93,9 @@
 			dependencies = (
 			);
 			name = OLMoE.swift;
+			packageProductDependencies = (
+				A0117FFE2C990F5600035007 /* llama */,
+			);
 			productName = OLMoE.swift;
 			productReference = A0117FE82C990EAB00035007 /* OLMoE.swift.app */;
 			productType = "com.apple.product-type.application";
@@ -96,6 +107,9 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				KnownAssetTags = (
+					New,
+				);
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
@@ -113,6 +127,9 @@
 				Base,
 			);
 			mainGroup = A0117FDF2C990EAB00035007;
+			packageReferences = (
+				A0117FFD2C990F5600035007 /* XCRemoteSwiftPackageReference "llama" */,
+			);
 			productRefGroup = A0117FE92C990EAB00035007 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -140,6 +157,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A0117FEE2C990EAB00035007 /* ContentView.swift in Sources */,
+				A01180012C990F7600035007 /* LLM.swift in Sources */,
+				A011800C2C9A919D00035007 /* ModelDownloadView.swift in Sources */,
 				A0117FEC2C990EAB00035007 /* OLMoE_swiftApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -274,6 +293,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Ai2 OLMoE";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -312,6 +332,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Ai2 OLMoE";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -359,6 +380,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A0117FFD2C990F5600035007 /* XCRemoteSwiftPackageReference "llama" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ggerganov/llama.cpp/";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A0117FFE2C990F5600035007 /* llama */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0117FFD2C990F5600035007 /* XCRemoteSwiftPackageReference "llama" */;
+			productName = llama;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A0117FE02C990EAB00035007 /* Project object */;
 }
