@@ -45,42 +45,66 @@ struct BotView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            ScrollView { Text(bot.output).monospaced() }
-            Spacer()
-            HStack(alignment: .bottom) {
-                ZStack(alignment: .leading) {
-                    TextEditor(text: $input)
-                        .frame(height: max(40, textEditorHeight))
-                        .scrollContentBackground(.hidden)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .foregroundStyle(.thinMaterial)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                        )
-                        .padding(8)
+        ZStack {
+            Color("BackgroundColor")
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(alignment: .leading) {
+                ScrollView {
+                    Text(bot.output)
+                        .monospaced()
+                        .foregroundColor(Color("TextColor"))
                 }
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear.preference(key: ViewHeightKey.self, value: geometry.size.height)
+                Spacer()
+                HStack(alignment: .bottom) {
+                    ZStack(alignment: .leading) {
+                        TextEditor(text: $input)
+                            .frame(height: max(40, textEditorHeight))
+                            .scrollContentBackground(.hidden)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .foregroundStyle(.thinMaterial)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color("TextColor").opacity(0.2), lineWidth: 1)
+                            )
+                            .padding(8)
+                            .foregroundColor(Color("TextColor"))
                     }
-                )
-                .onPreferenceChange(ViewHeightKey.self) { height in
-                    self.textEditorHeight = min(max(40, height), 120)
+                    .background(
+                        GeometryReader { geometry in
+                            Color.clear.preference(key: ViewHeightKey.self, value: geometry.size.height)
+                        }
+                    )
+                    .onPreferenceChange(ViewHeightKey.self) { height in
+                        self.textEditorHeight = min(max(40, height), 120)
+                    }
+                    
+                    VStack {
+                        Button(action: respond) {
+                            Image(systemName: "paperplane.fill")
+                                .foregroundColor(Color("AccentColor"))
+                                .font(.system(size: 24))  // Increase icon size
+                                .frame(width: 40, height: 40)  // Set a larger frame
+                        }
+                        .padding(.bottom, 8)  // Increase spacing between buttons
+                        
+                        Button(action: stop) {
+                            Image(systemName: "xmark")
+                                .foregroundColor(Color("TextColor"))
+                                .font(.system(size: 24))  // Increase icon size
+                                .frame(width: 40, height: 40)  // Set a larger frame
+                        }
+                    }
+                    .padding(.leading, 8)
                 }
-                
-                Button(action: respond) { Image(systemName: "paperplane.fill") }
-                Button(action: stop) { Image(systemName: "xmark") }
             }
+            .frame(maxWidth: .infinity)
+            .padding()
         }
-        .frame(maxWidth: .infinity)
-        .padding()
     }
 }
-
 struct ViewHeightKey: PreferenceKey {
     static var defaultValue: CGFloat { 0 }
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {

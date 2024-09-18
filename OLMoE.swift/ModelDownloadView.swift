@@ -15,7 +15,7 @@ struct ModelDownloadView: View {
                 Text("Model is ready to use!")
                 Button("Flush Model", action: flushModel)
                     .padding()
-                    .background(Color.red)
+                    .background(Color.accentColor)
                     .foregroundColor(.white)
                     .cornerRadius(8)
             } else if isDownloading {
@@ -26,7 +26,7 @@ struct ModelDownloadView: View {
             } else {
                 Button("Download Model", action: startDownload)
                     .padding()
-                    .background(Color.blue)
+                    .background(Color.accentColor)
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
