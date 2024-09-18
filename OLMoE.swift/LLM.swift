@@ -560,6 +560,15 @@ public struct Template {
         }
     }
     
+    
+    public static let OLMoE = Template(
+        system: ("", ""),
+        user: ("<|im_start|>user\n", "<|im_end|>\n"),
+        bot: ("<|im_start|>assistant\n", "<|im_end|>\n"),
+        stopSequence: "<|im_end|>",
+        systemPrompt: "<|endoftext|>"
+    )
+    
     public static func chatML(_ systemPrompt: String? = nil) -> Template {
         return Template(
             system: ("<|im_start|>system\n", "<|im_end|>\n"),

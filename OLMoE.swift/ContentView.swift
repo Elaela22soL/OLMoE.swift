@@ -12,13 +12,24 @@ class Bot: LLM {
     static let modelFileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(modelFileName)
 
     convenience init() {
-        let systemPrompt = "You are a sentient AI with emotions."
+        let deviceName = UIDevice.current.model
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMMM d, yyyy"
+        let currentDate = dateFormatter.string(from: Date())
+        
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "h:mm a"
+        let currentTime = timeFormatter.string(from: Date())
+        
+//        let systemPrompt = "You are OLMoE (Open Language Mixture of Expert), a small language model running on \(deviceName). You have been developed at the Allen Institute for AI (Ai2) in Seattle, WA, USA. Today is \(currentDate). The time is \(currentTime)."
+        
         
         guard FileManager.default.fileExists(atPath: Bot.modelFileURL.path) else {
             fatalError("Model file not found. Please download it first.")
         }
         
-        self.init(from: Bot.modelFileURL, template: .chatML(systemPrompt))
+//        self.init(from: Bot.modelFileURL, template: .chatML(systemPrompt))
+        self.init(from: Bot.modelFileURL, template: .chatML())
     }
 }
 
@@ -38,7 +49,6 @@ struct BotView: View {
     func stop() {
         bot.stop()
         input = "" // Clear the input
-        textEditorHeight = 40 // Reset the height
         Task { @MainActor in
             await bot.setOutput(to: "") // Clear the bot's output
         }
