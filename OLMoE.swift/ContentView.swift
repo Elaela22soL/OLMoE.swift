@@ -121,6 +121,7 @@ struct BotView: View {
                     .onPreferenceChange(ViewHeightKey.self) { height in
                         self.textEditorHeight = min(max(40, height), 120)
                     }
+                    
                     VStack {
                         Button(action: respond) {
                             Image(systemName: "paperplane.fill")
@@ -129,13 +130,13 @@ struct BotView: View {
                                 .frame(width: 40, height: 40)
                         }
                         .disabled(isGenerating)
+                        
                         Button(action: stop) {
                             Image(systemName: "trash.fill")
                                 .foregroundColor(Color("TextColor"))
                                 .font(.system(size: 24))
                                 .frame(width: 40, height: 40)
                         }
-                        .disabled(!isGenerating)
                     }
                 }
                 .padding(.horizontal)
