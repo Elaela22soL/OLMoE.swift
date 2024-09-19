@@ -32,12 +32,12 @@ class Bot: LLM {
     }
 }
 
-
 struct BotView: View {
     @StateObject var bot: Bot
     @State var input = ""
     @State private var textEditorHeight: CGFloat = 40
     @State private var isGenerating = false
+    @State private var scrollToBottom = false
     
     init(_ bot: Bot) {
         _bot = StateObject(wrappedValue: bot)
@@ -47,6 +47,8 @@ struct BotView: View {
         isGenerating = true
         Task {
             await bot.respond(to: input)
+            input = "" // Clear the input after sending
+            scrollToBottom = true
         }
         isGenerating = false
     }
@@ -74,10 +76,51 @@ struct BotView: View {
             
             VStack(alignment: .leading) {
                 if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
-                    ScrollView {
-                        Text(bot.output)
-                            .monospaced()
-                            .foregroundColor(Color("TextColor"))
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 10) {
+                                // Display history
+                                ForEach(bot.history, id: \.content) { chat in
+                                    if chat.content != bot.output {
+                                        Text(chat.role == .user ? "User: " : "Bot: ")
+                                            .fontWeight(.bold)
+                                            .foregroundColor(Color("TextColor"))
+                                        + Text(chat.content)
+                                            .foregroundColor(Color("TextColor"))
+                                    }
+                                }
+                                .opacity(0.5)
+                                .font(.manrope().monospaced())
+                                
+                                // Display current output
+                                Text(bot.output)
+                                    .monospaced()
+                                    .foregroundColor(Color("TextColor"))
+                                    .id("bottomID") // Unique ID for scrolling
+                                Color.clear.frame(height: 1).id("bottomID2")
+
+                            }
+                        }
+                        .onChange(of: bot.output) { _ in
+                            if isGenerating {
+                                withAnimation {
+                                    proxy.scrollTo("bottomID", anchor: .bottom)
+                                }
+                            } else {
+                                withAnimation {
+                                    proxy.scrollTo("bottomID2", anchor: .bottom)
+                                }
+                            }
+                            
+                        }
+                        .onChange(of: scrollToBottom) { newValue in
+                            if newValue {
+                                withAnimation {
+                                    proxy.scrollTo("bottomID", anchor: .bottom)
+                                }
+                                scrollToBottom = false
+                            }
+                        }
                     }
                 } else {
                     ZStack {
@@ -95,7 +138,6 @@ struct BotView: View {
                 }
                 Spacer()
                 
-                ///
                 HStack(alignment: .bottom, spacing: 8) {
                     ZStack(alignment: .leading) {
                         TextEditor(text: $input)
@@ -121,7 +163,6 @@ struct BotView: View {
                     .onPreferenceChange(ViewHeightKey.self) { height in
                         self.textEditorHeight = min(max(40, height), 120)
                     }
-                    
                     VStack {
                         Button(action: respond) {
                             Image(systemName: "paperplane.fill")
@@ -130,7 +171,6 @@ struct BotView: View {
                                 .frame(width: 40, height: 40)
                         }
                         .disabled(isGenerating)
-                        
                         Button(action: stop) {
                             Image(systemName: "trash.fill")
                                 .foregroundColor(Color("TextColor"))
@@ -141,12 +181,6 @@ struct BotView: View {
                 }
                 .padding(.horizontal)
                 .frame(maxWidth: .infinity)
-            
-            
-            
-            
-            ///
-            
             }
             .padding()
         }
