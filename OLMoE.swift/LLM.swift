@@ -548,6 +548,7 @@ public struct Template {
     
     public static func OLMoE(_ systemPrompt: String? = nil) -> Template {
         return Template(
+            prefix: "<|endoftext|>",
             system: ("<|system|>\n", "\n"),
             user: ("<|user|>\n", "\n"),
             bot: ("<|assistant|>\n", "\n"),

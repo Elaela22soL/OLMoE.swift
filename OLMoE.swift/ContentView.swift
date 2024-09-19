@@ -195,8 +195,10 @@ struct ViewHeightKey: PreferenceKey {
     }
 }
 
+import SwiftUI
+
 struct ContentView: View {
-    @State private var isModelReady = false
+    @StateObject private var downloadManager = BackgroundDownloadManager.shared
     @State private var bot: Bot?
 
     var body: some View {
@@ -204,10 +206,10 @@ struct ContentView: View {
             if let bot = bot {
                 BotView(bot)
             } else {
-                ModelDownloadView(isModelReady: $isModelReady)
+                ModelDownloadView()
             }
         }
-        .onChange(of: isModelReady) { newValue in
+        .onChange(of: downloadManager.isModelReady) { newValue in
             if newValue && bot == nil {
                 initializeBot()
             }
@@ -217,7 +219,7 @@ struct ContentView: View {
 
     private func checkModelAndInitializeBot() {
         if FileManager.default.fileExists(atPath: Bot.modelFileURL.path) {
-            isModelReady = true
+            downloadManager.isModelReady = true
             initializeBot()
         }
     }
