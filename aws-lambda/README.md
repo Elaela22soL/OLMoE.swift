@@ -105,3 +105,15 @@ You can log traces from any application using the API Gateway endpoint.
   }
 }
 ```
+
+## Example request with cURL
+
+```shell
+export API_KEY="YOUR_API_KEY"
+export API_URL="https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod"
+
+curl -X POST ${API_URL} \
+    -H "x-api-key: ${API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d '{"model": "model-name-here", "created": 1818857600, "messages": [{"role": "user", "content": "Hello, how are you?"}, {"role": "assistant", "content": "I am well, thanks! What can I help you with today?"}]}'
+```
