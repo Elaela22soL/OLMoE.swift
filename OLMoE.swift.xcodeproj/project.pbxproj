@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -31,6 +31,10 @@
 		A0ADA4532C9B83E6007BB509 /* ManropeFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManropeFont.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A04660392CA1E684007BD14C /* aws_lambda */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = aws_lambda; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		A0117FE52C990EAB00035007 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -46,6 +50,7 @@
 		A0117FDF2C990EAB00035007 = {
 			isa = PBXGroup;
 			children = (
+				A04660392CA1E684007BD14C /* aws_lambda */,
 				A0117FEA2C990EAB00035007 /* OLMoE.swift */,
 				A0117FE92C990EAB00035007 /* Products */,
 			);

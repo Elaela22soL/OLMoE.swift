@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai2 Model Trace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --text-color: #0A3235;
+            --background-color: #FAF2E9;
+            --accent-color: #F0529C;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-color: #FAF2E9;
+                --background-color: #0A3235;
+            }
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .metadata {
+            font-family: monospace;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .title-svg {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            fill: var(--accent-color);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            font-weight: normal;
+            font-size: 36px;
+            margin: 0;
+        }
+
+        .chat {
+            margin-top: 100px;
+            margin-bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+        }
+
+        .user {
+            align-self: flex-start;
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .assistant {
+            align-self: flex-end;
+            background-color: var(--text-color);
+            color: var(--background-color);
+        }
+
+        .system {
+            align-self: center;
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            border-radius: 5px;
+        }
+
+        .role {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .role-right {
+            text-align: right;
+        }
+
+        .content {
+            white-space: pre-wrap;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            font-size: 16px;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title-container">
+            <svg class="title-svg" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 206 205">
+                <path
+                    d="M82,80 L41,80 L41,41 L74,41 C78.4,41 82,37.4 82,33 L82,0 L121,0 L121,41 C121,62.6 103.5,80 82,80 Z M41,84 L0,84 L0,123 L33,123 C37.4,123 41,126.6 41,131 L41,164 L80,164 L80,123 C80,101.4 62.5,84 41,84 Z M172.1,82 C167.7,82 164.1,78.4 164.1,74 L164.1,41 L125.1,41 L125.1,82 C125.1,103.6 142.6,121 164.1,121 L205.1,121 L205.1,82 L172.1,82 Z M84,164 L84,205 L123,205 L123,172 C123,167.6 126.6,164 131,164 L164,164 L164,125 L123,125 C101.4,125 84,142.5 84,164 Z"
+                    id="Ai2 Logo"></path>
+            </svg>
+            <h1>Ai2 Model Trace</h1>
+        </div>
+        <div class="chat"></div>
+        <div class="metadata"></div>
+        <button id="copyButton">Copy JSON</button>
+    </div>
+
+    <script>
+        const chatData = [[ADD_JSON_HERE]];
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        function populateChat() {
+            const metadataElement = document.querySelector('.metadata');
+            const chatElement = document.querySelector('.chat');
+
+            metadataElement.textContent = `Model: ${chatData.metadata.model_id} | Timestamp: ${formatTimestamp(chatData.metadata.timestamp)}`;
+
+            chatData.messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', message.role);
+
+                const roleElement = document.createElement('div');
+                roleElement.classList.add('role');
+
+                switch (message.role) {
+                    case 'system':
+                        roleElement.textContent = '🖥️ System';
+                        break;
+                    case 'user':
+                        roleElement.textContent = '👤 User';
+                        break;
+                    case 'assistant':
+                        roleElement.textContent = '🤖 Assistant';
+                        roleElement.classList.add('role-right');
+                        break;
+                }
+
+                const contentElement = document.createElement('div');
+                contentElement.classList.add('content');
+                contentElement.textContent = message.content;
+
+                messageElement.appendChild(roleElement);
+                messageElement.appendChild(contentElement);
+                chatElement.appendChild(messageElement);
+            });
+        }
+
+        function copyJsonToClipboard() {
+            const jsonString = JSON.stringify(chatData, null, 2);
+            navigator.clipboard.writeText(jsonString).then(() => {
+                console.log('JSON copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy JSON: ', err);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populateChat();
+            document.getElementById('copyButton').addEventListener('click', copyJsonToClipboard);
+        });
+    </script>
+</body>
+</html>

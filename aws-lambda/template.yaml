@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: S3 Logging Lambda Function
+
+Resources:
+  S3LoggingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      Timeout: 60
+      MemorySize: 256
+      Environment:
+        Variables:
+          BUCKET_NAME: olmo-interactions-share
+      Policies:
+        - S3CrudPolicy:
+            BucketName: olmo-interactions-share
+
+Outputs:
+  S3LoggingFunction:
+    Description: "S3 Logging Lambda Function ARN"
+    Value: !GetAtt S3LoggingFunction.Arn
