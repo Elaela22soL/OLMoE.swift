@@ -22,3 +22,6 @@ __pycache__/
 
 # debugger data in xcode
 *.xcsessions
+
+# ignore secrets
+*.xcconfig

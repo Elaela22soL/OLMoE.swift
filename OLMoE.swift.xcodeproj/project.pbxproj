@@ -14,6 +14,9 @@
 		A0117FFF2C990F5600035007 /* llama in Frameworks */ = {isa = PBXBuildFile; productRef = A0117FFE2C990F5600035007 /* llama */; };
 		A01180012C990F7600035007 /* LLM.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01180002C990F7600035007 /* LLM.swift */; };
 		A011800C2C9A919D00035007 /* ModelDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A011800B2C9A919D00035007 /* ModelDownloadView.swift */; };
+		A046603B2CA3FA7B007BD14C /* release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A046603A2CA3FA7B007BD14C /* release.xcconfig */; };
+		A046603D2CA3FAFA007BD14C /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A046603C2CA3FAFA007BD14C /* Configuration.swift */; };
+		A046603F2CA400D2007BD14C /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A046603E2CA400D2007BD14C /* AppInfo.swift */; };
 		A0ADA4522C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A0ADA4512C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf */; };
 		A0ADA4542C9B83E9007BB509 /* ManropeFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADA4532C9B83E6007BB509 /* ManropeFont.swift */; };
 /* End PBXBuildFile section */
@@ -27,6 +30,10 @@
 		A0117FF32C990EAC00035007 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A01180002C990F7600035007 /* LLM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLM.swift; sourceTree = "<group>"; };
 		A011800B2C9A919D00035007 /* ModelDownloadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelDownloadView.swift; sourceTree = "<group>"; };
+		A046603A2CA3FA7B007BD14C /* release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = release.xcconfig; sourceTree = "<group>"; };
+		A046603C2CA3FAFA007BD14C /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		A046603E2CA400D2007BD14C /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+		A04660402CA4017D007BD14C /* OLMoE-swift-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "OLMoE-swift-Info.plist"; sourceTree = SOURCE_ROOT; };
 		A0ADA4512C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Manrope-VariableFont_wght.ttf"; sourceTree = "<group>"; };
 		A0ADA4532C9B83E6007BB509 /* ManropeFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManropeFont.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -67,6 +74,9 @@
 		A0117FEA2C990EAB00035007 /* OLMoE.swift */ = {
 			isa = PBXGroup;
 			children = (
+				A04660402CA4017D007BD14C /* OLMoE-swift-Info.plist */,
+				A046603E2CA400D2007BD14C /* AppInfo.swift */,
+				A046603C2CA3FAFA007BD14C /* Configuration.swift */,
 				A0ADA4532C9B83E6007BB509 /* ManropeFont.swift */,
 				A011800B2C9A919D00035007 /* ModelDownloadView.swift */,
 				A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */,
@@ -76,6 +86,7 @@
 				A0117FF22C990EAC00035007 /* Preview Content */,
 				A01180002C990F7600035007 /* LLM.swift */,
 				A0ADA4512C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf */,
+				A046603A2CA3FA7B007BD14C /* release.xcconfig */,
 			);
 			path = OLMoE.swift;
 			sourceTree = "<group>";
@@ -155,6 +166,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A046603B2CA3FA7B007BD14C /* release.xcconfig in Resources */,
 				A0117FF42C990EAC00035007 /* Preview Assets.xcassets in Resources */,
 				A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */,
 				A0ADA4522C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf in Resources */,
@@ -168,11 +180,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A046603D2CA3FAFA007BD14C /* Configuration.swift in Sources */,
 				A0117FEE2C990EAB00035007 /* ContentView.swift in Sources */,
 				A01180012C990F7600035007 /* LLM.swift in Sources */,
 				A011800C2C9A919D00035007 /* ModelDownloadView.swift in Sources */,
 				A0117FEC2C990EAB00035007 /* OLMoE_swiftApp.swift in Sources */,
 				A0ADA4542C9B83E9007BB509 /* ManropeFont.swift in Sources */,
+				A046603F2CA400D2007BD14C /* AppInfo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,6 +195,7 @@
 /* Begin XCBuildConfiguration section */
 		A0117FF52C990EAC00035007 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A046603A2CA3FA7B007BD14C /* release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -242,6 +257,7 @@
 		};
 		A0117FF62C990EAC00035007 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A046603A2CA3FA7B007BD14C /* release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -295,17 +311,19 @@
 		};
 		A0117FF82C990EAC00035007 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A046603A2CA3FA7B007BD14C /* release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = OLMoE.swift/OLMoE_swift.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
 				DEVELOPMENT_TEAM = QTBFJXDW7X;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "OLMoE-swift-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Ai2 OLMoE";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -334,17 +352,19 @@
 		};
 		A0117FF92C990EAC00035007 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A046603A2CA3FA7B007BD14C /* release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = OLMoE.swift/OLMoE_swift.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
 				DEVELOPMENT_TEAM = QTBFJXDW7X;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "OLMoE-swift-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Ai2 OLMoE";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
