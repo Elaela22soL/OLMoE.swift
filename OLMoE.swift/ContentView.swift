@@ -52,8 +52,10 @@ struct BotView: View {
             await bot.respond(to: input)
             input = "" // Clear the input after sending
             scrollToBottom = true
+            await MainActor.run {
+                isGenerating = false
+            }
         }
-        isGenerating = false
     }
     
     func stop() {
@@ -241,12 +243,18 @@ struct BotView: View {
                         }
                         .disabled(isSharing || bot.history.isEmpty)
                         Button(action: respond) {
-                            Image(systemName: "paperplane.fill")
-                                .foregroundColor(Color("AccentColor"))
-                                .font(.system(size: 24))
-                                .frame(width: 40, height: 40)
+                            HStack {
+                                if isGenerating {
+                                    SpinnerView(color: Color("AccentColor"))
+                                } else {
+                                    Image(systemName: "paperplane.fill")
+                                }
+                            }
+                            .foregroundColor(Color("AccentColor"))
+                            .font(.system(size: 24))
+                            .frame(width: 40, height: 40)
                         }
-                        .disabled(isGenerating)
+                        .disabled(isGenerating) // Disable the button when generating
                         Button(action: stop) {
                             Image(systemName: "trash.fill")
                                 .foregroundColor(Color("TextColor"))
