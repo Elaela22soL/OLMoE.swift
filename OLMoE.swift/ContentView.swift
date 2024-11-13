@@ -41,6 +41,7 @@ struct BotView: View {
     @State private var isSharing = false
     @State private var shareURL: URL?
     @State private var showShareSheet = false
+    @FocusState private var isTextEditorFocused: Bool
     
     init(_ bot: Bot) {
         _bot = StateObject(wrappedValue: bot)
@@ -190,6 +191,9 @@ struct BotView: View {
                                 scrollToBottom = false
                             }
                         }
+                        .gesture(TapGesture().onEnded({
+                            isTextEditorFocused = false
+                        }))
                     }
                 } else {
                     ZStack {
@@ -233,21 +237,30 @@ struct BotView: View {
                         self.textEditorHeight = min(max(40, height), 120)
                     }
                     VStack(spacing: 8) {
-                        Button(action: shareConversation) {
+                        Button(action: {
+                            isTextEditorFocused = false
+                            shareConversation()
+                        }) {
                             Image(systemName: "square.and.arrow.up")
                                 .foregroundColor(Color("TextColor"))
                                 .font(.system(size: 24))
                                 .frame(width: 40, height: 40)
                         }
                         .disabled(isSharing || bot.history.isEmpty)
-                        Button(action: respond) {
+                        Button(action: {
+                            isTextEditorFocused = false
+                            respond()
+                        }) {
                             Image(systemName: "paperplane.fill")
                                 .foregroundColor(Color("AccentColor"))
                                 .font(.system(size: 24))
                                 .frame(width: 40, height: 40)
                         }
                         .disabled(isGenerating)
-                        Button(action: stop) {
+                        Button(action: {
+                            isTextEditorFocused = false
+                            stop()
+                        }) {
                             Image(systemName: "trash.fill")
                                 .foregroundColor(Color("TextColor"))
                                 .font(.system(size: 24))
@@ -265,6 +278,9 @@ struct BotView: View {
                 ActivityViewController(activityItems: [url])
             }
         })
+        .gesture(TapGesture().onEnded({
+            isTextEditorFocused = false
+        }))
     }
 }
 
