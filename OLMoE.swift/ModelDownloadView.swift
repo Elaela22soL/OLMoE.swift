@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import Network
 
 func formatSize(_ size: Int64) -> String {
     let sizeInGB = Double(size) / 1_000_000_000.0
@@ -16,6 +17,7 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
     @Published var downloadedSize: Int64 = 0
     @Published var totalSize: Int64 = 0
     
+    private var networkMonitor: NWPathMonitor?
     private var backgroundSession: URLSession!
     private var downloadTask: URLSessionDownloadTask?
     private var lastUpdateTime: Date = Date()
@@ -28,9 +30,31 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         config.isDiscretionary = false
         config.sessionSendsLaunchEvents = true
         backgroundSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
+        
+        startNetworkMonitoring()
+    }
+    
+    private func startNetworkMonitoring() {
+        networkMonitor = NWPathMonitor()
+        networkMonitor?.pathUpdateHandler = { path in
+            DispatchQueue.main.async {
+                if path.status == .unsatisfied {
+                    self.downloadError = "Connection lost. Please check your internet connection."
+                    self.isDownloading = false
+                    self.downloadTask?.cancel()
+                }
+            }
+        }
+        
+        let queue = DispatchQueue(label: "NetworkMonitor")
+        networkMonitor?.start(queue: queue)
     }
     
     func startDownload() {
+        if networkMonitor?.currentPath.status == .unsatisfied {
+            return
+        }
+        
         guard let url = URL(string: "https://dolma-artifacts.org/app/olmoe-1b-7b-0924-instruct-q4_k_m.gguf") else { return }
         
         isDownloading = true
