@@ -693,6 +693,23 @@ extension URL {
         appendingPathComponent(path)
     }
     @backDeployed(before: iOS 16)
+    public static var applicationSupportDirectory: URL {
+        let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+        let url = paths[0].appendingPathComponent("Models")
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        
+        // Exclude from backup
+        do {
+            var mutableURL = url
+            var resourceValues = URLResourceValues()
+            resourceValues.isExcludedFromBackup = true
+            try mutableURL.setResourceValues(resourceValues)
+        } catch {
+            print("Error excluding from backup: \(error)")
+        }
+        
+        return url
+    }
     public static var documentsDirectory: URL {
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
