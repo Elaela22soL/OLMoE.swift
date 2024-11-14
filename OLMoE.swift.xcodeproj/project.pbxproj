@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		48D976622CE57322008DB9FD /* keyboardDismiss.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D976602CE57322008DB9FD /* keyboardDismiss.swift */; };
+		58133EF62CE535C60052EFAD /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58133EF52CE535C60052EFAD /* SpinnerView.swift */; };
 		A0117FEC2C990EAB00035007 /* OLMoE_swiftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */; };
 		A0117FEE2C990EAB00035007 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0117FED2C990EAB00035007 /* ContentView.swift */; };
 		A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0117FEF2C990EAC00035007 /* Assets.xcassets */; };
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		48D976602CE57322008DB9FD /* keyboardDismiss.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = keyboardDismiss.swift; sourceTree = "<group>"; };
+		58133EF52CE535C60052EFAD /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
 		A0117FE82C990EAB00035007 /* OLMoE.swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OLMoE.swift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OLMoE_swiftApp.swift; sourceTree = "<group>"; };
 		A0117FED2C990EAB00035007 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 				A011800B2C9A919D00035007 /* ModelDownloadView.swift */,
 				A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */,
 				A0117FED2C990EAB00035007 /* ContentView.swift */,
+				58133EF52CE535C60052EFAD /* SpinnerView.swift */,
 				A0117FEF2C990EAC00035007 /* Assets.xcassets */,
 				A0117FF12C990EAC00035007 /* OLMoE_swift.entitlements */,
 				A0117FF22C990EAC00035007 /* Preview Content */,
@@ -198,6 +201,7 @@
 				A0117FEC2C990EAB00035007 /* OLMoE_swiftApp.swift in Sources */,
 				48D976622CE57322008DB9FD /* keyboardDismiss.swift in Sources */,
 				A0ADA4542C9B83E9007BB509 /* ManropeFont.swift in Sources */,
+				58133EF62CE535C60052EFAD /* SpinnerView.swift in Sources */,
 				A046603F2CA400D2007BD14C /* AppInfo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

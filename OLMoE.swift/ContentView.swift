@@ -54,8 +54,10 @@ struct BotView: View {
             input = "" // Clear the input after sending
             await bot.respond(to: originalInput)
             scrollToBottom = true
+            await MainActor.run {
+                isGenerating = false
+            }
         }
-        isGenerating = false
     }
     
     func stop() {
@@ -260,12 +262,18 @@ struct BotView: View {
                             isTextEditorFocused = false
                             respond()
                         }) {
-                            Image(systemName: "paperplane.fill")
-                                .foregroundColor(Color("AccentColor"))
-                                .font(.system(size: 24))
-                                .frame(width: 40, height: 40)
+                            HStack {
+                                if isGenerating {
+                                    SpinnerView(color: Color("AccentColor"))
+                                } else {
+                                    Image(systemName: "paperplane.fill")
+                                }
+                            }
+                            .foregroundColor(Color("AccentColor"))
+                            .font(.system(size: 24))
+                            .frame(width: 40, height: 40)
                         }
-                        .disabled(isGenerating)
+                        .disabled(isGenerating) // Disable the button when generating
                         Button(action: {
                             isTextEditorFocused = false
                             stop()
