@@ -13,26 +13,20 @@ struct DisclaimerPageData {
     let buttonText: String
 }
 
-// Placeholder disclaimer text displayed at app start
-enum Disclaimer {
-    static let pages = [
-        
-        DisclaimerPageData(title: "[TODO] Disclaimers",
-                           text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam odio urna, porta vel eleifend volutpat, porta vitae justo. Aenean sit amet sem id urna consectetur feugiat. Morbi in sem gravida orci rutrum maximus. Donec pretium accumsan orci quis elementum. Sed a tempor libero. Cras tempus nisl ut mattis pretium. Fusce in congue arcu. Vivamus nec sollicitudin est. Cras id eleifend nisl. Phasellus quis neque in leo accumsan fermentum et quis diam. Integer non lectus blandit, hendrerit ante sed, bibendum sapien. Etiam quis facilisis ante. Donec lacinia tincidunt est, quis volutpat est tincidunt et. Nullam nibh risus, tempor quis lacinia ac, dictum et arcu. Curabitur sit amet mauris id mi facilisis laoreet a non metus.",
-                           buttonText: "Next"),
-        
-        DisclaimerPageData(title: "[TODO] Additional Disclaimers",
-                           text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam odio urna, porta vel eleifend volutpat, porta vitae justo. Aenean sit amet sem id urna consectetur feugiat. Morbi in sem gravida orci rutrum maximus. Donec pretium accumsan orci quis elementum. Sed a tempor libero. Cras tempus nisl ut mattis pretium. Fusce in congue arcu. Vivamus nec sollicitudin est. Cras id eleifend nisl. Phasellus quis neque in leo accumsan fermentum et quis diam. Integer non lectus blandit, hendrerit ante sed, bibendum sapien. Etiam quis facilisis ante. Donec lacinia tincidunt est, quis volutpat est tincidunt et. Nullam nibh risus, tempor quis lacinia ac, dictum et arcu. Curabitur sit amet mauris id mi facilisis laoreet a non metus.",
-                           buttonText: "I Agree")
-    ]
-}
-
 struct DisclaimerPage: View {
-    typealias PageButton = (text: String, onDismiss: () -> Void)
+    typealias PageButton = (text: String, onTap: () -> Void)
     
     let title: String
     let message: String
     let confirm: PageButton
+    let cancel: PageButton?
+    
+    init(title: String, message: String, confirm: PageButton, cancel: PageButton? = nil) {
+        self.title = title
+        self.message = message
+        self.confirm = confirm
+        self.cancel = cancel
+    }
     
     var body: some View {
         VStack(spacing: 20) {
@@ -47,9 +41,16 @@ struct DisclaimerPage: View {
                 .padding(.horizontal, 20)
             
             Button(confirm.text) {
-                confirm.onDismiss()
+                confirm.onTap()
             }
-            .padding(.bottom, 20)
+            .padding(.vertical, 5)
+            
+            if let cancel = cancel {
+                Button(cancel.text) {
+                    cancel.onTap()
+                }
+                .padding(.vertical, 5)
+            }
         }
     }
 }

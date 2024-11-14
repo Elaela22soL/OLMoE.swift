@@ -41,6 +41,7 @@ struct BotView: View {
     @State private var isSharing = false
     @State private var shareURL: URL?
     @State private var showShareSheet = false
+    @State private var isSharingConfirmationVisible = false
     @FocusState private var isTextEditorFocused: Bool
     
     init(_ bot: Bot) {
@@ -250,13 +251,39 @@ struct BotView: View {
                     VStack(spacing: 8) {
                         Button(action: {
                             isTextEditorFocused = false
-                            shareConversation()
+                            isSharingConfirmationVisible = true
                         }) {
-                            Image(systemName: "square.and.arrow.up")
-                                .foregroundColor(Color("TextColor"))
-                                .font(.system(size: 24))
-                                .frame(width: 40, height: 40)
+                            HStack {
+                                if isSharing {
+                                    SpinnerView(color: Color("AccentColor"))
+                                } else {
+                                    Image(systemName: "square.and.arrow.up")
+                                }
+                            }
+                            .foregroundColor(Color("TextColor"))
+                            .font(.system(size: 24))
+                            .frame(width: 40, height: 40)
                         }
+                        .popover(isPresented: $isSharingConfirmationVisible, content: {
+                            DisclaimerPage(
+                                title: Disclaimers.ShareDisclaimer().title,
+                                message: Disclaimers.ShareDisclaimer().text,
+                                confirm: DisclaimerPage.PageButton(
+                                    text: Disclaimers.ShareDisclaimer().buttonText,
+                                    onTap: {
+                                        shareConversation()
+                                        isSharingConfirmationVisible = false
+                                   }
+                               ),
+                               cancel: DisclaimerPage.PageButton(
+                                    text: "Cancel",
+                                    onTap: {
+                                        isSharingConfirmationVisible = false
+                                    }
+                               )
+                           )
+                           .presentationBackground(Color("BackgroundColor"))
+                        })
                         .disabled(isSharing || bot.history.isEmpty)
                         Button(action: {
                             isTextEditorFocused = false
@@ -327,7 +354,12 @@ struct ContentView: View {
     @State private var bot: Bot?
     @State private var showDisclaimerPage : Bool = true
     @State private var disclaimerPageIndex: Int = 0
-
+    
+    let disclaimers: [Disclaimer] = [
+        Disclaimers.MainDisclaimer(),
+        Disclaimers.AdditionalDisclaimer()
+    ]
+    
     var body: some View {
         VStack {
             if let bot = bot {
@@ -342,13 +374,13 @@ struct ContentView: View {
             }
         }
         .popover(isPresented: $showDisclaimerPage) {
-            let page = Disclaimer.pages[disclaimerPageIndex]
+            let page = disclaimers[disclaimerPageIndex]
             DisclaimerPage(
                 title: page.title,
                 message: page.text,
                 confirm: DisclaimerPage.PageButton(
                     text: page.buttonText,
-                    onDismiss: {
+                    onTap: {
                         nextInfoPage()
                     })
             )
@@ -358,8 +390,8 @@ struct ContentView: View {
     }
 
     private func nextInfoPage() {
-        disclaimerPageIndex = min(Disclaimer.pages.count, disclaimerPageIndex + 1)
-        if disclaimerPageIndex >= Disclaimer.pages.count {
+        disclaimerPageIndex = min(disclaimers.count, disclaimerPageIndex + 1)
+        if disclaimerPageIndex >= disclaimers.count {
             disclaimerPageIndex = 0
             showDisclaimerPage = false
         }
