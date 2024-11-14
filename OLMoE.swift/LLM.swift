@@ -693,7 +693,7 @@ extension URL {
         appendingPathComponent(path)
     }
     @backDeployed(before: iOS 16)
-    public static var applicationSupportDirectory: URL {
+    public static var modelsDirectory: URL {
         let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
         let url = paths[0].appendingPathComponent("Models")
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
