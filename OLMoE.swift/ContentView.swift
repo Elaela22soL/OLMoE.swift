@@ -9,7 +9,7 @@ import SwiftUI
 
 class Bot: LLM {
     static let modelFileName = "olmoe-1b-7b-0924-instruct-q4_k_m.gguf"
-    static let modelFileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(modelFileName)
+    static let modelFileURL = URL.modelsDirectory.appendingPathComponent(modelFileName)
 
     convenience init() {
         let deviceName = UIDevice.current.model

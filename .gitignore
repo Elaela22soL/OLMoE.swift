@@ -25,3 +25,9 @@ __pycache__/
 
 # ignore secrets
 *.xcconfig
+
+OLMoE.swift.xcodeproj/project.xcworkspace/xcuserdata/
+
+.cursorrules
+
+no_commit/

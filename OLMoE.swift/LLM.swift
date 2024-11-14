@@ -137,7 +137,7 @@ open class LLM: ObservableObject {
     
     public convenience init(
         from huggingFaceModel: HuggingFaceModel,
-        to url: URL = .documentsDirectory,
+        to url: URL = .modelsDirectory,
         as name: String? = nil,
         history: [Chat] = [],
         seed: UInt32 = .random(in: .min ... .max),
@@ -669,7 +669,7 @@ public struct HuggingFaceModel {
         return nil
     }
     
-    public func download(to directory: URL = .documentsDirectory, as name: String? = nil, _ updateProgress: @escaping (Double) -> Void) async throws -> URL {
+    public func download(to directory: URL = .modelsDirectory, as name: String? = nil, _ updateProgress: @escaping (Double) -> Void) async throws -> URL {
         var destination: URL
         if let name {
             destination = directory.appending(path: name)
@@ -693,8 +693,22 @@ extension URL {
         appendingPathComponent(path)
     }
     @backDeployed(before: iOS 16)
-    public static var documentsDirectory: URL {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    public static var modelsDirectory: URL {
+        let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+        let url = paths[0].appendingPathComponent("Models")
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        
+        // Exclude from backup
+        do {
+            var mutableURL = url
+            var resourceValues = URLResourceValues()
+            resourceValues.isExcludedFromBackup = true
+            try mutableURL.setResourceValues(resourceValues)
+        } catch {
+            print("Error excluding from backup: \(error)")
+        }
+        
+        return url
     }
     fileprivate var exists: Bool { FileManager.default.fileExists(atPath: path) }
     fileprivate func getData() async throws -> Data {
