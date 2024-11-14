@@ -353,6 +353,7 @@ struct ContentView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
     @State private var bot: Bot?
     @State private var showDisclaimerPage : Bool = true
+    @State private var showInfoPage : Bool = false
     @State private var disclaimerPageIndex: Int = 0
     
     let disclaimers: [Disclaimer] = [
@@ -381,15 +382,23 @@ struct ContentView: View {
                 confirm: DisclaimerPage.PageButton(
                     text: page.buttonText,
                     onTap: {
-                        nextInfoPage()
+                        nextDisclaimerPage()
                     })
             )
+            .interactiveDismissDisabled(true)
             .presentationBackground(Color("BackgroundColor"))
+        }
+        .overlay(
+            InfoButton(action: { showInfoPage = true })
+            , alignment: .topTrailing
+        )
+        .sheet(isPresented: $showInfoPage) {
+            InfoView()
         }
         .onAppear(perform: checkModelAndInitializeBot)
     }
 
-    private func nextInfoPage() {
+    private func nextDisclaimerPage() {
         disclaimerPageIndex = min(disclaimers.count, disclaimerPageIndex + 1)
         if disclaimerPageIndex >= disclaimers.count {
             disclaimerPageIndex = 0
