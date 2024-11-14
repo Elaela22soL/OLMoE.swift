@@ -137,7 +137,7 @@ open class LLM: ObservableObject {
     
     public convenience init(
         from huggingFaceModel: HuggingFaceModel,
-        to url: URL = .documentsDirectory,
+        to url: URL = .modelsDirectory,
         as name: String? = nil,
         history: [Chat] = [],
         seed: UInt32 = .random(in: .min ... .max),
@@ -669,7 +669,7 @@ public struct HuggingFaceModel {
         return nil
     }
     
-    public func download(to directory: URL = .documentsDirectory, as name: String? = nil, _ updateProgress: @escaping (Double) -> Void) async throws -> URL {
+    public func download(to directory: URL = .modelsDirectory, as name: String? = nil, _ updateProgress: @escaping (Double) -> Void) async throws -> URL {
         var destination: URL
         if let name {
             destination = directory.appending(path: name)
@@ -709,9 +709,6 @@ extension URL {
         }
         
         return url
-    }
-    public static var documentsDirectory: URL {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
     fileprivate var exists: Bool { FileManager.default.fileExists(atPath: path) }
     fileprivate func getData() async throws -> Data {
