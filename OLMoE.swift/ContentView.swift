@@ -41,6 +41,7 @@ struct BotView: View {
     @State private var isSharing = false
     @State private var shareURL: URL?
     @State private var showShareSheet = false
+    @FocusState private var isTextEditorFocused: Bool
     
     init(_ bot: Bot) {
         _bot = StateObject(wrappedValue: bot)
@@ -49,8 +50,9 @@ struct BotView: View {
     func respond() {
         isGenerating = true
         Task {
-            await bot.respond(to: input)
+            let originalInput = input
             input = "" // Clear the input after sending
+            await bot.respond(to: originalInput)
             scrollToBottom = true
             await MainActor.run {
                 isGenerating = false
@@ -192,6 +194,9 @@ struct BotView: View {
                                 scrollToBottom = false
                             }
                         }
+                        .gesture(TapGesture().onEnded({
+                            isTextEditorFocused = false
+                        }))
                     }
                 } else {
                     ZStack {
@@ -210,7 +215,7 @@ struct BotView: View {
                 Spacer()
                 
                 HStack(alignment: .bottom, spacing: 8) {
-                    ZStack(alignment: .leading) {
+                    ZStack(alignment: .topLeading) {
                         TextEditor(text: $input)
                             .frame(height: max(40, textEditorHeight))
                             .scrollContentBackground(.hidden)
@@ -222,27 +227,41 @@ struct BotView: View {
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color("TextColor").opacity(0.2), lineWidth: 1)
                             )
-                            .padding(8)
                             .foregroundColor(Color("TextColor"))
                             .font(.manrope())
-                    }
-                    .background(
-                        GeometryReader { geometry in
-                            Color.clear.preference(key: ViewHeightKey.self, value: geometry.size.height)
+                            .focused($isTextEditorFocused)
+                            .onChange(of: isTextEditorFocused, { _, isFocused in
+                                if isFocused {
+                                    textEditorHeight = 120
+                                } else {
+                                    textEditorHeight = 40
+                                    self.hideKeyboard()
+                                }
+                            })
+                        
+                        if input.isEmpty {
+                            Text("Message")
+                                .padding([.horizontal], 4)
+                                .padding([.vertical], 8)
+                                .foregroundColor(.gray)
                         }
-                    )
-                    .onPreferenceChange(ViewHeightKey.self) { height in
-                        self.textEditorHeight = min(max(40, height), 120)
+                            
                     }
                     VStack(spacing: 8) {
-                        Button(action: shareConversation) {
+                        Button(action: {
+                            isTextEditorFocused = false
+                            shareConversation()
+                        }) {
                             Image(systemName: "square.and.arrow.up")
                                 .foregroundColor(Color("TextColor"))
                                 .font(.system(size: 24))
                                 .frame(width: 40, height: 40)
                         }
                         .disabled(isSharing || bot.history.isEmpty)
-                        Button(action: respond) {
+                        Button(action: {
+                            isTextEditorFocused = false
+                            respond()
+                        }) {
                             HStack {
                                 if isGenerating {
                                     SpinnerView(color: Color("AccentColor"))
@@ -255,7 +274,10 @@ struct BotView: View {
                             .frame(width: 40, height: 40)
                         }
                         .disabled(isGenerating) // Disable the button when generating
-                        Button(action: stop) {
+                        Button(action: {
+                            isTextEditorFocused = false
+                            stop()
+                        }) {
                             Image(systemName: "trash.fill")
                                 .foregroundColor(Color("TextColor"))
                                 .font(.system(size: 24))
@@ -273,6 +295,9 @@ struct BotView: View {
                 ActivityViewController(activityItems: [url])
             }
         })
+        .gesture(TapGesture().onEnded({
+            isTextEditorFocused = false
+        }))
     }
 }
 
