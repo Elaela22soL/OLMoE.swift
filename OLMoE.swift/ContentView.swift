@@ -47,6 +47,10 @@ struct BotView: View {
     private var hasValidInput: Bool {
         !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
+
+    private var isInputDisabled: Bool {
+        isGenerating || isSharing
+    }
     
     init(_ bot: Bot) {
         _bot = StateObject(wrappedValue: bot)
@@ -243,6 +247,8 @@ struct BotView: View {
                                     self.hideKeyboard()
                                 }
                             })
+                            .disabled(isInputDisabled)
+                            .opacity(isInputDisabled ? 0.6 : 1)
                         
                         if input.isEmpty {
                             Text("Message")

@@ -191,20 +191,27 @@ open class LLM: ObservableObject {
         self.template = template
     }
     
-    private var shouldContinuePredicting = false
-    public func stop() {
-        shouldContinuePredicting = false
-    }
+    private var inferenceTask: Task<Void, Never>?
     
+    public func stop() {
+        inferenceTask?.cancel()
+        inferenceTask = nil
+        context = nil // Clear context after canceling task
+    }
+
     @InferenceActor
     private func predictNextToken() async -> Token {
-        guard shouldContinuePredicting else { return model.endToken }
+        // Ensure context exists; otherwise, return end token
+        guard let context = self.context else { return model.endToken }
+        
+        // Check if the task has been canceled
+        guard !Task.isCancelled else { return model.endToken }
         
         guard let sampler = self.sampler else {
             fatalError("Sampler not initialized")
         }
         
-        // Sample the next token
+        // Sample the next token with a valid context
         let token = llama_sampler_sample(sampler, context.pointer, batch.n_tokens - 1)
         
         batch.clear()
@@ -212,6 +219,9 @@ open class LLM: ObservableObject {
         context.decode(batch)
         return token
     }
+
+
+
     
     private var currentCount: Int32!
     private var decoded = ""
@@ -253,7 +263,6 @@ open class LLM: ObservableObject {
             batch.add(token, batch.n_tokens, [0], i == initialCount - 1)
         }
         context.decode(batch)
-        shouldContinuePredicting = true
         return true
     }
     
@@ -281,8 +290,15 @@ open class LLM: ObservableObject {
             static var letters: [CChar] = []
         }
         guard token != model.endToken else { return false }
-        var word = decode(token)
-        guard let stopSequence else { output.yield(word); return true }
+
+        let word = decode(token) // Decode the token directly
+        
+        guard let stopSequence else {
+            output.yield(word)
+            return true
+        }
+
+        // Existing stop sequence handling logic
         var found = 0 < saved.stopSequenceEndIndex
         var letters: [CChar] = []
         for letter in word.utf8CString {
@@ -298,7 +314,8 @@ open class LLM: ObservableObject {
             } else if found {
                 saved.stopSequenceEndIndex = 0
                 if !saved.letters.isEmpty {
-                    word = String(cString: saved.letters + [0]) + word
+                    let prefix = String(cString: saved.letters + [0])
+                    output.yield(prefix + word)
                     saved.letters.removeAll()
                 }
                 output.yield(word)
@@ -306,24 +323,37 @@ open class LLM: ObservableObject {
             }
             letters.append(letter)
         }
-        if !letters.isEmpty { output.yield(found ? String(cString: letters + [0]) : word) }
+        if !letters.isEmpty {
+            output.yield(found ? String(cString: letters + [0]) : word)
+        }
         return true
     }
+
     
     private func getResponse(from input: String) -> AsyncStream<String> {
-        .init { output in Task {
-            defer { context = nil }
-            guard prepare(from: input, to: output) else { return output.finish() }
-            var response: [String] = []
-            while currentCount < maxTokenCount {
-                let token = await predictNextToken()
-                if !process(token, to: output) { return output.finish() }
-                currentCount += 1
+        AsyncStream<String> { output in
+            Task { [weak self] in
+                guard let self = self else { return output.finish() } // Safely unwrap `self`
+                defer { self.context = nil }  // Use `self` safely now that it's unwrapped
+
+                guard self.prepare(from: input, to: output) else {
+                    return output.finish()
+                }
+                
+                var response: [String] = []
+                while self.currentCount < self.maxTokenCount {
+                    let token = await self.predictNextToken()
+                    if !self.process(token, to: output) { return output.finish() }
+                    self.currentCount += 1
+                }
+                
+                await self.finishResponse(from: &response, to: output)
+                output.finish()
             }
-            await finishResponse(from: &response, to: output)
-            return output.finish()
-        } }
+        }
     }
+
+
     
     private var input: String = ""
     private var isAvailable = true
@@ -343,19 +373,31 @@ open class LLM: ObservableObject {
     
     @InferenceActor
     public func respond(to input: String, with makeOutputFrom: @escaping (AsyncStream<String>) async -> String) async {
-        guard isAvailable else { return }
-        isAvailable = false
-        self.input = input
-        let processedInput = preprocess(input, history)
-        let response = getResponse(from: processedInput)
-        let output = await makeOutputFrom(response)
-        history += [(.user, input), (.bot, output)]
-        let historyCount = history.count
-        if historyLimit < historyCount {
-            history.removeFirst(min(2, historyCount))
+        inferenceTask?.cancel() // Cancel any ongoing inference task
+        inferenceTask = Task { [weak self] in
+            guard let self = self else { return }
+            
+            self.input = input
+            let processedInput = self.preprocess(input, self.history)
+            let responseStream = self.getResponse(from: processedInput)
+            
+            // Generate the output string using the async closure
+            let output = await makeOutputFrom(responseStream)
+            
+            await MainActor.run {
+                // Update history and process the final output on the main actor
+                self.history.append((.user, input))
+                self.history.append((.bot, output))
+                
+                // Maintain the history limit
+                if self.history.count > self.historyLimit {
+                    self.history.removeFirst(min(2, self.history.count))
+                }
+                
+                self.postprocess(output)
+            }
         }
-        postprocess(output)
-        isAvailable = true
+        await inferenceTask?.value
     }
     
     open func respond(to input: String) async {
@@ -374,8 +416,10 @@ open class LLM: ObservableObject {
 
     private var multibyteCharacter: [CUnsignedChar] = []
     private func decode(_ token: Token) -> String {
+        multibyteCharacter.removeAll(keepingCapacity: true) // Reset multibyte buffer
         return model.decode(token, with: &multibyteCharacter)
     }
+
     
     public func decode(_ tokens: [Token]) -> String {
         return tokens.map({model.decodeOnly($0)}).joined()
