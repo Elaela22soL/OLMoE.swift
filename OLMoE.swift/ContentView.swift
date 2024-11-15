@@ -43,6 +43,10 @@ struct BotView: View {
     @State private var showShareSheet = false
     @State private var isSharingConfirmationVisible = false
     @FocusState private var isTextEditorFocused: Bool
+
+    private var hasValidInput: Bool {
+        !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
     
     init(_ bot: Bot) {
         _bot = StateObject(wrappedValue: bot)
@@ -296,11 +300,11 @@ struct BotView: View {
                                     Image(systemName: "paperplane.fill")
                                 }
                             }
-                            .foregroundColor(Color("AccentColor"))
+                            .foregroundColor(hasValidInput ? Color("AccentColor") : Color("AccentColor").opacity(0.5))
                             .font(.system(size: 24))
                             .frame(width: 40, height: 40)
                         }
-                        .disabled(isGenerating) // Disable the button when generating
+                        .disabled(isGenerating || !hasValidInput) // Disable the button when generating or the prompt is empty
                         Button(action: {
                             isTextEditorFocused = false
                             stop()
