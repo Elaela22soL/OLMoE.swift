@@ -42,6 +42,7 @@ struct BotView: View {
     @State private var shareURL: URL?
     @State private var showShareSheet = false
     @State private var isSharingConfirmationVisible = false
+    @State private var isDeleteHistoryConfirmationVisible = false
     @FocusState private var isTextEditorFocused: Bool
 
     private var hasValidInput: Bool {
@@ -50,6 +51,10 @@ struct BotView: View {
 
     private var isInputDisabled: Bool {
         isGenerating || isSharing
+    }
+    
+    private var isDeleteButtonDisabled: Bool {
+        isInputDisabled || bot.history.isEmpty
     }
     
     init(_ bot: Bot) {
@@ -73,6 +78,9 @@ struct BotView: View {
         bot.stop()
         input = "" // Clear the input
         isGenerating = false
+    }
+    
+    func deleteHistory() {
         Task { @MainActor in
             await bot.clearHistory()
             bot.setOutput(to: "")
@@ -256,7 +264,6 @@ struct BotView: View {
                                 .padding([.vertical], 8)
                                 .foregroundColor(.gray)
                         }
-                            
                     }
                     VStack(spacing: 8) {
                         Button(action: {
@@ -295,31 +302,42 @@ struct BotView: View {
                            .presentationBackground(Color("BackgroundColor"))
                         })
                         .disabled(isSharing || bot.history.isEmpty)
-                        Button(action: {
-                            isTextEditorFocused = false
-                            respond()
-                        }) {
-                            HStack {
-                                if isGenerating {
-                                    SpinnerView(color: Color("AccentColor"))
-                                } else {
+                        ZStack {
+                            if isGenerating {
+                                Button(action: stop) {
+                                    Image(systemName: "stop.fill")
+                                }
+                            } else {
+                                Button(action: respond) {
                                     Image(systemName: "paperplane.fill")
                                 }
+                                .disabled(!hasValidInput)
+                                .foregroundColor(hasValidInput ? Color("AccentColor") : Color("AccentColor").opacity(0.5))
                             }
-                            .foregroundColor(hasValidInput ? Color("AccentColor") : Color("AccentColor").opacity(0.5))
-                            .font(.system(size: 24))
-                            .frame(width: 40, height: 40)
                         }
-                        .disabled(isGenerating || !hasValidInput) // Disable the button when generating or the prompt is empty
+                        .onTapGesture {
+                            isTextEditorFocused = false
+                        }
+                        .font(.system(size: 24))
+                        .frame(width: 40, height: 40)
+                        
                         Button(action: {
                             isTextEditorFocused = false
+                            isDeleteHistoryConfirmationVisible = true
                             stop()
                         }) {
                             Image(systemName: "trash.fill")
                                 .foregroundColor(Color("TextColor"))
                                 .font(.system(size: 24))
                                 .frame(width: 40, height: 40)
-                        }
+                        }.alert("Delete history?", isPresented: $isDeleteHistoryConfirmationVisible, actions: {
+                            Button("Delete", action: deleteHistory)
+                            Button("Cancel", role: .cancel) {
+                                isDeleteHistoryConfirmationVisible = false
+                            }
+                        })
+                        .disabled(isDeleteButtonDisabled)
+                        .opacity(isDeleteButtonDisabled ? 0.5 : 1)
                     }
                 }
                 .padding(.horizontal)
