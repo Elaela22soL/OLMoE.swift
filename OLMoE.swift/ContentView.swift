@@ -365,6 +365,8 @@ struct ContentView: View {
     @State private var showDisclaimerPage : Bool = true
     @State private var showInfoPage : Bool = false
     @State private var disclaimerPageIndex: Int = 0
+    @State private var isSupportedDevice: Bool = isDeviceSupported()
+    @State private var useMockedModelResponse: Bool = false
     
     let disclaimers: [Disclaimer] = [
         Disclaimers.MainDisclaimer(),
@@ -373,7 +375,15 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            if let bot = bot {
+            if !isSupportedDevice && !useMockedModelResponse {
+                UnsupportedDeviceView(
+                    proceedAnyway: { isSupportedDevice = true },
+                    proceedMocked: {
+                        bot?.loopBackTestResponse = true
+                        useMockedModelResponse = true                        
+                    }
+                )
+            } else if let bot = bot {
                 BotView(bot)
             } else {
                 ModelDownloadView()
@@ -425,5 +435,6 @@ struct ContentView: View {
 
     private func initializeBot() {
         bot = Bot()
+        bot?.loopBackTestResponse = useMockedModelResponse
     }
 }
