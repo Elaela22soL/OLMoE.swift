@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 71;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,7 +18,6 @@
 		A0117FFF2C990F5600035007 /* llama in Frameworks */ = {isa = PBXBuildFile; productRef = A0117FFE2C990F5600035007 /* llama */; };
 		A01180012C990F7600035007 /* LLM.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01180002C990F7600035007 /* LLM.swift */; };
 		A011800C2C9A919D00035007 /* ModelDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A011800B2C9A919D00035007 /* ModelDownloadView.swift */; };
-		A046603B2CA3FA7B007BD14C /* release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A046603A2CA3FA7B007BD14C /* release.xcconfig */; };
 		A046603D2CA3FAFA007BD14C /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A046603C2CA3FAFA007BD14C /* Configuration.swift */; };
 		A046603F2CA400D2007BD14C /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A046603E2CA400D2007BD14C /* AppInfo.swift */; };
 		A0ADA4522C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A0ADA4512C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf */; };
@@ -38,7 +37,6 @@
 		A0117FF32C990EAC00035007 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A01180002C990F7600035007 /* LLM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLM.swift; sourceTree = "<group>"; };
 		A011800B2C9A919D00035007 /* ModelDownloadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelDownloadView.swift; sourceTree = "<group>"; };
-		A046603A2CA3FA7B007BD14C /* release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = release.xcconfig; sourceTree = "<group>"; };
 		A046603C2CA3FAFA007BD14C /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		A046603E2CA400D2007BD14C /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
 		A04660402CA4017D007BD14C /* OLMoE-swift-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "OLMoE-swift-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -47,6 +45,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		483F0F7A2CE805200078202E /* BuildConfig */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = BuildConfig; sourceTree = "<group>"; };
 		48AA86D92CE688A4000B9138 /* Constants */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Constants; sourceTree = "<group>"; };
 		48AA86DF2CE69622000B9138 /* Extensions */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Extensions; sourceTree = "<group>"; };
 		A04660392CA1E684007BD14C /* aws_lambda */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = aws_lambda; sourceTree = "<group>"; };
@@ -84,6 +83,7 @@
 		A0117FEA2C990EAB00035007 /* OLMoE.swift */ = {
 			isa = PBXGroup;
 			children = (
+				483F0F7A2CE805200078202E /* BuildConfig */,
 				48AA86D92CE688A4000B9138 /* Constants */,
 				48AA86DF2CE69622000B9138 /* Extensions */,
 				A04660402CA4017D007BD14C /* OLMoE-swift-Info.plist */,
@@ -102,7 +102,6 @@
 				A0117FF22C990EAC00035007 /* Preview Content */,
 				A01180002C990F7600035007 /* LLM.swift */,
 				A0ADA4512C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf */,
-				A046603A2CA3FA7B007BD14C /* release.xcconfig */,
 			);
 			path = OLMoE.swift;
 			sourceTree = "<group>";
@@ -131,6 +130,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				483F0F7A2CE805200078202E /* BuildConfig */,
 				48AA86D92CE688A4000B9138 /* Constants */,
 				48AA86DF2CE69622000B9138 /* Extensions */,
 			);
@@ -186,7 +186,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A046603B2CA3FA7B007BD14C /* release.xcconfig in Resources */,
 				A0117FF42C990EAC00035007 /* Preview Assets.xcassets in Resources */,
 				A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */,
 				A0ADA4522C9B82CE007BB509 /* Manrope-VariableFont_wght.ttf in Resources */,
@@ -219,7 +218,8 @@
 /* Begin XCBuildConfiguration section */
 		A0117FF52C990EAC00035007 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A046603A2CA3FA7B007BD14C /* release.xcconfig */;
+			baseConfigurationReferenceAnchor = 483F0F7A2CE805200078202E /* BuildConfig */;
+			baseConfigurationReferenceRelativePath = release.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -281,7 +281,8 @@
 		};
 		A0117FF62C990EAC00035007 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A046603A2CA3FA7B007BD14C /* release.xcconfig */;
+			baseConfigurationReferenceAnchor = 483F0F7A2CE805200078202E /* BuildConfig */;
+			baseConfigurationReferenceRelativePath = release.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -335,7 +336,6 @@
 		};
 		A0117FF82C990EAC00035007 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A046603A2CA3FA7B007BD14C /* release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -343,7 +343,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
-				DEVELOPMENT_TEAM = QTBFJXDW7X;
+				DEVELOPMENT_TEAM = MJLARYDQWH;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -364,7 +364,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.soldaini.OLMoE-swift";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.genui.ai2.OLMoE-swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -376,7 +376,6 @@
 		};
 		A0117FF92C990EAC00035007 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A046603A2CA3FA7B007BD14C /* release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -384,7 +383,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
-				DEVELOPMENT_TEAM = QTBFJXDW7X;
+				DEVELOPMENT_TEAM = MJLARYDQWH;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -405,7 +404,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.soldaini.OLMoE-swift";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.genui.ai2.OLMoE-swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";

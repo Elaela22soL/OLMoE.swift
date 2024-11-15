@@ -31,3 +31,5 @@ OLMoE.swift.xcodeproj/project.xcworkspace/xcuserdata/
 .cursorrules
 
 no_commit/
+
+*.example.xcconfig
