@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A3510C72CE7F80D004AC2E3 /* DeviceSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A3510C62CE7F80A004AC2E3 /* DeviceSupport.swift */; };
 		1AA5BE972CE56A54004CA83D /* DisclaimerPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA5BE962CE56A4B004CA83D /* DisclaimerPageView.swift */; };
 		1ADB3B842CE69EFA0000EDA1 /* InfoPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADB3B832CE69EF80000EDA1 /* InfoPageView.swift */; };
 		58133EF62CE535C60052EFAD /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58133EF52CE535C60052EFAD /* SpinnerView.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1A3510C62CE7F80A004AC2E3 /* DeviceSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSupport.swift; sourceTree = "<group>"; };
 		1AA5BE962CE56A4B004CA83D /* DisclaimerPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisclaimerPageView.swift; sourceTree = "<group>"; };
 		1ADB3B832CE69EF80000EDA1 /* InfoPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoPageView.swift; sourceTree = "<group>"; };
 		58133EF52CE535C60052EFAD /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 				58133EF52CE535C60052EFAD /* SpinnerView.swift */,
 				1AA5BE962CE56A4B004CA83D /* DisclaimerPageView.swift */,
 				1ADB3B832CE69EF80000EDA1 /* InfoPageView.swift */,
+				1A3510C62CE7F80A004AC2E3 /* DeviceSupport.swift */,
 				A0117FEF2C990EAC00035007 /* Assets.xcassets */,
 				A0117FF12C990EAC00035007 /* OLMoE_swift.entitlements */,
 				A0117FF22C990EAC00035007 /* Preview Content */,
@@ -197,6 +200,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A3510C72CE7F80D004AC2E3 /* DeviceSupport.swift in Sources */,
 				A046603D2CA3FAFA007BD14C /* Configuration.swift in Sources */,
 				1AA5BE972CE56A54004CA83D /* DisclaimerPageView.swift in Sources */,
 				A0117FEE2C990EAB00035007 /* ContentView.swift in Sources */,

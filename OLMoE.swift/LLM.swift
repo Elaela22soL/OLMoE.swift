@@ -41,6 +41,8 @@ open class LLM: ObservableObject {
     public var historyLimit: Int
     public var path: [CChar]
     
+    public var loopBackTestResponse: Bool = false
+    
     @Published public private(set) var output = ""
     @MainActor public func setOutput(to newOutput: consuming String) {
         output = newOutput
@@ -371,6 +373,19 @@ open class LLM: ObservableObject {
         return output
     }
     
+    private func getTestLoopbackResponse() -> AsyncStream<String> {
+        return AsyncStream { continuation  in
+            Task {
+                continuation.yield("This is a test loop-back response:\n")
+                for i in 0...5 {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000 / 2)
+                    continuation.yield("\(i) - \(input)\n")
+                }
+                continuation.finish()
+            }
+        }
+    }
+    
     @InferenceActor
     public func respond(to input: String, with makeOutputFrom: @escaping (AsyncStream<String>) async -> String) async {
         inferenceTask?.cancel() // Cancel any ongoing inference task
@@ -379,7 +394,7 @@ open class LLM: ObservableObject {
             
             self.input = input
             let processedInput = self.preprocess(input, self.history)
-            let responseStream = self.getResponse(from: processedInput)
+            let responseStream = loopBackTestResponse ? self.getTestLoopbackResponse() : self.getResponse(from: processedInput)
             
             // Generate the output string using the async closure
             let output = await makeOutputFrom(responseStream)
