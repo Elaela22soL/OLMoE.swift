@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import DeviceCheck
+import CryptoKit
 
 class Bot: LLM {
     static let modelFileName = "olmoe-1b-7b-0924-instruct-q4_k_m.gguf"
@@ -91,6 +93,74 @@ struct BotView: View {
         isSharing = true
         Task {
             do {
+                // App Attest Service
+                let service = DCAppAttestService.shared
+                guard service.isSupported else {
+                    print("App Attest not supported on this device")
+                    isSharing = false
+                    return
+                }
+
+                let challengeString = "STATIC_CHALLENGE_RECEIVED_FROM_SERVER"
+                let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
+
+                let userDefaults = UserDefaults.standard
+                let keyIDKey = "appAttestKeyID"
+                let attestationDoneKey = "appAttestAttestationDone"
+                var keyID = userDefaults.string(forKey: keyIDKey)
+
+                if keyID == nil {
+                    // Generate a new key
+                    keyID = try await withCheckedThrowingContinuation { continuation in
+                        service.generateKey { newKeyID, error in
+                            if let error = error {
+                                continuation.resume(throwing: error)
+                            } else if let newKeyID = newKeyID {
+                                continuation.resume(returning: newKeyID)
+                            } else {
+                                continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
+                            }
+                        }
+                    }
+                    // Store key ID in local storage
+                    userDefaults.set(keyID, forKey: keyIDKey)
+                    userDefaults.set(false, forKey: attestationDoneKey)
+                }
+
+                let attestationDone = userDefaults.bool(forKey: attestationDoneKey)
+                var attestationObjectBase64: String? = nil
+                if !attestationDone {
+                    let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
+                        // atestation happens here
+                        service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
+                            if let error = error {
+                                continuation.resume(throwing: error)
+                            } else if let attestation = attestation {
+                                continuation.resume(returning: attestation)
+                            } else {
+                                continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
+                            }
+                        }
+                    }
+                    attestationObjectBase64 = attestationObject.base64EncodedString()
+                    userDefaults.set(true, forKey: attestationDoneKey)
+                }
+
+                let assertionObject: Data = try await withCheckedThrowingContinuation { continuation in
+                    service.generateAssertion(keyID!, clientDataHash: clientDataHash) { assertion, error in
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        } else if let assertion = assertion {
+                            continuation.resume(returning: assertion)
+                        } else {
+                            continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
+                        }
+                    }
+                }
+                let assertionObjectBase64 = assertionObject.base64EncodedString()
+                
+                
+                // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = "https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod"
                 
@@ -101,13 +171,22 @@ struct BotView: View {
                     ["role": chat.role == .user ? "user" : "assistant", "content": chat.content]
                 }
                 
-                let payload: [String: Any] = [
+                var payload: [String: Any] = [
                     "model": modelName,
                     "system_fingerprint": systemFingerprint,
                     "created": Int(Date().timeIntervalSince1970),
-                    "messages": messages
+                    "messages": messages,
+                    "key_id": keyID!,
+                    "assertion": assertionObjectBase64,
+                    "challenge": challengeString
                 ]
+                                
+                if let attestationObjectBase64 = attestationObjectBase64 {
+                    payload["attestation_object"] = attestationObjectBase64
+                }
                 
+                print(payload)
+
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
                 
                 var request = URLRequest(url: URL(string: apiUrl)!)
