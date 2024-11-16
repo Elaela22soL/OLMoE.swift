@@ -380,7 +380,8 @@ struct ActivityViewController: UIViewControllerRepresentable {
 struct ContentView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
     @State private var bot: Bot?
-    @State private var showDisclaimerPage : Bool = true
+    @AppStorage("hasSeenDisclaimer") private var hasSeenDisclaimer : Bool = false
+    @State private var showDisclaimerPage : Bool = false
     @State private var showInfoPage : Bool = false
     @State private var disclaimerPageIndex: Int = 0
     @State private var isSupportedDevice: Bool = isDeviceSupported()
@@ -434,6 +435,11 @@ struct ContentView: View {
             InfoView()
         }
         .onAppear(perform: checkModelAndInitializeBot)
+        .onAppear {
+            if !hasSeenDisclaimer {
+                showDisclaimerPage = true
+            }
+        }
     }
 
     private func nextDisclaimerPage() {
@@ -441,6 +447,7 @@ struct ContentView: View {
         if disclaimerPageIndex >= disclaimers.count {
             disclaimerPageIndex = 0
             showDisclaimerPage = false
+            hasSeenDisclaimer = true
         }
     }
         
