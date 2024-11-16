@@ -92,7 +92,7 @@ struct BotView: View {
         Task {
             do {
                 let apiKey = Configuration.apiKey
-                let apiUrl = "https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod"
+                let apiUrl = Configuration.apiUrl
                 
                 let modelName = "olmoe-1b-7b-0924-instruct-q4_k_m"
                 let systemFingerprint = "\(modelName)-\(AppInfo.shared.appId)"
