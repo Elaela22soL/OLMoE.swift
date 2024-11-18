@@ -4,10 +4,11 @@
 
 1. Rename `BuildConfig/release.example.xcconfig` to `release.xcconfig`.
 
-2. Go to One Password, in the bault "Allen Institue" search for "AWS Gateway API Key", copy and paste key in the newly renamed file
+2. Go to One Password, in the vault "Allen Institute" search for "AWS Gateway API Key" and "AWS Lambda Endpoint - Prod", copy and paste them in the newly renamed file
 
 ```plaintext
 API_KEY=your_api_key_here
+API_URL=api_url
 ```
 
 3. Open the project in Xcode.
