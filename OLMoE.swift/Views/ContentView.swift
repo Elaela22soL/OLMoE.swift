@@ -110,7 +110,16 @@ struct BotView: View {
                 
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
                 
-                var request = URLRequest(url: URL(string: apiUrl)!)
+
+                guard let url = URL(string: apiUrl), !apiUrl.isEmpty else {
+                    print("Invalid URL")
+                    await MainActor.run {
+                        isSharing = false
+                    }
+                    return
+                }
+
+                var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
