@@ -92,7 +92,7 @@ struct BotView: View {
         Task {
             do {
                 let apiKey = Configuration.apiKey
-                let apiUrl = "https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod"
+                let apiUrl = Configuration.apiUrl
                 
                 let modelName = "olmoe-1b-7b-0924-instruct-q4_k_m"
                 let systemFingerprint = "\(modelName)-\(AppInfo.shared.appId)"
@@ -110,7 +110,16 @@ struct BotView: View {
                 
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
                 
-                var request = URLRequest(url: URL(string: apiUrl)!)
+
+                guard let url = URL(string: apiUrl), !apiUrl.isEmpty else {
+                    print("Invalid URL")
+                    await MainActor.run {
+                        isSharing = false
+                    }
+                    return
+                }
+
+                var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.setValue(apiKey, forHTTPHeaderField: "x-api-key")

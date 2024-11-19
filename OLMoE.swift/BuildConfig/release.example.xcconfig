@@ -1,0 +1,9 @@
+//
+//  release.example.xcconfig
+//  OLMoE.swift
+//
+//  Created by Stanley Jovel on 11/15/24.
+//
+
+API_KEY = ...
+API_URL = https://...
