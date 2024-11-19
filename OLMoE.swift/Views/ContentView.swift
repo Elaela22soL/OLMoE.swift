@@ -161,8 +161,8 @@ struct BotView: View {
 
                 // Prepare payload
                 let apiKey = Configuration.apiKey
-                let apiUrl = "https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod"
-
+                let apiUrl = Configuration.apiUrl
+                
                 let modelName = "olmoe-1b-7b-0924-instruct-q4_k_m"
                 let systemFingerprint = "\(modelName)-\(AppInfo.shared.appId)"
 
@@ -183,8 +183,17 @@ struct BotView: View {
                 }
 
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
+                
 
-                var request = URLRequest(url: URL(string: apiUrl)!)
+                guard let url = URL(string: apiUrl), !apiUrl.isEmpty else {
+                    print("Invalid URL")
+                    await MainActor.run {
+                        isSharing = false
+                    }
+                    return
+                }
+
+                var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
@@ -454,7 +463,8 @@ struct ActivityViewController: UIViewControllerRepresentable {
 struct ContentView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
     @State private var bot: Bot?
-    @State private var showDisclaimerPage : Bool = true
+    @AppStorage("hasSeenDisclaimer") private var hasSeenDisclaimer : Bool = false
+    @State private var showDisclaimerPage : Bool = false
     @State private var showInfoPage : Bool = false
     @State private var disclaimerPageIndex: Int = 0
     @State private var isSupportedDevice: Bool = isDeviceSupported()
@@ -508,6 +518,11 @@ struct ContentView: View {
             InfoView()
         }
         .onAppear(perform: checkModelAndInitializeBot)
+        .onAppear {
+            if !hasSeenDisclaimer {
+                showDisclaimerPage = true
+            }
+        }
     }
 
     private func nextDisclaimerPage() {
@@ -515,6 +530,7 @@ struct ContentView: View {
         if disclaimerPageIndex >= disclaimers.count {
             disclaimerPageIndex = 0
             showDisclaimerPage = false
+            hasSeenDisclaimer = true
         }
     }
         
