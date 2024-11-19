@@ -12,4 +12,10 @@ extension Font {
         custom("PPTelegraf-Regular", size: UIFont.preferredFont(forTextStyle: textStyle.uiTextStyle).pointSize)
             .weight(weight)
     }
+    
+    static func telegraf(_ weight: Weight = .regular, size: CGFloat) -> Font {
+        custom("PPTelegraf-Regular", size: size)
+            .weight(weight)
+    }
+    
 }
