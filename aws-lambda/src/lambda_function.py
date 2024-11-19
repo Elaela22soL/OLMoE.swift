@@ -3,6 +3,10 @@ from dataclasses import dataclass, field
 import boto3  # type: ignore
 import uuid
 from datetime import datetime
+from attestation import verify_attest
+
+from pyattest.configs.apple import AppleConfig
+from pyattest.attestation import Attestation, PyAttestException
 
 # Initialize S3 client
 s3 = boto3.client("s3")
@@ -14,7 +18,6 @@ S3_SHARE_PREFIX = "share"
 
 with open("chat_template.html", "r") as f:
     CHAT_TEMPLATE = f.read()
-
 
 @dataclass
 class Message:
@@ -88,9 +91,14 @@ class Trace:
 
 def lambda_handler(event, context):
     try:
-        # get the body from the event
-        # body = json.loads(event.get("body", "{}"))
-        body = event
+        key_id = event.get('key_id')
+        attestation_object = event.get('attestation_object')
+        
+        if not verify_attest(key_id, attestation_object):
+            return {"statusCode": 500, "body": json.dumps({"outcome": "failure", "error": "Attestation verification failed"})}
+        
+        body = { k:v for k,v in event.items() if k not in ['key_id', 'attestation_object'] }
+
         # Extract logs from the event
         parsed_log = Trace.from_dict(body)
         url = write_to_s3(parsed_log)
