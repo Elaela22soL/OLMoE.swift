@@ -377,12 +377,10 @@ struct BotView: View {
                             .scrollContentBackground(.hidden)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color("Surface"))
                                     .foregroundStyle(.thinMaterial)
                             )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color("TextColor").opacity(0.2), lineWidth: 1)
-                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                             .foregroundColor(Color("TextColor"))
                             .font(.manrope())
                             .focused($isTextEditorFocused)
