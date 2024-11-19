@@ -6,7 +6,7 @@ CERTIFICATE_AS_BYTES = b'MIICITCCAaegAwIBAgIQC/O+DvHN0uD7jG5yH2IXmDAKBggqhkjOPQQ
 CERTIFICATE = base64.decodebytes(CERTIFICATE_AS_BYTES)
 
 APP_ID = 'MJLARYDQWH.com.genui.ai2.olmoe'
-TEMP_CHALLENGE = b'STATIC_CHALLENGE_RECEIVED_FROM_SERVER'
+TEMP_CHALLENGE = b'v2meFE5AEkg63eGSGCbgbhmbpm1lIBPR'
 IS_PRODUCTION = True
 
 def verify_attest(key_id: str, attestation_object: str) -> bool:

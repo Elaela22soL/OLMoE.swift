@@ -96,12 +96,10 @@ struct BotView: View {
                 // App Attest Service
                 let service = DCAppAttestService.shared
                 
-                // TODO: Use a random string for challenge
-                // TODO: Receive challenge from lambda
                 // TODO: Move attest logic into it's own class
                 // TODO: Make attest available on simulator
                 // TODO: Deploy lambda to prod
-                let challengeString = "STATIC_CHALLENGE_RECEIVED_FROM_SERVER"
+                let challengeString = Configuration.challenge
                 let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
                 let userDefaults = UserDefaults.standard
                 let keyIDKey = "appAttestKeyID"
@@ -183,7 +181,7 @@ struct BotView: View {
                 if let attestationObjectBase64 = attestationObjectBase64 {
                     payload["attestation_object"] = attestationObjectBase64
                 }
-
+                
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
                 
 
@@ -200,7 +198,6 @@ struct BotView: View {
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
                 request.httpBody = jsonData
-
                 let (data, response) = try await URLSession.shared.data(for: request)
 
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
