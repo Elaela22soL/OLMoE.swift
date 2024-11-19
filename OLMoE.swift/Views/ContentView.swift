@@ -473,7 +473,7 @@ struct ActivityViewController: UIViewControllerRepresentable {
 struct ContentView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
     @State private var bot: Bot?
-    @AppStorage("hasSeenDisclaimer__") private var hasSeenDisclaimer : Bool = false
+    @AppStorage("hasSeenDisclaimer") private var hasSeenDisclaimer : Bool = false
     @State private var showDisclaimerPage : Bool = false
     @State private var showInfoPage : Bool = false
     @State private var disclaimerPageIndex: Int = 0
@@ -546,7 +546,7 @@ struct ContentView: View {
         if disclaimerPageIndex >= disclaimers.count {
             disclaimerPageIndex = 0
             showDisclaimerPage = false
-            //hasSeenDisclaimer = true
+            hasSeenDisclaimer = true
         }
     }
         
