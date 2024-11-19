@@ -21,7 +21,7 @@ struct UnsupportedDeviceView: View {
         
         VStack {
             Text("Device Not Supported")
-                .font(.title)
+                .font(.telegraf(textStyle: .title))
                 .padding()
             Text("This app requires a device with at least 8GB of RAM.")
                 .multilineTextAlignment(.center)

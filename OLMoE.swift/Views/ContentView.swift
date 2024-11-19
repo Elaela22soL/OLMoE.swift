@@ -229,7 +229,65 @@ struct BotView: View {
             }
         }
     }
-
+    
+    @ViewBuilder
+    func shareButton() -> some View {
+        Button(action: {
+            isTextEditorFocused = false
+            isSharingConfirmationVisible = true
+        }) {
+            HStack {
+                if isSharing {
+                    SpinnerView(color: Color("AccentColor"))
+                } else {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+            .foregroundColor(Color("TextColor"))
+        }
+        .popover(isPresented: $isSharingConfirmationVisible, content: {
+            DisclaimerPage(
+                title: Disclaimers.ShareDisclaimer().title,
+                message: Disclaimers.ShareDisclaimer().text,
+                confirm: DisclaimerPage.PageButton(
+                    text: Disclaimers.ShareDisclaimer().buttonText,
+                    onTap: {
+                        shareConversation()
+                        isSharingConfirmationVisible = false
+                   }
+               ),
+               cancel: DisclaimerPage.PageButton(
+                    text: "Cancel",
+                    onTap: {
+                        isSharingConfirmationVisible = false
+                    }
+               )
+           )
+           .presentationBackground(Color("BackgroundColor"))
+        })
+        .disabled(isSharing || bot.history.isEmpty)
+        .opacity(isSharing || bot.history.isEmpty ? 0.5 : 1)
+    }
+    
+    @ViewBuilder
+    func trashButton() -> some View {
+        return Button(action: {
+            isTextEditorFocused = false
+            isDeleteHistoryConfirmationVisible = true
+            stop()
+        }) {
+            Image(systemName: "trash.fill")
+                .foregroundColor(Color("TextColor"))
+        }.alert("Delete history?", isPresented: $isDeleteHistoryConfirmationVisible, actions: {
+            Button("Delete", action: deleteHistory)
+            Button("Cancel", role: .cancel) {
+                isDeleteHistoryConfirmationVisible = false
+            }
+        })
+        .disabled(isDeleteButtonDisabled)
+        .opacity(isDeleteButtonDisabled ? 0.5 : 1)
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             contentView(in: geometry)
@@ -270,7 +328,6 @@ struct BotView: View {
                                     .foregroundColor(Color("TextColor"))
                                     .id("bottomID") // Unique ID for scrolling
                                 Color.clear.frame(height: 1).id("bottomID2")
-                                
                             }
                         }
                         .onChange(of: bot.output) { _ in
@@ -320,12 +377,10 @@ struct BotView: View {
                             .scrollContentBackground(.hidden)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color("Surface"))
                                     .foregroundStyle(.thinMaterial)
                             )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color("TextColor").opacity(0.2), lineWidth: 1)
-                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                             .foregroundColor(Color("TextColor"))
                             .font(.manrope())
                             .focused($isTextEditorFocused)
@@ -348,42 +403,6 @@ struct BotView: View {
                         }
                     }
                     VStack(spacing: 8) {
-                        Button(action: {
-                            isTextEditorFocused = false
-                            isSharingConfirmationVisible = true
-                        }) {
-                            HStack {
-                                if isSharing {
-                                    SpinnerView(color: Color("AccentColor"))
-                                } else {
-                                    Image(systemName: "square.and.arrow.up")
-                                }
-                            }
-                            .foregroundColor(Color("TextColor"))
-                            .font(.system(size: 24))
-                            .frame(width: 40, height: 40)
-                        }
-                        .popover(isPresented: $isSharingConfirmationVisible, content: {
-                            DisclaimerPage(
-                                title: Disclaimers.ShareDisclaimer().title,
-                                message: Disclaimers.ShareDisclaimer().text,
-                                confirm: DisclaimerPage.PageButton(
-                                    text: Disclaimers.ShareDisclaimer().buttonText,
-                                    onTap: {
-                                        shareConversation()
-                                        isSharingConfirmationVisible = false
-                                   }
-                               ),
-                               cancel: DisclaimerPage.PageButton(
-                                    text: "Cancel",
-                                    onTap: {
-                                        isSharingConfirmationVisible = false
-                                    }
-                               )
-                           )
-                           .presentationBackground(Color("BackgroundColor"))
-                        })
-                        .disabled(isSharing || bot.history.isEmpty)
                         ZStack {
                             if isGenerating {
                                 Button(action: stop) {
@@ -402,24 +421,6 @@ struct BotView: View {
                         }
                         .font(.system(size: 24))
                         .frame(width: 40, height: 40)
-                        
-                        Button(action: {
-                            isTextEditorFocused = false
-                            isDeleteHistoryConfirmationVisible = true
-                            stop()
-                        }) {
-                            Image(systemName: "trash.fill")
-                                .foregroundColor(Color("TextColor"))
-                                .font(.system(size: 24))
-                                .frame(width: 40, height: 40)
-                        }.alert("Delete history?", isPresented: $isDeleteHistoryConfirmationVisible, actions: {
-                            Button("Delete", action: deleteHistory)
-                            Button("Cancel", role: .cancel) {
-                                isDeleteHistoryConfirmationVisible = false
-                            }
-                        })
-                        .disabled(isDeleteButtonDisabled)
-                        .opacity(isDeleteButtonDisabled ? 0.5 : 1)
                     }
                 }
                 .padding(.horizontal)
@@ -435,6 +436,13 @@ struct BotView: View {
         .gesture(TapGesture().onEnded({
             isTextEditorFocused = false
         }))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                shareButton()
+                trashButton()
+            }
+        }
     }
 }
 
@@ -459,6 +467,7 @@ struct ActivityViewController: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ActivityViewController>) {}
 }
 
+
 struct ContentView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
     @State private var bot: Bot?
@@ -475,51 +484,57 @@ struct ContentView: View {
     ]
     
     var body: some View {
-        VStack {
-            if !isSupportedDevice && !useMockedModelResponse {
-                UnsupportedDeviceView(
-                    proceedAnyway: { isSupportedDevice = true },
-                    proceedMocked: {
-                        bot?.loopBackTestResponse = true
-                        useMockedModelResponse = true                        
+        NavigationStack {
+            VStack {
+                if !isSupportedDevice && !useMockedModelResponse {
+                    UnsupportedDeviceView(
+                        proceedAnyway: { isSupportedDevice = true },
+                        proceedMocked: {
+                            bot?.loopBackTestResponse = true
+                            useMockedModelResponse = true
+                        }
+                    )
+                } else if let bot = bot {
+                    BotView(bot)
+                } else {
+                    ModelDownloadView()
+                }
+            }
+            .onChange(of: downloadManager.isModelReady) { newValue in
+                if newValue && bot == nil {
+                    initializeBot()
+                }
+            }
+            .popover(isPresented: $showDisclaimerPage) {
+                let page = disclaimers[disclaimerPageIndex]
+                DisclaimerPage(
+                    title: page.title,
+                    message: page.text,
+                    confirm: DisclaimerPage.PageButton(
+                        text: page.buttonText,
+                        onTap: {
+                            nextDisclaimerPage()
+                        })
+                )
+                .interactiveDismissDisabled(true)
+                .presentationBackground(Color("BackgroundColor"))
+            }
+            .onAppear(perform: checkModelAndInitializeBot)
+            .onAppear {
+                if !hasSeenDisclaimer {
+                    showDisclaimerPage = true
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                AppToolbar(
+                    leadingContent: {
+                        InfoButton(action: { showInfoPage = true })
                     }
                 )
-            } else if let bot = bot {
-                BotView(bot)
-            } else {
-                ModelDownloadView()
             }
-        }
-        .onChange(of: downloadManager.isModelReady) { newValue in
-            if newValue && bot == nil {
-                initializeBot()
-            }
-        }
-        .popover(isPresented: $showDisclaimerPage) {
-            let page = disclaimers[disclaimerPageIndex]
-            DisclaimerPage(
-                title: page.title,
-                message: page.text,
-                confirm: DisclaimerPage.PageButton(
-                    text: page.buttonText,
-                    onTap: {
-                        nextDisclaimerPage()
-                    })
-            )
-            .interactiveDismissDisabled(true)
-            .presentationBackground(Color("BackgroundColor"))
-        }
-        .overlay(
-            InfoButton(action: { showInfoPage = true })
-            , alignment: .topTrailing
-        )
-        .sheet(isPresented: $showInfoPage) {
-            InfoView()
-        }
-        .onAppear(perform: checkModelAndInitializeBot)
-        .onAppear {
-            if !hasSeenDisclaimer {
-                showDisclaimerPage = true
+            .sheet(isPresented: $showInfoPage) {
+                InfoView()
             }
         }
     }
