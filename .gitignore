@@ -27,6 +27,7 @@ __pycache__/
 *.xcconfig
 
 OLMoE.swift.xcodeproj/project.xcworkspace/xcuserdata/
+OLMoE.swift.xcodeproj/xcuserdata
 
 .cursorrules
 

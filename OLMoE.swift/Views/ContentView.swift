@@ -99,6 +99,8 @@ struct BotView: View {
                 // TODO: Use a random string for challenge
                 // TODO: Receive challenge from lambda
                 // TODO: Move attest logic into it's own class
+                // TODO: Make attest available on simulator
+                // TODO: Deploy lambda to prod
                 let challengeString = "STATIC_CHALLENGE_RECEIVED_FROM_SERVER"
                 let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
                 let userDefaults = UserDefaults.standard
