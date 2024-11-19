@@ -95,14 +95,17 @@ struct BotView: View {
             do {
                 // App Attest Service
                 let service = DCAppAttestService.shared
+                
+                // TODO: Use a random string for challenge
+                // TODO: Receive challenge from lambda
+                // TODO: Move attest logic into it's own class
                 let challengeString = "STATIC_CHALLENGE_RECEIVED_FROM_SERVER"
                 let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
                 let userDefaults = UserDefaults.standard
                 let keyIDKey = "appAttestKeyID"
-                var keyID = userDefaults.string(forKey: keyIDKey)
+                var keyID: String? = nil //userDefaults.string(forKey: keyIDKey)
                 let attestationDoneKey = "appAttestAttestationDone"
                 let attestationDone = userDefaults.bool(forKey: attestationDoneKey)
-                var assertionObjectBase64: String? = nil
                 var attestationObjectBase64: String? = nil
 
                 #if targetEnvironment(simulator)
@@ -110,7 +113,6 @@ struct BotView: View {
                 keyID = "simulatorTest-\(keyIDKey)"
                 userDefaults.set(true, forKey: attestationDoneKey)
                 // Create a mock assertion
-                assertionObjectBase64 = "mock_assertion".data(using: .utf8)?.base64EncodedString()
                 attestationObjectBase64 = "mock_attestation".data(using: .utf8)?.base64EncodedString()
 
                 #else
@@ -155,18 +157,6 @@ struct BotView: View {
                     userDefaults.set(true, forKey: attestationDoneKey)
                 }
 
-                let assertionObject: Data = try await withCheckedThrowingContinuation { continuation in
-                    service.generateAssertion(keyID!, clientDataHash: clientDataHash) { assertion, error in
-                        if let error = error {
-                            continuation.resume(throwing: error)
-                        } else if let assertion = assertion {
-                            continuation.resume(returning: assertion)
-                        } else {
-                            continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
-                        }
-                    }
-                }
-                assertionObjectBase64 = assertionObject.base64EncodedString()
                 #endif
 
                 // Prepare payload
@@ -185,16 +175,12 @@ struct BotView: View {
                     "system_fingerprint": systemFingerprint,
                     "created": Int(Date().timeIntervalSince1970),
                     "messages": messages,
-                    "key_id": keyID!,
-                    "assertion": assertionObjectBase64!,
-                    "challenge": challengeString
+                    "key_id": keyID!
                 ]
 
                 if let attestationObjectBase64 = attestationObjectBase64 {
                     payload["attestation_object"] = attestationObjectBase64
                 }
-
-                print(payload)
 
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
 
