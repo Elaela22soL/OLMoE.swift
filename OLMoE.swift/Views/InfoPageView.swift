@@ -37,8 +37,6 @@ struct InfoButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "info.circle")
-                .font(.system(size: 24))
-                .frame(width: 40, height: 40)
                 .foregroundColor(Color("TextColor"))
                 .padding()
         }
