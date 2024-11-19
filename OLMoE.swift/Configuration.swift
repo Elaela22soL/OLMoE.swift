@@ -44,4 +44,12 @@ extension Configuration {
             return "API_URL_NOT_FOUND"
         }
     }
+    static var challenge: String {
+        do {
+            return try Configuration.value(for: "APP_ATTEST_TEMP_CHALLENGE")
+        } catch {
+            print("Failed to retrieve challenge: \(error)")
+            return "ATTEST_FAILED"
+        }
+    }
 }

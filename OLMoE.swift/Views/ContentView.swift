@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import DeviceCheck
+import CryptoKit
 
 class Bot: LLM {
     static let modelFileName = "olmoe-1b-7b-0924-instruct-q4_k_m.gguf"
@@ -91,22 +93,94 @@ struct BotView: View {
         isSharing = true
         Task {
             do {
+                // App Attest Service
+                let service = DCAppAttestService.shared
+                
+                // TODO: Move attest logic into it's own class
+                // TODO: Make attest available on simulator
+                // TODO: Deploy lambda to prod
+                let challengeString = Configuration.challenge
+                let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
+                let userDefaults = UserDefaults.standard
+                let keyIDKey = "appAttestKeyID"
+                var keyID: String? = nil //userDefaults.string(forKey: keyIDKey)
+                let attestationDoneKey = "appAttestAttestationDone"
+                let attestationDone = userDefaults.bool(forKey: attestationDoneKey)
+                var attestationObjectBase64: String? = nil
+
+                #if targetEnvironment(simulator)
+                // Simulator bypass
+                keyID = "simulatorTest-\(keyIDKey)"
+                userDefaults.set(true, forKey: attestationDoneKey)
+                // Create a mock assertion
+                attestationObjectBase64 = "mock_attestation".data(using: .utf8)?.base64EncodedString()
+
+                #else
+                guard service.isSupported else {
+                    print("App Attest not supported on this device")
+                    isSharing = false
+                    return
+                }
+
+                if keyID == nil {
+                    // Generate a new key
+                    keyID = try await withCheckedThrowingContinuation { continuation in
+                        service.generateKey { newKeyID, error in
+                            if let error = error {
+                                continuation.resume(throwing: error)
+                            } else if let newKeyID = newKeyID {
+                                continuation.resume(returning: newKeyID)
+                            } else {
+                                continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
+                            }
+                        }
+                    }
+                    // Store key ID in local storage
+                    userDefaults.set(keyID, forKey: keyIDKey)
+                    userDefaults.set(false, forKey: attestationDoneKey)
+                }
+
+                if !attestationDone {
+                    let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
+                        // attestation happens here
+                        service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
+                            if let error = error {
+                                continuation.resume(throwing: error)
+                            } else if let attestation = attestation {
+                                continuation.resume(returning: attestation)
+                            } else {
+                                continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
+                            }
+                        }
+                    }
+                    attestationObjectBase64 = attestationObject.base64EncodedString()
+                    userDefaults.set(true, forKey: attestationDoneKey)
+                }
+
+                #endif
+
+                // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
                 
                 let modelName = "olmoe-1b-7b-0924-instruct-q4_k_m"
                 let systemFingerprint = "\(modelName)-\(AppInfo.shared.appId)"
-                
+
                 let messages = bot.history.map { chat in
                     ["role": chat.role == .user ? "user" : "assistant", "content": chat.content]
                 }
-                
-                let payload: [String: Any] = [
+
+                var payload: [String: Any] = [
                     "model": modelName,
                     "system_fingerprint": systemFingerprint,
                     "created": Int(Date().timeIntervalSince1970),
-                    "messages": messages
+                    "messages": messages,
+                    "key_id": keyID!
                 ]
+
+                if let attestationObjectBase64 = attestationObjectBase64 {
+                    payload["attestation_object"] = attestationObjectBase64
+                }
                 
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
                 
@@ -124,9 +198,8 @@ struct BotView: View {
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
                 request.httpBody = jsonData
-                
                 let (data, response) = try await URLSession.shared.data(for: request)
-                
+
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                     let responseString = String(data: data, encoding: .utf8)!
                     if let jsonData = responseString.data(using: .utf8),
@@ -150,13 +223,13 @@ struct BotView: View {
             } catch {
                 print("Error sharing conversation: \(error)")
             }
-            
+
             await MainActor.run {
                 isSharing = false
             }
         }
     }
-    
+
     var body: some View {
         GeometryReader { geometry in
             contentView(in: geometry)
