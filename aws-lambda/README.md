@@ -1,6 +1,5 @@
 # AWS Lambda to enable logging to S3
 
-
 ## Setup
 
 1. Install AWS CLI
@@ -23,7 +22,9 @@ AWS_PROFILE=llm sam build
 Then, run the lambda locally:
 
 ```shell
-AWS_PROFILE=llm sam local invoke S3LoggingFunction -e tests/test_event.json
+AWS_PROFILE=llm sam local invoke S3LoggingFunction -e tests/dev_attest.json
+# or
+AWS_PROFILE=llm sam local invoke S3LoggingFunction -e tests/prod_attest.json
 ```
 
 ## Deploy
@@ -45,7 +46,7 @@ AWS_PROFILE=llm sam deploy
 You can log traces from any application using the API Gateway endpoint.
 
 - **Method**: POST
-- **URL**: https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod
+- **URL**: <https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod>
 - **Body**:
 
 ```json

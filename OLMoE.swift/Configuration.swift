@@ -36,4 +36,20 @@ extension Configuration {
             return "API_KEY_NOT_FOUND"
         }
     }
+    static var apiUrl: String {
+        do {
+            return try Configuration.value(for: "API_URL")
+        } catch {
+            print("Failed to retrieve API_URL: \(error)")
+            return "API_URL_NOT_FOUND"
+        }
+    }
+    static var challenge: String {
+        do {
+            return try Configuration.value(for: "APP_ATTEST_TEMP_CHALLENGE")
+        } catch {
+            print("Failed to retrieve challenge: \(error)")
+            return "ATTEST_FAILED"
+        }
+    }
 }
