@@ -30,21 +30,12 @@ extension Font {
         }
     }
     
-//    static func manrope(_ weight: ManropeWeight = .regular, size: CGFloat? = nil) -> Font {
-//        if let size = size {
-//            return custom("Manrope-VariableFont_wght", size: size).weight(weight.weight)
-//        } else {
-//            return custom("Manrope-VariableFont_wght", size: UIFont.preferredFont(forTextStyle: .body).pointSize)
-//                .weight(weight.weight)
-//        }
-//    }
-    
     static func manrope(_ weight: ManropeWeight = .regular, textStyle: TextStyle = .body) -> Font {
-        custom("Manrope-VariableFont_wght", size: UIFont.preferredFont(forTextStyle: textStyle.uiTextStyle).pointSize)
+        custom("Manrope", size: UIFont.preferredFont(forTextStyle: textStyle.uiTextStyle).pointSize)
             .weight(weight.weight)
     }
     static func manrope(_ weight: Weight = .regular, size: CGFloat) -> Font {
-        custom("Manrope-VariableFont_wght", size: size)
+        custom("Manrope", size: size)
             .weight(weight)
     }
 }

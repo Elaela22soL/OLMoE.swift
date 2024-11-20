@@ -22,9 +22,9 @@ struct MessageInputView: View {
             TextField("Message", text: $input, axis: .vertical)
                 .scrollContentBackground(.hidden)
                 .multilineTextAlignment(.leading)
-                .lineLimit(5)
+                .lineLimit(10)
                 .foregroundColor(Color("TextColor"))
-                .font(.system(size: 14, weight: .regular))
+                .font(.manrope(size: 14))
                 .focused($isTextEditorFocused)
                 .onChange(of: isTextEditorFocused) { _, isFocused in
                     if !isFocused {
@@ -54,6 +54,7 @@ struct MessageInputView: View {
             }
             .font(.system(size: 24))
             .frame(width: 40, height: 40)
+            .padding(.top, 2)
             .padding(.trailing, 4)
             
         }
@@ -65,4 +66,20 @@ struct MessageInputView: View {
         .padding(12)
         .frame(maxWidth: .infinity)
     }
+}
+
+#Preview {
+    MessageInputView(
+        input: .constant("Message"),
+        isGenerating: .constant(false),
+        isInputDisabled: false,
+        hasValidInput: true,
+        respond: {
+            print("Send")
+        },
+        stop: {
+            print("Stop")
+        }
+    )
+    .preferredColorScheme(.dark)
 }

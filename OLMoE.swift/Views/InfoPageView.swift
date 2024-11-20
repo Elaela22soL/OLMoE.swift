@@ -7,30 +7,6 @@
 
 import SwiftUI
 
-enum InfoText {
-
-    static let infoTitle = "About"
-    static let infoContent =
-        """
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante ante, molestie ac dui in, ornare euismod mauris. In fringilla metus orci, a commodo lorem lacinia ut. Duis sodales felis a arcu efficitur, sit amet consectetur ante ultricies. Cras a mattis magna. Ut sit amet euismod elit. Duis vestibulum nibh at dapibus eleifend. Vestibulum metus nibh, efficitur in ante quis, interdum feugiat ipsum. Nullam in odio facilisis augue dapibus lacinia ut nec nisi.
-        """
-
-    static let faqTitle = "FAQ"
-    static let faq =
-        """
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-
-        Q: Lorem?
-        A: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante ante, molestie ac dui in, ornare euismod mauris.
-
-        Q: Ipsum?    
-        A: Curabitur nec scelerisque magna. Donec et felis sit amet velit scelerisque condimentum scelerisque a sapien. Donec finibus magna eu justo aliquam consectetur. 
-
-        Q: Dolor?
-        A: Donec tellus nulla, ultricies et sagittis sit amet, consectetur ac elit. In sodales nunc justo, a malesuada ex hendrerit sit amet. Suspendisse ligula nulla, faucibus at tincidunt id, efficitur condimentum nibh. 
-        """
-}
-
 struct InfoButton: View {
     let action: () -> Void
 
@@ -60,35 +36,12 @@ struct InfoView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    HStack {
-                        Spacer()
 
-                        Image("Splash")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 120)
-
-                        Spacer()
-                    }
-
-                    Text(InfoText.infoTitle)
-                        .font(.title)
-                        .font(.manrope())
-                        .bold()
-                        .padding(.horizontal)
-
-                    Text(InfoText.infoContent)
-                        .font(.manrope())
-                        .padding(.horizontal)
-
-                    Text(InfoText.faqTitle)
-                        .font(.title)
-                        .font(.manrope())
-                        .bold()
-                        .padding(.horizontal)
-
-                    Text(InfoText.faq)
-                        .font(.manrope())
+                    Ai2Logo()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                                 
+                    Text(.init(InfoText.body))
+                        .font(.manrope(size: 16))
                         .padding(.horizontal)
                 }
                 .padding()
@@ -109,4 +62,8 @@ struct InfoView: View {
             )
         }
     }
+}
+
+#Preview("InfoView") {
+    InfoView()
 }

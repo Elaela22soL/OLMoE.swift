@@ -10,6 +10,7 @@ struct OLMoE_swiftApp: App {
             ContentView()
                 .environment(\.font, .manrope())
                 .environment(\.colorScheme, .dark)
+                .preferredColorScheme(.dark)
                 
         }
     }
