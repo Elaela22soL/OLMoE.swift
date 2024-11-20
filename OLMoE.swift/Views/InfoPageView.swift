@@ -39,11 +39,9 @@ struct InfoView: View {
 
                     Ai2Logo()
                         .frame(maxWidth: .infinity, alignment: .center)
-                        
-                                        
+                                 
                     Text(.init(InfoText.body))
-                        //.font(.manrope())     // Doesn't support bold for markdown
-                        .font(.system(size: 16))
+                        .font(.manrope(size: 16))
                         .padding(.horizontal)
                 }
                 .padding()
@@ -64,4 +62,8 @@ struct InfoView: View {
             )
         }
     }
+}
+
+#Preview("InfoView") {
+    InfoView()
 }
