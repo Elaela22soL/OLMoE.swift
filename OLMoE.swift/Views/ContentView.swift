@@ -239,6 +239,7 @@ struct BotView: View {
             isTextEditorFocused = false
             disclaimerHandlers.setActiveDisclaimer(Disclaimers.ShareDisclaimer())
             disclaimerHandlers.setConfirmAction({ shareConversation() })
+            disclaimerHandlers.setCancelAction({ disclaimerHandlers.setActiveDisclaimer(nil) })
         }) {
             HStack {
                 if isSharing {
