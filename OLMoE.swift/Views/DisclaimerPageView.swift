@@ -42,16 +42,18 @@ struct DisclaimerPage: View {
         ) {
             VStack(spacing: 20) {
                 Text(title)
-                    .font(.headline)
+                    .font(.modalTitle())
+                    .multilineTextAlignment(.center)
 
                 Text(message)
-                    .font(.body)
+                    .font(.modalBody())
                     .padding(.horizontal, 20)
 
                 VStack(spacing: 12) {
                     Button(confirm.text) {
                         confirm.onTap()
                     }
+                    .font(.modalButton())
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(Color.accentColor)
@@ -62,6 +64,7 @@ struct DisclaimerPage: View {
                         Button(cancel.text) {
                             cancel.onTap()
                         }
+                        .font(.modalButton())
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color("BackgroundColor"))
