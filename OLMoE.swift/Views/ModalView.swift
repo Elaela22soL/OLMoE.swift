@@ -36,7 +36,7 @@ struct ModalView<Content: View>: View {
                         }
                     }
                   .padding()
-                .background(Color("BackgroundColor"))
+                .background(Color("Surface"))
                 }
 
                 ScrollView {
@@ -44,10 +44,10 @@ struct ModalView<Content: View>: View {
                         .padding()
                         .frame(maxWidth: .infinity)
                 }
-                .background(Color("BackgroundColor"))
+                .background(Color("Surface"))
             }
             .frame(maxWidth: 300, maxHeight: 600)
-            .background(Color("BackgroundColor"))
+            .background(Color("Surface"))
             .cornerRadius(12)
             .padding(.horizontal, 20)
         }
