@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import os
 import DeviceCheck
 import CryptoKit
 
@@ -18,17 +19,17 @@ class Bot: LLM {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM d, yyyy"
         let currentDate = dateFormatter.string(from: Date())
-        
+
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "h:mm a"
         let currentTime = timeFormatter.string(from: Date())
-        
+
         let systemPrompt = "You are OLMoE (Open Language Mixture of Expert), a small language model running on \(deviceName). You have been developed at the Allen Institute for AI (Ai2) in Seattle, WA, USA. Today is \(currentDate). The time is \(currentTime)."
-    
+
         guard FileManager.default.fileExists(atPath: Bot.modelFileURL.path) else {
             fatalError("Model file not found. Please download it first.")
         }
-        
+
 //        self.init(from: Bot.modelFileURL, template: .OLMoE(systemPrompt))
         self.init(from: Bot.modelFileURL, template: .OLMoE())
     }
@@ -46,6 +47,7 @@ struct BotView: View {
     @State private var isSharingConfirmationVisible = false
     @State private var isDeleteHistoryConfirmationVisible = false
     @FocusState private var isTextEditorFocused: Bool
+    let disclaimerHandlers: DisclaimerHandlers
 
     private var hasValidInput: Bool {
         !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -54,15 +56,16 @@ struct BotView: View {
     private var isInputDisabled: Bool {
         isGenerating || isSharing
     }
-    
+
     private var isDeleteButtonDisabled: Bool {
         isInputDisabled || bot.history.isEmpty
     }
-    
-    init(_ bot: Bot) {
+
+    init(_ bot: Bot, disclaimerHandlers: DisclaimerHandlers) {
         _bot = StateObject(wrappedValue: bot)
+        self.disclaimerHandlers = disclaimerHandlers
     }
-    
+
     func respond() {
         isGenerating = true
         Task {
@@ -75,27 +78,28 @@ struct BotView: View {
             }
         }
     }
-    
+
     func stop() {
         bot.stop()
         input = "" // Clear the input
         isGenerating = false
     }
-    
+
     func deleteHistory() {
         Task { @MainActor in
             await bot.clearHistory()
             bot.setOutput(to: "")
         }
     }
-    
+
     func shareConversation() {
         isSharing = true
+        disclaimerHandlers.setActiveDisclaimer(nil)
         Task {
             do {
                 // App Attest Service
                 let service = DCAppAttestService.shared
-                
+
                 // TODO: Move attest logic into it's own class
                 // TODO: Make attest available on simulator
                 // TODO: Deploy lambda to prod
@@ -162,7 +166,7 @@ struct BotView: View {
                 // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
-                
+
                 let modelName = "olmoe-1b-7b-0924-instruct-q4_k_m"
                 let systemFingerprint = "\(modelName)-\(AppInfo.shared.appId)"
 
@@ -181,9 +185,9 @@ struct BotView: View {
                 if let attestationObjectBase64 = attestationObjectBase64 {
                     payload["attestation_object"] = attestationObjectBase64
                 }
-                
+
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
-                
+
 
                 guard let url = URL(string: apiUrl), !apiUrl.isEmpty else {
                     print("Invalid URL")
@@ -229,12 +233,13 @@ struct BotView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     func shareButton() -> some View {
         Button(action: {
             isTextEditorFocused = false
-            isSharingConfirmationVisible = true
+            disclaimerHandlers.setActiveDisclaimer(Disclaimers.ShareDisclaimer())
+            disclaimerHandlers.setConfirmAction({ shareConversation() })
         }) {
             HStack {
                 if isSharing {
@@ -245,33 +250,13 @@ struct BotView: View {
             }
             .foregroundColor(Color("TextColor"))
         }
-        .popover(isPresented: $isSharingConfirmationVisible, content: {
-            DisclaimerPage(
-                title: Disclaimers.ShareDisclaimer().title,
-                message: Disclaimers.ShareDisclaimer().text,
-                confirm: DisclaimerPage.PageButton(
-                    text: Disclaimers.ShareDisclaimer().buttonText,
-                    onTap: {
-                        shareConversation()
-                        isSharingConfirmationVisible = false
-                   }
-               ),
-               cancel: DisclaimerPage.PageButton(
-                    text: "Cancel",
-                    onTap: {
-                        isSharingConfirmationVisible = false
-                    }
-               )
-           )
-           .presentationBackground(Color("BackgroundColor"))
-        })
         .disabled(isSharing || bot.history.isEmpty)
         .opacity(isSharing || bot.history.isEmpty ? 0.5 : 1)
     }
-    
+
     @ViewBuilder
     func trashButton() -> some View {
-        return Button(action: {
+        Button(action: {
             isTextEditorFocused = false
             isDeleteHistoryConfirmationVisible = true
             stop()
@@ -287,7 +272,7 @@ struct BotView: View {
         .disabled(isDeleteButtonDisabled)
         .opacity(isDeleteButtonDisabled ? 0.5 : 1)
     }
-    
+
     var body: some View {
         GeometryReader { geometry in
             contentView(in: geometry)
@@ -298,12 +283,12 @@ struct BotView: View {
             }
         })
     }
-    
+
     private func contentView(in geometry: GeometryProxy) -> some View {
         ZStack {
             Color("BackgroundColor")
                 .edgesIgnoringSafeArea(.all)
-            
+
             VStack(alignment: .leading) {
                 if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
                     ScrollViewReader { proxy in
@@ -321,7 +306,7 @@ struct BotView: View {
                                 }
                                 .opacity(0.5)
                                 .font(.manrope().monospaced())
-                                
+
                                 // Display current output
                                 Text(bot.output)
                                     .monospaced()
@@ -340,7 +325,7 @@ struct BotView: View {
                                     proxy.scrollTo("bottomID2", anchor: .bottom)
                                 }
                             }
-                            
+
                         }
                         .onChange(of: scrollToBottom) { newValue in
                             if newValue {
@@ -369,7 +354,7 @@ struct BotView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 Spacer()
-                
+
                 HStack(alignment: .bottom, spacing: 8) {
                     ZStack(alignment: .topLeading) {
                         TextEditor(text: $input)
@@ -396,7 +381,7 @@ struct BotView: View {
                             })
                             .disabled(isInputDisabled)
                             .opacity(isInputDisabled ? 0.6 : 1)
-                        
+
                         if input.isEmpty {
                             Text("Message")
                                 .padding([.horizontal], 4)
@@ -469,87 +454,130 @@ struct ActivityViewController: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ActivityViewController>) {}
 }
 
+struct DisclaimerHandlers {
+    var setActiveDisclaimer: (Disclaimer?) -> Void
+    var setConfirmAction: (@escaping () -> Void) -> Void
+    var setCancelAction: ((() -> Void)?) -> Void
+}
 
 struct ContentView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
     @State private var bot: Bot?
+    #if DEBUG
+    @State private var hasSeenDisclaimer: Bool = false
+    #else
     @AppStorage("hasSeenDisclaimer__") private var hasSeenDisclaimer : Bool = false
+    #endif
+    @State private var onDisclaimerConfirm: (() -> Void)?
+    @State private var onDisclaimerCancel: (() -> Void)?
     @State private var showDisclaimerPage : Bool = false
     @State private var showInfoPage : Bool = false
     @State private var disclaimerPageIndex: Int = 0
+    @State private var activeDisclaimer: Disclaimer?
     @State private var isSupportedDevice: Bool = isDeviceSupported()
     @State private var useMockedModelResponse: Bool = false
-    
+
+    let logger = Logger(subsystem: "com.allenai.olmoe", category: "ContentView")
+
     let disclaimers: [Disclaimer] = [
         Disclaimers.MainDisclaimer(),
         Disclaimers.AdditionalDisclaimer()
     ]
-    
+
     var body: some View {
-        NavigationStack {
-            VStack {
-                if !isSupportedDevice && !useMockedModelResponse {
-                    UnsupportedDeviceView(
-                        proceedAnyway: { isSupportedDevice = true },
-                        proceedMocked: {
-                            bot?.loopBackTestResponse = true
-                            useMockedModelResponse = true
+        ZStack {
+            NavigationStack {
+                VStack {
+                    if !isSupportedDevice && !useMockedModelResponse {
+                        UnsupportedDeviceView(
+                            proceedAnyway: { isSupportedDevice = true },
+                            proceedMocked: {
+                                bot?.loopBackTestResponse = true
+                                useMockedModelResponse = true
+                            }
+                        )
+                    } else if let bot = bot {
+                        BotView(bot, disclaimerHandlers: DisclaimerHandlers(
+                            setActiveDisclaimer: { self.activeDisclaimer = $0 },
+                            setConfirmAction: { self.onDisclaimerConfirm = $0 },
+                            setCancelAction: { self.onDisclaimerCancel = $0 }
+                        ))
+                    } else {
+                        ModelDownloadView()
+                    }
+                }
+                .onChange(of: downloadManager.isModelReady) { newValue in
+                    if newValue && bot == nil {
+                        initializeBot()
+                    }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    AppToolbar(
+                        leadingContent: {
+                            InfoButton(action: { showInfoPage = true })
                         }
                     )
-                } else if let bot = bot {
-                    BotView(bot)
-                } else {
-                    ModelDownloadView()
                 }
             }
-            .onChange(of: downloadManager.isModelReady) { newValue in
-                if newValue && bot == nil {
-                    initializeBot()
-                }
-            }
-            .popover(isPresented: $showDisclaimerPage) {
-                let page = disclaimers[disclaimerPageIndex]
-                DisclaimerPage(
-                    title: page.title,
-                    message: page.text,
-                    confirm: DisclaimerPage.PageButton(
-                        text: page.buttonText,
-                        onTap: {
-                            nextDisclaimerPage()
-                        })
-                )
-                .interactiveDismissDisabled(true)
-                .presentationBackground(Color("BackgroundColor"))
-            }
-            .onAppear(perform: checkModelAndInitializeBot)
             .onAppear {
-                if !hasSeenDisclaimer {
-                    showDisclaimerPage = true
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                AppToolbar(
-                    leadingContent: {
-                        InfoButton(action: { showInfoPage = true })
-                    }
-                )
+                showInitialDisclaimer()
             }
             .sheet(isPresented: $showInfoPage) {
                 InfoView()
             }
+
+            if let disclaimer = activeDisclaimer {
+                Color.black.opacity(0.3).edgesIgnoringSafeArea(.all)
+                DisclaimerPage(
+                    title: disclaimer.title,
+                    message: disclaimer.text,
+                    isPresented: $showDisclaimerPage,
+                    confirm: DisclaimerPage.PageButton(
+                        text: disclaimer.buttonText,
+                        onTap: {
+                            onDisclaimerConfirm?()
+                        }
+                    ),
+                    cancel: onDisclaimerCancel.map { cancelAction in
+                        DisclaimerPage.PageButton(
+                            text: "Cancel",
+                            onTap: {
+                                cancelAction()
+                                activeDisclaimer = nil
+                            }
+                        )
+                    }
+                )
+            }
+        }
+    }
+
+    private func showInitialDisclaimer() {
+        if !hasSeenDisclaimer {
+            activeDisclaimer = disclaimers[disclaimerPageIndex]
+            onDisclaimerCancel = nil
+            onDisclaimerConfirm = nextDisclaimerPage
+            showDisclaimerPage = true
         }
     }
 
     private func nextDisclaimerPage() {
-        disclaimerPageIndex = min(disclaimers.count, disclaimerPageIndex + 1)
+        disclaimerPageIndex += 1
         if disclaimerPageIndex >= disclaimers.count {
+            activeDisclaimer = nil
             disclaimerPageIndex = 0
+            onDisclaimerConfirm = nil
             showDisclaimerPage = false
-            //hasSeenDisclaimer = true
+            hasSeenDisclaimer = true
+        } else {
+            activeDisclaimer = disclaimers[disclaimerPageIndex]
+            onDisclaimerConfirm = nextDisclaimerPage
+            onDisclaimerCancel = nil
+            showDisclaimerPage = true
         }
     }
-        
+
     private func checkModelAndInitializeBot() {
         if FileManager.default.fileExists(atPath: Bot.modelFileURL.path) {
             downloadManager.isModelReady = true
