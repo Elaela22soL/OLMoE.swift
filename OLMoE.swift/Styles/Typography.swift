@@ -8,8 +8,4 @@ extension Font {
     static func modalBody() -> Font {
         .system(size: 16, weight: .regular)
     }
-
-    static func modalButton() -> Font {
-        .system(size: 17, weight: .semibold)
-    }
 }
