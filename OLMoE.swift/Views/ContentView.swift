@@ -406,35 +406,15 @@ struct ActivityViewController: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ActivityViewController>) {}
 }
 
-struct DisclaimerHandlers {
-    var setActiveDisclaimer: (Disclaimer?) -> Void
-    var setConfirmAction: (@escaping () -> Void) -> Void
-    var setCancelAction: ((() -> Void)?) -> Void
-}
-
 struct ContentView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
+    @StateObject private var disclaimerState = DisclaimerState()
     @State private var bot: Bot?
-    #if DEBUG
-    @State private var hasSeenDisclaimer: Bool = false
-    #else
-    @AppStorage("hasSeenDisclaimer") private var hasSeenDisclaimer : Bool = false
-    #endif
-    @State private var onDisclaimerConfirm: (() -> Void)?
-    @State private var onDisclaimerCancel: (() -> Void)?
-    @State private var showDisclaimerPage : Bool = false
     @State private var showInfoPage : Bool = false
-    @State private var disclaimerPageIndex: Int = 0
-    @State private var activeDisclaimer: Disclaimer?
     @State private var isSupportedDevice: Bool = isDeviceSupported()
     @State private var useMockedModelResponse: Bool = false
 
     let logger = Logger(subsystem: "com.allenai.olmoe", category: "ContentView")
-
-    let disclaimers: [Disclaimer] = [
-        Disclaimers.MainDisclaimer(),
-        Disclaimers.AdditionalDisclaimer()
-    ]
 
     var body: some View {
         ZStack {
@@ -450,9 +430,9 @@ struct ContentView: View {
                         )
                     } else if let bot = bot {
                         BotView(bot, disclaimerHandlers: DisclaimerHandlers(
-                            setActiveDisclaimer: { self.activeDisclaimer = $0 },
-                            setConfirmAction: { self.onDisclaimerConfirm = $0 },
-                            setCancelAction: { self.onDisclaimerCancel = $0 }
+                            setActiveDisclaimer: { self.disclaimerState.activeDisclaimer = $0 },
+                            setConfirmAction: { self.disclaimerState.onConfirm = $0 },
+                            setCancelAction: { self.disclaimerState.onCancel = $0 }
                         ))
                     } else {
                         ModelDownloadView()
@@ -473,60 +453,35 @@ struct ContentView: View {
                 }
             }
             .onAppear {
-                showInitialDisclaimer()
+                disclaimerState.showInitialDisclaimer()
             }
             .sheet(isPresented: $showInfoPage) {
                 InfoView()
             }
 
-            if let disclaimer = activeDisclaimer {
+            if let disclaimer = disclaimerState.activeDisclaimer {
                 Color.black.opacity(0.3).edgesIgnoringSafeArea(.all)
                 DisclaimerPage(
                     title: disclaimer.title,
                     message: disclaimer.text,
-                    isPresented: $showDisclaimerPage,
+                    isPresented: $disclaimerState.showDisclaimerPage,
                     confirm: DisclaimerPage.PageButton(
                         text: disclaimer.buttonText,
                         onTap: {
-                            onDisclaimerConfirm?()
+                            disclaimerState.onConfirm?()
                         }
                     ),
-                    cancel: onDisclaimerCancel.map { cancelAction in
+                    cancel: disclaimerState.onCancel.map { cancelAction in
                         DisclaimerPage.PageButton(
                             text: "Cancel",
                             onTap: {
                                 cancelAction()
-                                activeDisclaimer = nil
+                                disclaimerState.activeDisclaimer = nil
                             }
                         )
                     }
                 )
             }
-        }
-    }
-
-    private func showInitialDisclaimer() {
-        if !hasSeenDisclaimer {
-            activeDisclaimer = disclaimers[disclaimerPageIndex]
-            onDisclaimerCancel = nil
-            onDisclaimerConfirm = nextDisclaimerPage
-            showDisclaimerPage = true
-        }
-    }
-
-    private func nextDisclaimerPage() {
-        disclaimerPageIndex += 1
-        if disclaimerPageIndex >= disclaimers.count {
-            activeDisclaimer = nil
-            disclaimerPageIndex = 0
-            onDisclaimerConfirm = nil
-            showDisclaimerPage = false
-            hasSeenDisclaimer = true
-        } else {
-            activeDisclaimer = disclaimers[disclaimerPageIndex]
-            onDisclaimerConfirm = nextDisclaimerPage
-            onDisclaimerCancel = nil
-            showDisclaimerPage = true
         }
     }
 
