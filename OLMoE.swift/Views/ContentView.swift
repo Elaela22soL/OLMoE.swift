@@ -38,7 +38,6 @@ class Bot: LLM {
 struct BotView: View {
     @StateObject var bot: Bot
     @State var input = ""
-    @State private var textEditorHeight: CGFloat = 40
     @State private var isGenerating = false
     @State private var scrollToBottom = false
     @State private var isSharing = false
@@ -354,62 +353,15 @@ struct BotView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 Spacer()
-
-                HStack(alignment: .bottom, spacing: 8) {
-                    ZStack(alignment: .topLeading) {
-                        TextEditor(text: $input)
-                            .frame(height: max(40, textEditorHeight))
-                            .scrollContentBackground(.hidden)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color("Surface"))
-                                    .foregroundStyle(.thinMaterial)
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .foregroundColor(Color("TextColor"))
-                            .font(.manrope())
-                            .focused($isTextEditorFocused)
-                            .onChange(of: isTextEditorFocused, { _, isFocused in
-                                if isFocused {
-                                    textEditorHeight = 120
-                                } else {
-                                    textEditorHeight = 40
-                                    self.hideKeyboard()
-                                }
-                            })
-                            .disabled(isInputDisabled)
-                            .opacity(isInputDisabled ? 0.6 : 1)
-
-                        if input.isEmpty {
-                            Text("Message")
-                                .padding([.horizontal], 4)
-                                .padding([.vertical], 8)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    VStack(spacing: 8) {
-                        ZStack {
-                            if isGenerating {
-                                Button(action: stop) {
-                                    Image(systemName: "stop.fill")
-                                }
-                            } else {
-                                Button(action: respond) {
-                                    Image(systemName: "paperplane.fill")
-                                }
-                                .disabled(!hasValidInput)
-                                .foregroundColor(hasValidInput ? Color("AccentColor") : Color("AccentColor").opacity(0.5))
-                            }
-                        }
-                        .onTapGesture {
-                            isTextEditorFocused = false
-                        }
-                        .font(.system(size: 24))
-                        .frame(width: 40, height: 40)
-                    }
-                }
-                .padding(.horizontal)
-                .frame(maxWidth: .infinity)
+                
+                MessageInputView(
+                    input: $input,
+                    isGenerating: $isGenerating,
+                    isInputDisabled: isInputDisabled,
+                    hasValidInput: hasValidInput,
+                    respond: respond,
+                    stop: stop
+                )
             }
             .padding()
         }
