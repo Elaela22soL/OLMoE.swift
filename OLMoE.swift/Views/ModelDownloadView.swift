@@ -179,7 +179,7 @@ struct ModelDownloadView: View {
                     Text("Model is ready to use!")
                         .foregroundColor(Color("TextColor"))
                     Button("Flush Model", action: downloadManager.flushModel)
-                        .buttonStyle(PrimaryButton())
+                        .buttonStyle(.PrimaryButton)
                 } else if downloadManager.isDownloading {
                     ProgressView("Downloading...", value: downloadManager.downloadProgress, total: 1.0)
                         .progressViewStyle(LinearProgressViewStyle())
@@ -211,7 +211,7 @@ struct ModelDownloadView: View {
                         .frame(height: 16)
                     
                     Button("Download Model", action: downloadManager.startDownload)
-                        .buttonStyle(PrimaryButton())
+                        .buttonStyle(.PrimaryButton)
                 }
 
                 if let error = downloadManager.downloadError {

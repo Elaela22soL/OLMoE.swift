@@ -10,8 +10,7 @@ import SwiftUI
 struct MessageInputView: View {
     @Binding var input: String
     @Binding var isGenerating: Bool
-    @FocusState private var isTextEditorFocused: Bool
-    
+    @FocusState.Binding var isTextEditorFocused: Bool
     let isInputDisabled: Bool
     let hasValidInput: Bool
     let respond: () -> Void
@@ -69,9 +68,12 @@ struct MessageInputView: View {
 }
 
 #Preview {
+    @FocusState var isTextEditorFocused: Bool
+    
     MessageInputView(
         input: .constant("Message"),
         isGenerating: .constant(false),
+        isTextEditorFocused: $isTextEditorFocused,
         isInputDisabled: false,
         hasValidInput: true,
         respond: {

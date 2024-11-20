@@ -358,6 +358,7 @@ struct BotView: View {
                 MessageInputView(
                     input: $input,
                     isGenerating: $isGenerating,
+                    isTextEditorFocused: $isTextEditorFocused,
                     isInputDisabled: isInputDisabled,
                     hasValidInput: hasValidInput,
                     respond: respond,
