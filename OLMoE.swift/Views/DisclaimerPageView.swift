@@ -7,6 +7,56 @@
 
 import SwiftUI
 
+struct DisclaimerHandlers {
+    var setActiveDisclaimer: (Disclaimer?) -> Void
+    var setConfirmAction: (@escaping () -> Void) -> Void
+    var setCancelAction: ((() -> Void)?) -> Void
+}
+
+class DisclaimerState: ObservableObject {
+#if DEBUG
+    @Published private var hasSeenDisclaimer: Bool = false
+#else
+    @AppStorage("hasSeenDisclaimer") private var hasSeenDisclaimer : Bool = false
+#endif
+    @Published var showDisclaimerPage : Bool = false
+    @Published var activeDisclaimer: Disclaimer? = nil
+    var onConfirm: (() -> Void)?
+    var onCancel: (() -> Void)?
+    private var disclaimerPageIndex: Int = 0
+    
+    let disclaimers: [Disclaimer] = [
+        Disclaimers.LimitationDisclaimer(),
+        Disclaimers.PrivacyDisclaimer(),
+        Disclaimers.AcknowledgementDisclaimer()
+    ]
+    
+    func showInitialDisclaimer() {
+        if !hasSeenDisclaimer {
+            activeDisclaimer = disclaimers[disclaimerPageIndex]
+            onCancel = nil
+            onConfirm = nextDisclaimerPage
+            showDisclaimerPage = true
+        }
+    }
+
+    private func nextDisclaimerPage() {
+        disclaimerPageIndex += 1
+        if disclaimerPageIndex >= disclaimers.count {
+            activeDisclaimer = nil
+            disclaimerPageIndex = 0
+            onConfirm = nil
+            showDisclaimerPage = false
+            hasSeenDisclaimer = true
+        } else {
+            activeDisclaimer = disclaimers[disclaimerPageIndex]
+            onConfirm = nextDisclaimerPage
+            onCancel = nil
+            showDisclaimerPage = true
+        }
+    }
+}
+
 struct DisclaimerPageData {
     let title: String
     let text: String
@@ -45,7 +95,7 @@ struct DisclaimerPage: View {
                     .font(.modalTitle())
                     .multilineTextAlignment(.center)
 
-                Text(message)
+                Text(.init(message))
                     .font(.modalBody())
                     .padding(.horizontal, 20)
                 
