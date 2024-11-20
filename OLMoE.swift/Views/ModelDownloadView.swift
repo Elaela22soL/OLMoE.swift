@@ -178,6 +178,7 @@ struct ModelDownloadView: View {
                 if downloadManager.isModelReady {
                     Text("Model is ready to use!")
                         .foregroundColor(Color("TextColor"))
+                        .font(.title())
                     Button("Flush Model", action: downloadManager.flushModel)
                         .buttonStyle(.PrimaryButton)
                 } else if downloadManager.isDownloading {
@@ -185,10 +186,11 @@ struct ModelDownloadView: View {
                         .progressViewStyle(LinearProgressViewStyle())
                         .padding()
                         .foregroundColor(Color("TextColor"))
+                        .font(.body())
                     HStack {
                         Text("\(Int(downloadManager.downloadProgress * 100))%")
                             .foregroundColor(Color("TextColor"))
-                            .font(.manrope())
+                            .font(.body())
                         
                         Divider()
                             .frame(height: 20)
@@ -196,7 +198,7 @@ struct ModelDownloadView: View {
                         
                         Text("\(formatSize(downloadManager.downloadedSize)) / \(formatSize(downloadManager.totalSize))")
                             .foregroundColor(Color("TextColor"))
-                            .font(.manrope())
+                            .font(.body())
                     }
                 } else {
                     Text("Welcome")
@@ -204,7 +206,7 @@ struct ModelDownloadView: View {
                     
                     Text("To get started, download the latest AI model.")
                         .multilineTextAlignment(.center)
-                        .font(.manrope(textStyle: .body))
+                        .font(.body())
                         .padding([.bottom], 4)
                     
                     Spacer()

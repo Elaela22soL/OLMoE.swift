@@ -1,11 +1,11 @@
 import SwiftUI
 
 extension Font {
-    static func modalTitle() -> Font {
-        .system(size: 28, weight: .medium)
+    static func title() -> Font {
+        .telegraf(.medium, size: 24)
     }
 
-    static func modalBody() -> Font {
-        .system(size: 16, weight: .regular)
+    static func body() -> Font {
+        .manrope(.medium, size: 14)
     }
 }

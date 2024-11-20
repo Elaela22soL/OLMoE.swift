@@ -41,7 +41,7 @@ struct InfoView: View {
                         .frame(maxWidth: .infinity, alignment: .center)
                                  
                     Text(.init(InfoText.body))
-                        .font(.manrope(size: 16))
+                        .font(.body())
                         .padding(.horizontal)
                 }
                 .padding()

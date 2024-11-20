@@ -23,7 +23,7 @@ struct MessageInputView: View {
                 .multilineTextAlignment(.leading)
                 .lineLimit(10)
                 .foregroundColor(Color("TextColor"))
-                .font(.manrope(size: 14))
+                .font(.body())
                 .focused($isTextEditorFocused)
                 .onChange(of: isTextEditorFocused) { _, isFocused in
                     if !isFocused {

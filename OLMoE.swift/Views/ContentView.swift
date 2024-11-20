@@ -299,21 +299,18 @@ struct BotView: View {
                                     if chat.content != bot.output {
                                         Text(chat.role == .user ? "User: " : "Bot: ")
                                             .fontWeight(.bold)
-                                            .foregroundColor(Color("TextColor"))
                                         + Text(chat.content)
-                                            .foregroundColor(Color("TextColor"))
                                     }
                                 }
                                 .opacity(0.5)
-                                .font(.manrope().monospaced())
 
                                 // Display current output
                                 Text(bot.output)
-                                    .monospaced()
-                                    .foregroundColor(Color("TextColor"))
                                     .id("bottomID") // Unique ID for scrolling
                                 Color.clear.frame(height: 1).id("bottomID2")
                             }
+                            .font(.body().monospaced())
+                            .foregroundColor(Color("TextColor"))
                         }
                         .onChange(of: bot.output) { _ in
                             if isGenerating {
