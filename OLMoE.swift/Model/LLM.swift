@@ -392,6 +392,11 @@ open class LLM: ObservableObject {
         inferenceTask = Task { [weak self] in
             guard let self = self else { return }
             
+            await MainActor.run {
+                // Append user's message to history prior to response generation
+                self.history.append((.user, input))
+            }
+            
             self.input = input
             let processedInput = self.preprocess(input, self.history)
             let responseStream = loopBackTestResponse ? self.getTestLoopbackResponse() : self.getResponse(from: processedInput)
@@ -401,7 +406,6 @@ open class LLM: ObservableObject {
             
             await MainActor.run {
                 // Update history and process the final output on the main actor
-                self.history.append((.user, input))
                 self.history.append((.bot, output))
                 
                 // Maintain the history limit
