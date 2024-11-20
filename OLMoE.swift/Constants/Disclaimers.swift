@@ -33,9 +33,9 @@ struct Disclaimers {
     struct AcknowledgementDisclaimer: Disclaimer {
         let title = "Acknowledgement"
         let text = """
-            'I understand that the OLMoE app may output unintended, inappropriate, or offensive results. I agree to Ai2’s [Terms of Use](https://allenai.org/terms), [Responsible Use Guidelines](https://allenai.org/responsible-use), and [Privacy Policy](https://allenai.org/privacy-policy/). 
+            'I understand that the OLMoE app may output unintended, inappropriate, or offensive results. I agree to Ai2’s [Terms of Use](https://allenai.org/terms), [Responsible Use Guidelines](https://allenai.org/responsible-use), and [Privacy Policy](https://allenai.org/privacy-policy/).'
             """
-        let buttonText = "I Agree"
+        let buttonText = "Agree"
     }
 
     struct ShareDisclaimer: Disclaimer {
