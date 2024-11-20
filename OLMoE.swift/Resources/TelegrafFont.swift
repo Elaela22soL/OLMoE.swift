@@ -9,12 +9,12 @@ import SwiftUI
 
 extension Font {
     static func telegraf(_ weight: Weight = .regular, textStyle: TextStyle = .body) -> Font {
-        custom("PPTelegraf-Regular", size: UIFont.preferredFont(forTextStyle: textStyle.uiTextStyle).pointSize)
+        custom("PP Telegraf", size: UIFont.preferredFont(forTextStyle: textStyle.uiTextStyle).pointSize)
             .weight(weight)
     }
     
     static func telegraf(_ weight: Weight = .regular, size: CGFloat) -> Font {
-        custom("PPTelegraf-Regular", size: size)
+        custom("PP Telegraf", size: size)
             .weight(weight)
     }
     
