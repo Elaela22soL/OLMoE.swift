@@ -43,6 +43,10 @@ extension Font {
         custom("Manrope-VariableFont_wght", size: UIFont.preferredFont(forTextStyle: textStyle.uiTextStyle).pointSize)
             .weight(weight.weight)
     }
+    static func manrope(_ weight: Weight = .regular, size: CGFloat) -> Font {
+        custom("Manrope-VariableFont_wght", size: size)
+            .weight(weight)
+    }
 }
 
 extension Font.TextStyle {
