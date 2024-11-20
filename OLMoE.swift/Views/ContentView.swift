@@ -353,7 +353,7 @@ struct BotView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 Spacer()
-                
+
                 MessageInputView(
                     input: $input,
                     isGenerating: $isGenerating,
@@ -416,7 +416,7 @@ struct ContentView: View {
     #if DEBUG
     @State private var hasSeenDisclaimer: Bool = false
     #else
-    @AppStorage("hasSeenDisclaimer__") private var hasSeenDisclaimer : Bool = false
+    @AppStorage("hasSeenDisclaimer") private var hasSeenDisclaimer : Bool = false
     #endif
     @State private var onDisclaimerConfirm: (() -> Void)?
     @State private var onDisclaimerCancel: (() -> Void)?
