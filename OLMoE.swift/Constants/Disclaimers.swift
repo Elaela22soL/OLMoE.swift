@@ -39,9 +39,10 @@ struct Disclaimers {
     }
 
     struct ShareDisclaimer: Disclaimer {
-        let title = "[TODO] Share Disclaimers"
-        let text =
-            "The Ai2 Playground is intended for research and educational purposes in accordance with our Terms of Use, Responsible Use Guidelines, and Privacy Policy. The Ai2 Playground collects user queries and inputs entered into it as well as other information about the user. You will have 30 days to delete your queries will be stored and used for future research and educational purposes in the public interest consistent with Ai2’s mission as a 501(c)(3) nonprofit organization. All retained prompt history and user interaction data shared with the Ai2 Playground and Dataset Explorer may be shared outside of Ai2, as permitted by applicable law and Ai2’s policies. Please use your discretion and best judgment when accessing and Playground. NEVER submit any personal, sensitive, or confidential your use of the Ai2 Playground or Dataset Explorer."
+        let title = "Share Disclaimer"
+        let text = """
+            By sharing this conversation, you are agreeing to allow Ai2 to collect this interaction data to identify areas for improvement and to develop new features that advance the scientific and educational purposes of Ai2. Once you share a conversation, your data cannot be deleted and will be retained as described in our [Terms of Use](https://allenai.org/terms/2024-09-25) and [Privacy Policy](https://allenai.org/privacy-policy).
+            """
         let buttonText = "Share"
     }
 }
