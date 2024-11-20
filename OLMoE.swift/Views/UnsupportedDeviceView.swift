@@ -20,25 +20,31 @@ struct UnsupportedDeviceView: View {
         let formattedMemory = String(format: "%.2f", availableMemoryInGB)
         
         VStack {
+            Image("Exclamation")
+                .foregroundColor(Color("AccentColor"))
+            
             Text("Device Not Supported")
-                .font(.title)
-                .padding()
+                .font(.telegraf(textStyle: .title))
+                .foregroundColor(Color("AccentColor"))
+            
             Text("This app requires a device with at least 8GB of RAM.")
                 .multilineTextAlignment(.center)
-                .padding()
-            
-            if availableMemoryInGB > 0 {
-                Text("(The model requires ~4 GB and this device has: \(formattedMemory) GB available.)")
-                    .multilineTextAlignment(.center)
-                    .padding()
-            }
-            
+                .padding([.horizontal], 32)
+                .padding([.vertical], 2)
+                        
             if FeatureFlags.allowDeviceBypass {
+                if availableMemoryInGB > 0 {
+                    Text("(The model requires ~6 GB and this device has: \(formattedMemory) GB available.)")
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+                
                 Button("Proceed Anyway") {
                     proceedAnyway()
                 }
                 .padding(.vertical, 5)
             }
+            
             if FeatureFlags.allowMockedModel {
                 Button("Proceed With Mocked Model") {
                     proceedMocked()

@@ -3,9 +3,10 @@ Transform: AWS::Serverless-2016-10-31
 Description: S3 Logging Lambda Function
 
 Resources:
-  S3LoggingFunction:
+  OlmoeAttestS3LoggingFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: olmoe-attest-s3-share-logging-function
       CodeUri: src/
       Handler: lambda_function.lambda_handler
       Runtime: python3.11
@@ -19,6 +20,6 @@ Resources:
             BucketName: olmo-interactions-share
 
 Outputs:
-  S3LoggingFunction:
+  OlmoeAttestS3LoggingFunction:
     Description: "S3 Logging Lambda Function ARN"
-    Value: !GetAtt S3LoggingFunction.Arn
+    Value: !GetAtt OlmoeAttestS3LoggingFunction.Arn
