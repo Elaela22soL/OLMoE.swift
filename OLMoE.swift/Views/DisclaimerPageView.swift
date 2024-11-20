@@ -92,11 +92,11 @@ struct DisclaimerPage: View {
         ) {
             VStack(spacing: 20) {
                 Text(title)
-                    .font(.modalTitle())
+                    .font(.title())
                     .multilineTextAlignment(.center)
 
                 Text(.init(message))
-                    .font(.modalBody())
+                    .font(.body())
                     .padding(.horizontal, 20)
                 
                 HStack(spacing: 12) {

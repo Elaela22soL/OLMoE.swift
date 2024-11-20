@@ -24,25 +24,28 @@ struct UnsupportedDeviceView: View {
                 .foregroundColor(Color("AccentColor"))
             
             Text("Device Not Supported")
-                .font(.telegraf(textStyle: .title))
+                .font(.title())
                 .foregroundColor(Color("AccentColor"))
             
             Text("This app requires a device with at least 8GB of RAM.")
                 .multilineTextAlignment(.center)
                 .padding([.horizontal], 32)
                 .padding([.vertical], 2)
+                .font(.body())
                         
             if FeatureFlags.allowDeviceBypass {
                 if availableMemoryInGB > 0 {
                     Text("(The model requires ~6 GB and this device has: \(formattedMemory) GB available.)")
                         .multilineTextAlignment(.center)
                         .padding()
+                        .font(.body())
                 }
                 
                 Button("Proceed Anyway") {
                     proceedAnyway()
                 }
                 .padding(.vertical, 5)
+                .font(.body())
             }
             
             if FeatureFlags.allowMockedModel {
@@ -50,6 +53,7 @@ struct UnsupportedDeviceView: View {
                     proceedMocked()
                 }
                 .padding(.vertical, 5)
+                .font(.body())
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
