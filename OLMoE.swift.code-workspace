@@ -22,6 +22,7 @@
 			".venv/lib/python3.11/site-packages"
 		],
 		"python.languageServer": "Default",
+		"trailing-spaces.trimOnSave": true,
 		"workbench.editor.highlightModifiedTabs": true
 	}
 }
