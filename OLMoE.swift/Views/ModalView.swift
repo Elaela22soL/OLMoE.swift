@@ -16,40 +16,50 @@ struct ModalView<Content: View>: View {
         self.allowOutsideTapDismiss = allowOutsideTapDismiss
     }
 
+    func calculateWidth(screenWidth: CGFloat) -> CGFloat {
+        let minWidth: CGFloat = 300
+        let maxWidth: CGFloat = 600
+        let margin: CGFloat = 24
+        let idealWidth = screenWidth - 2 * margin
+        return max(minWidth, min(idealWidth, maxWidth))
+    }
+    
     var body: some View {
-        ZStack {
-            Color.black.opacity(0.3)
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    if allowOutsideTapDismiss {
-                        isPresented = false
-                    }
-                }
-
-            VStack(spacing: 0) {
-                if showCloseButton {
-                HStack {
-                    Spacer()
-                        Button(action: { isPresented = false }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(Color("TextColor"))
+        GeometryReader { proxy in
+            ZStack {
+                Color.black.opacity(0.3)
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        if allowOutsideTapDismiss {
+                            isPresented = false
                         }
                     }
-                  .padding()
-                .background(Color("Surface"))
-                }
-
-                ScrollView {
-                    content
+                
+                VStack(spacing: 0) {
+                    if showCloseButton {
+                        HStack {
+                            Spacer()
+                            Button(action: { isPresented = false }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(Color("TextColor"))
+                            }
+                        }
                         .padding()
-                        .frame(maxWidth: .infinity)
+                        .background(Color("Surface"))
+                    }
+                    
+                    ScrollView {
+                        content
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                    }
+                    .background(Color("Surface"))
                 }
+                .frame(maxWidth: calculateWidth(screenWidth: proxy.size.width), maxHeight: 600)
                 .background(Color("Surface"))
+                .cornerRadius(12)
+                .padding(.horizontal, 20)
             }
-            .frame(maxWidth: 300, maxHeight: 600)
-            .background(Color("Surface"))
-            .cornerRadius(12)
-            .padding(.horizontal, 20)
         }
     }
 }
