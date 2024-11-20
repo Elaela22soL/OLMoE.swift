@@ -36,7 +36,7 @@ struct ModalView<Content: View>: View {
                         }
                     }
                   .padding()
-                .background(Color("BackgroundColor"))
+                .background(Color("Surface"))
                 }
 
                 ScrollView {
@@ -44,10 +44,10 @@ struct ModalView<Content: View>: View {
                         .padding()
                         .frame(maxWidth: .infinity)
                 }
-                .background(Color("BackgroundColor"))
+                .background(Color("Surface"))
             }
             .frame(maxWidth: 300, maxHeight: 600)
-            .background(Color("BackgroundColor"))
+            .background(Color("Surface"))
             .cornerRadius(12)
             .padding(.horizontal, 20)
         }
@@ -78,10 +78,7 @@ struct ModalView<Content: View>: View {
             Text("This is a more complex modal with multiple elements.")
 
             Button("Sample Action") { }
-                .padding()
-                .background(Color.accentColor)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+                .buttonStyle(.PrimaryButton)
         }
         .padding()
     }

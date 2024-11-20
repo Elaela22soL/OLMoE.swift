@@ -19,7 +19,7 @@ struct Disclaimers {
         let text = """
        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam odio urna, porta vel eleifend volutpat, porta vitae justo. Aenean sit amet sem id urna consectetur feugiat. Morbi in sem gravida orci rutrum maximus. Donec pretium accumsan orci quis elementum. Sed a tempor libero. Cras tempus nisl ut mattis pretium. Fusce in congue arcu. Vivamus nec sollicitudin est. Cras id eleifend nisl. Phasellus quis neque in leo accumsan fermentum et quis diam. Integer non lectus blandit, hendrerit ante sed, bibendum sapien. Etiam quis facilisis ante. Donec lacinia tincidunt est, quis volutpat est tincidunt et. Nullam nibh risus, tempor quis lacinia ac, dictum et arcu. Curabitur sit amet mauris id mi facilisis laoreet a non metus.
        """
-        let buttonText = "Next"
+        let buttonText = "Next \u{02192}"
    }
    
    struct AdditionalDisclaimer: Disclaimer {

@@ -42,35 +42,38 @@ struct DisclaimerPage: View {
         ) {
             VStack(spacing: 20) {
                 Text(title)
-                    .font(.headline)
+                    .font(.modalTitle())
+                    .multilineTextAlignment(.center)
 
                 Text(message)
-                    .font(.body)
+                    .font(.modalBody())
                     .padding(.horizontal, 20)
-
-                VStack(spacing: 12) {
-                    Button(confirm.text) {
-                        confirm.onTap()
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.accentColor)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-
-                if let cancel = cancel {
+                
+                HStack(spacing: 12) {
+                    if let cancel = cancel {
                         Button(cancel.text) {
                             cancel.onTap()
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color("BackgroundColor"))
-                        .foregroundColor(Color("TextColor"))
-                        .cornerRadius(8)
+                        .buttonStyle(.SecondaryButton)
                     }
+                    
+                    Button(confirm.text) {
+                        confirm.onTap()
+                    }
+                    .buttonStyle(.PrimaryButton)
                 }
                 .padding(.horizontal, 20)
             }
         }
     }
+}
+
+#Preview("DisclaimerPage") {
+    DisclaimerPage(
+        title: "Title",
+        message: "Message",
+        isPresented: .constant(true),
+        confirm: (text: "Confirm", onTap: { print("Confirmed") }),
+        cancel: (text: "Cancel", onTap: { print("Cancelled") })
+    )
 }
