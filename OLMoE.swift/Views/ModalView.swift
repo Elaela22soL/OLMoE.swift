@@ -78,10 +78,7 @@ struct ModalView<Content: View>: View {
             Text("This is a more complex modal with multiple elements.")
 
             Button("Sample Action") { }
-                .padding()
-                .background(Color.accentColor)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+                .buttonStyle(.PrimaryButton)
         }
         .padding()
     }
