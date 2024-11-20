@@ -43,6 +43,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		48188E282CEE676800B0EF03 /* Styles */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Styles; sourceTree = "<group>"; };
 		487932D72CEBB63D00A741C5 /* BuildConfig */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = BuildConfig; sourceTree = "<group>"; };
 		48AA86D92CE688A4000B9138 /* Constants */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Constants; sourceTree = "<group>"; };
 		48AA86DF2CE69622000B9138 /* Extensions */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Extensions; sourceTree = "<group>"; };
@@ -84,6 +85,7 @@
 		A0117FEA2C990EAB00035007 /* OLMoE.swift */ = {
 			isa = PBXGroup;
 			children = (
+				48188E282CEE676800B0EF03 /* Styles */,
 				487932D72CEBB63D00A741C5 /* BuildConfig */,
 				B26FDB422CEAD48F00E1D57C /* Views */,
 				B26FDB412CEAD48600E1D57C /* Resources */,
@@ -141,6 +143,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				48188E282CEE676800B0EF03 /* Styles */,
 				487932D72CEBB63D00A741C5 /* BuildConfig */,
 				48AA86D92CE688A4000B9138 /* Constants */,
 				48AA86DF2CE69622000B9138 /* Extensions */,
