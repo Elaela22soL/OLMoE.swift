@@ -252,7 +252,7 @@ struct BotView: View {
             }
             .foregroundColor(Color("TextColor"))
         }
-       .disabled(isSharing || bot.history.isEmpty)
+        .disabled(isSharing || bot.history.isEmpty)
         .opacity(isSharing || bot.history.isEmpty ? 0.5 : 1)
     }
 
