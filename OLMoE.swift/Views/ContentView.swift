@@ -107,10 +107,11 @@ struct BotView: View {
                 var attestationObjectBase64: String? = nil
 
                 #if targetEnvironment(simulator)
-                // Simulator bypass
-                keyID = "simulatorTest-\(keyIDKey)"
-                // Create a mock assertion
-                attestationObjectBase64 = "mock_attestation".data(using: .utf8)?.base64EncodedString()
+                await MainActor.run {
+                    print("Share not available in simulator")
+                    isSharing = false
+                }
+                return
 
                 #else
                 guard service.isSupported else {
