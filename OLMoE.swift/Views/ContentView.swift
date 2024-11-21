@@ -294,26 +294,7 @@ struct BotView: View {
             VStack(alignment: .leading) {
                 if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
                     ScrollViewReader { proxy in
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 10) {
-                                // Display history
-                                ForEach(bot.history, id: \.content) { chat in
-                                    if chat.content != bot.output {
-                                        Text(chat.role == .user ? "User: " : "Bot: ")
-                                            .fontWeight(.bold)
-                                        + Text(chat.content)
-                                    }
-                                }
-                                .opacity(0.5)
-
-                                // Display current output
-                                Text(bot.output)
-                                    .id("bottomID") // Unique ID for scrolling
-                                Color.clear.frame(height: 1).id("bottomID2")
-                            }
-                            .font(.body().monospaced())
-                            .foregroundColor(Color("TextColor"))
-                        }
+                        ChatView(history: bot.history, output: bot.output)
                         .onChange(of: bot.output) { _ in
                             if isGenerating {
                                 withAnimation {
