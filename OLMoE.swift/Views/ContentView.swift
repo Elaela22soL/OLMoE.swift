@@ -343,7 +343,7 @@ struct BotView: View {
                     stop: stop
                 )
             }
-            .padding()
+            .padding(12)
         }
         .sheet(isPresented: $showShareSheet, content: {
             if let url = shareURL {
