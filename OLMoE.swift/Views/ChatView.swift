@@ -19,8 +19,7 @@ public struct ChatBubble: View {
 
             Text(text)
                 .padding(12)
-                .background(isUser ? Color("Surface") : Color("Background"))
-                .foregroundColor(Color("TextColor"))
+                .background(isUser ? Color("Surface") : Color("BackgroundColor"))
                 .cornerRadius(12)
                 .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
                 .font(.body())
