@@ -93,7 +93,7 @@ struct BotView: View {
 
     func shareConversation() {
         isSharing = true
-        disclaimerHandlers.setActiveDisclaimer(nil)
+        disclaimerHandlers.setShowDisclaimerPage(false)
         Task {
             do {
                 // App Attest Service
