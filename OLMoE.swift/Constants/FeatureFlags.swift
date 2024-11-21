@@ -8,7 +8,7 @@
 
 enum FeatureFlags {
     
-    static let allowDeviceBypass = false
+    static let allowDeviceBypass = true
     
-    static let allowMockedModel = false
+    static let allowMockedModel = true
 }
