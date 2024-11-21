@@ -9,8 +9,10 @@ import SwiftUI
 
 struct DisclaimerHandlers {
     var setActiveDisclaimer: (Disclaimer?) -> Void
-    var setConfirmAction: (@escaping () -> Void) -> Void
+    var setAllowOutsideTapDismiss: (Bool) -> Void
     var setCancelAction: ((() -> Void)?) -> Void
+    var setConfirmAction: (@escaping () -> Void) -> Void
+    var setShowDisclaimerPage: (Bool) -> Void
 }
 
 class DisclaimerState: ObservableObject {
@@ -21,19 +23,21 @@ class DisclaimerState: ObservableObject {
 #endif
     @Published var showDisclaimerPage : Bool = false
     @Published var activeDisclaimer: Disclaimer? = nil
+    @Published var allowOutsideTapDismiss: Bool = false
     var onConfirm: (() -> Void)?
     var onCancel: (() -> Void)?
     private var disclaimerPageIndex: Int = 0
-    
+
     let disclaimers: [Disclaimer] = [
         Disclaimers.LimitationDisclaimer(),
         Disclaimers.PrivacyDisclaimer(),
         Disclaimers.AcknowledgementDisclaimer()
     ]
-    
+
     func showInitialDisclaimer() {
         if !hasSeenDisclaimer {
             activeDisclaimer = disclaimers[disclaimerPageIndex]
+            allowOutsideTapDismiss = false
             onCancel = nil
             onConfirm = nextDisclaimerPage
             showDisclaimerPage = true
@@ -66,20 +70,23 @@ struct DisclaimerPageData {
 struct DisclaimerPage: View {
     typealias PageButton = (text: String, onTap: () -> Void)
 
-    let title: String
+    let allowOutsideTapDismiss: Bool
+    @Binding var isPresented: Bool
     let message: String
+    let title: String
     let confirm: PageButton
     let cancel: PageButton?
-    @Binding var isPresented: Bool
 
-    init(title: String,
-         message: String,
+    init(allowOutsideTapDismiss: Bool,
          isPresented: Binding<Bool>,
+         message: String,
+         title: String,
          confirm: PageButton,
          cancel: PageButton? = nil) {
-        self.title = title
-        self.message = message
+        self.allowOutsideTapDismiss = allowOutsideTapDismiss
         self._isPresented = isPresented
+        self.message = message
+        self.title = title
         self.confirm = confirm
         self.cancel = cancel
     }
@@ -87,8 +94,8 @@ struct DisclaimerPage: View {
     var body: some View {
         ModalView(
             isPresented: $isPresented,
-            showCloseButton: false,
-            allowOutsideTapDismiss: false
+            allowOutsideTapDismiss: allowOutsideTapDismiss,
+            showCloseButton: false
         ) {
             VStack(spacing: 20) {
                 Text(title)
@@ -98,7 +105,7 @@ struct DisclaimerPage: View {
                 Text(.init(message))
                     .font(.body())
                     .padding(.horizontal, 20)
-                
+
                 HStack(spacing: 12) {
                     if let cancel = cancel {
                         Button(cancel.text) {
@@ -106,7 +113,7 @@ struct DisclaimerPage: View {
                         }
                         .buttonStyle(.SecondaryButton)
                     }
-                    
+
                     Button(confirm.text) {
                         confirm.onTap()
                     }
@@ -120,9 +127,10 @@ struct DisclaimerPage: View {
 
 #Preview("DisclaimerPage") {
     DisclaimerPage(
-        title: "Title",
-        message: "Message",
+        allowOutsideTapDismiss: false,
         isPresented: .constant(true),
+        message: "Message",
+        title: "Title",
         confirm: (text: "Confirm", onTap: { print("Confirmed") }),
         cancel: (text: "Cancel", onTap: { print("Cancelled") })
     )

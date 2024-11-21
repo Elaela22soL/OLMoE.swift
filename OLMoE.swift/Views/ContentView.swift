@@ -238,8 +238,10 @@ struct BotView: View {
         Button(action: {
             isTextEditorFocused = false
             disclaimerHandlers.setActiveDisclaimer(Disclaimers.ShareDisclaimer())
+            disclaimerHandlers.setCancelAction({ disclaimerHandlers.setShowDisclaimerPage(false) })
+            disclaimerHandlers.setAllowOutsideTapDismiss(true)
             disclaimerHandlers.setConfirmAction({ shareConversation() })
-            disclaimerHandlers.setCancelAction({ disclaimerHandlers.setActiveDisclaimer(nil) })
+            disclaimerHandlers.setShowDisclaimerPage(true)
         }) {
             HStack {
                 if isSharing {
@@ -428,8 +430,10 @@ struct ContentView: View {
                     } else if let bot = bot {
                         BotView(bot, disclaimerHandlers: DisclaimerHandlers(
                             setActiveDisclaimer: { self.disclaimerState.activeDisclaimer = $0 },
+                            setAllowOutsideTapDismiss: { self.disclaimerState.allowOutsideTapDismiss = $0 },
+                            setCancelAction: { self.disclaimerState.onCancel = $0 },
                             setConfirmAction: { self.disclaimerState.onConfirm = $0 },
-                            setCancelAction: { self.disclaimerState.onCancel = $0 }
+                            setShowDisclaimerPage: { self.disclaimerState.showDisclaimerPage = $0 }
                         ))
                     } else {
                         ModelDownloadView()
@@ -456,29 +460,27 @@ struct ContentView: View {
                 InfoView()
             }
 
-            if let disclaimer = disclaimerState.activeDisclaimer {
-                Color.black.opacity(0.3).edgesIgnoringSafeArea(.all)
-                DisclaimerPage(
-                    title: disclaimer.title,
-                    message: disclaimer.text,
-                    isPresented: $disclaimerState.showDisclaimerPage,
-                    confirm: DisclaimerPage.PageButton(
-                        text: disclaimer.buttonText,
-                        onTap: {
-                            disclaimerState.onConfirm?()
-                        }
-                    ),
-                    cancel: disclaimerState.onCancel.map { cancelAction in
-                        DisclaimerPage.PageButton(
-                            text: "Cancel",
-                            onTap: {
-                                cancelAction()
-                                disclaimerState.activeDisclaimer = nil
-                            }
-                        )
+            DisclaimerPage(
+                allowOutsideTapDismiss: disclaimerState.allowOutsideTapDismiss,
+                isPresented: $disclaimerState.showDisclaimerPage,
+                message: disclaimerState.activeDisclaimer?.text ?? "",
+                title: disclaimerState.activeDisclaimer?.title ?? "",
+                confirm: DisclaimerPage.PageButton(
+                    text: disclaimerState.activeDisclaimer?.buttonText ?? "",
+                    onTap: {
+                        disclaimerState.onConfirm?()
                     }
-                )
-            }
+                ),
+                cancel: disclaimerState.onCancel.map { cancelAction in
+                    DisclaimerPage.PageButton(
+                        text: "Cancel",
+                        onTap: {
+                            cancelAction()
+                            disclaimerState.activeDisclaimer = nil
+                        }
+                    )
+                }
+            )
         }
     }
 
