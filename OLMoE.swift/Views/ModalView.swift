@@ -1,19 +1,19 @@
 import SwiftUI
 
 struct ModalView<Content: View>: View {
+    let allowOutsideTapDismiss: Bool
     let content: Content
     @Binding var isPresented: Bool
     let showCloseButton: Bool
-    let allowOutsideTapDismiss: Bool
 
     init(isPresented: Binding<Bool>,
-        showCloseButton: Bool = true,
         allowOutsideTapDismiss: Bool = true,
+        showCloseButton: Bool = true,
         @ViewBuilder content: () -> Content) {
+        self.allowOutsideTapDismiss = allowOutsideTapDismiss
         self.content = content()
         self._isPresented = isPresented
         self.showCloseButton = showCloseButton
-        self.allowOutsideTapDismiss = allowOutsideTapDismiss
     }
 
     func calculateWidth(screenWidth: CGFloat) -> CGFloat {
@@ -23,42 +23,45 @@ struct ModalView<Content: View>: View {
         let idealWidth = screenWidth - 2 * margin
         return max(minWidth, min(idealWidth, maxWidth))
     }
-    
+
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                Color.black.opacity(0.3)
-                    .edgesIgnoringSafeArea(.all)
-                    .onTapGesture {
-                        if allowOutsideTapDismiss {
-                            isPresented = false
-                        }
-                    }
-                
-                VStack(spacing: 0) {
-                    if showCloseButton {
-                        HStack {
-                            Spacer()
-                            Button(action: { isPresented = false }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(Color("TextColor"))
+        if isPresented {
+            GeometryReader { proxy in
+                ZStack {
+                    Color.black.opacity(0.3)
+                        .edgesIgnoringSafeArea(.all)
+                        .contentShape(Rectangle())  // Make entire overlay tappable
+                        .onTapGesture {
+                            if allowOutsideTapDismiss {
+                                isPresented = false
                             }
                         }
-                        .padding()
+
+                    VStack(spacing: 0) {
+                        if showCloseButton {
+                            HStack {
+                                Spacer()
+                                Button(action: { isPresented = false }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(Color("TextColor"))
+                                }
+                            }
+                            .padding()
+                            .background(Color("Surface"))
+                        }
+
+                        ScrollView {
+                            content
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                        }
                         .background(Color("Surface"))
                     }
-                    
-                    ScrollView {
-                        content
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                    }
+                    .frame(maxWidth: calculateWidth(screenWidth: proxy.size.width), maxHeight: 600)
                     .background(Color("Surface"))
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
                 }
-                .frame(maxWidth: calculateWidth(screenWidth: proxy.size.width), maxHeight: 600)
-                .background(Color("Surface"))
-                .cornerRadius(12)
-                .padding(.horizontal, 20)
             }
         }
     }
@@ -97,8 +100,8 @@ struct ModalView<Content: View>: View {
 #Preview("Modal with No Close Button") {
     ModalView(
         isPresented: .constant(true),
-        showCloseButton: false,
-        allowOutsideTapDismiss: false
+        allowOutsideTapDismiss: false,
+        showCloseButton: false
     ) {
       VStack(spacing: 16) {
           Text("Complex Title")
