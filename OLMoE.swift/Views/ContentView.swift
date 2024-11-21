@@ -101,20 +101,14 @@ struct BotView: View {
 
                 // TODO: Move attest logic into it's own class
                 // TODO: Make attest available on simulator
-                // TODO: Deploy lambda to prod
                 let challengeString = Configuration.challenge
                 let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
-                let userDefaults = UserDefaults.standard
-                let keyIDKey = "appAttestKeyID"
-                var keyID: String? = nil //userDefaults.string(forKey: keyIDKey)
-                let attestationDoneKey = "appAttestAttestationDone"
-                let attestationDone = userDefaults.bool(forKey: attestationDoneKey)
+                var keyID: String? = nil
                 var attestationObjectBase64: String? = nil
 
                 #if targetEnvironment(simulator)
                 // Simulator bypass
                 keyID = "simulatorTest-\(keyIDKey)"
-                userDefaults.set(true, forKey: attestationDoneKey)
                 // Create a mock assertion
                 attestationObjectBase64 = "mock_attestation".data(using: .utf8)?.base64EncodedString()
 
@@ -138,27 +132,21 @@ struct BotView: View {
                             }
                         }
                     }
-                    // Store key ID in local storage
-                    userDefaults.set(keyID, forKey: keyIDKey)
-                    userDefaults.set(false, forKey: attestationDoneKey)
                 }
 
-                if !attestationDone {
-                    let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
-                        // attestation happens here
-                        service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
-                            if let error = error {
-                                continuation.resume(throwing: error)
-                            } else if let attestation = attestation {
-                                continuation.resume(returning: attestation)
-                            } else {
-                                continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
-                            }
+                let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
+                    // attestation happens here
+                    service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        } else if let attestation = attestation {
+                            continuation.resume(returning: attestation)
+                        } else {
+                            continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
                         }
                     }
-                    attestationObjectBase64 = attestationObject.base64EncodedString()
-                    userDefaults.set(true, forKey: attestationDoneKey)
                 }
+                attestationObjectBase64 = attestationObject.base64EncodedString()
 
                 #endif
 
@@ -250,8 +238,8 @@ struct BotView: View {
             }
             .foregroundColor(Color("TextColor"))
         }
-        .disabled(isSharing || bot.history.isEmpty)
-        .opacity(isSharing || bot.history.isEmpty ? 0.5 : 1)
+        .disabled(isSharing || bot.history.isEmpty || isGenerating)
+        .opacity(isSharing || bot.history.isEmpty || isGenerating ? 0.5 : 1)
     }
 
     @ViewBuilder
