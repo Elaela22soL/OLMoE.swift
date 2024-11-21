@@ -327,7 +327,7 @@ struct BotView: View {
                             Image("Splash")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: min(geometry.size.width - 160, 290))
+                                .frame(width: max(140, min(geometry.size.width - 160, 290)))
                             Spacer()
                         }
                     }
