@@ -93,7 +93,7 @@ struct BotView: View {
 
     func shareConversation() {
         isSharing = true
-        disclaimerHandlers.setActiveDisclaimer(nil)
+        disclaimerHandlers.setShowDisclaimerPage(false)
         Task {
             do {
                 // App Attest Service
@@ -101,22 +101,17 @@ struct BotView: View {
 
                 // TODO: Move attest logic into it's own class
                 // TODO: Make attest available on simulator
-                // TODO: Deploy lambda to prod
                 let challengeString = Configuration.challenge
                 let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
-                let userDefaults = UserDefaults.standard
-                let keyIDKey = "appAttestKeyID"
-                var keyID: String? = nil //userDefaults.string(forKey: keyIDKey)
-                let attestationDoneKey = "appAttestAttestationDone"
-                let attestationDone = userDefaults.bool(forKey: attestationDoneKey)
+                var keyID: String? = nil
                 var attestationObjectBase64: String? = nil
 
                 #if targetEnvironment(simulator)
-                // Simulator bypass
-                keyID = "simulatorTest-\(keyIDKey)"
-                userDefaults.set(true, forKey: attestationDoneKey)
-                // Create a mock assertion
-                attestationObjectBase64 = "mock_attestation".data(using: .utf8)?.base64EncodedString()
+                await MainActor.run {
+                    print("Share not available in simulator")
+                    isSharing = false
+                }
+                return
 
                 #else
                 guard service.isSupported else {
@@ -138,27 +133,21 @@ struct BotView: View {
                             }
                         }
                     }
-                    // Store key ID in local storage
-                    userDefaults.set(keyID, forKey: keyIDKey)
-                    userDefaults.set(false, forKey: attestationDoneKey)
                 }
 
-                if !attestationDone {
-                    let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
-                        // attestation happens here
-                        service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
-                            if let error = error {
-                                continuation.resume(throwing: error)
-                            } else if let attestation = attestation {
-                                continuation.resume(returning: attestation)
-                            } else {
-                                continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
-                            }
+                let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
+                    // attestation happens here
+                    service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        } else if let attestation = attestation {
+                            continuation.resume(returning: attestation)
+                        } else {
+                            continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
                         }
                     }
-                    attestationObjectBase64 = attestationObject.base64EncodedString()
-                    userDefaults.set(true, forKey: attestationDoneKey)
                 }
+                attestationObjectBase64 = attestationObject.base64EncodedString()
 
                 #endif
 
@@ -238,8 +227,10 @@ struct BotView: View {
         Button(action: {
             isTextEditorFocused = false
             disclaimerHandlers.setActiveDisclaimer(Disclaimers.ShareDisclaimer())
+            disclaimerHandlers.setCancelAction({ disclaimerHandlers.setShowDisclaimerPage(false) })
+            disclaimerHandlers.setAllowOutsideTapDismiss(true)
             disclaimerHandlers.setConfirmAction({ shareConversation() })
-            disclaimerHandlers.setCancelAction({ disclaimerHandlers.setActiveDisclaimer(nil) })
+            disclaimerHandlers.setShowDisclaimerPage(true)
         }) {
             HStack {
                 if isSharing {
@@ -250,8 +241,8 @@ struct BotView: View {
             }
             .foregroundColor(Color("TextColor"))
         }
-        .disabled(isSharing || bot.history.isEmpty)
-        .opacity(isSharing || bot.history.isEmpty ? 0.5 : 1)
+        .disabled(isSharing || bot.history.isEmpty || isGenerating)
+        .opacity(isSharing || bot.history.isEmpty || isGenerating ? 0.5 : 1)
     }
 
     @ViewBuilder
@@ -325,7 +316,7 @@ struct BotView: View {
                             Image("Splash")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: min(geometry.size.width - 160, 290))
+                                .frame(width: max(140, min(geometry.size.width - 160, 290)))
                             Spacer()
                         }
                     }
@@ -409,8 +400,10 @@ struct ContentView: View {
                     } else if let bot = bot {
                         BotView(bot, disclaimerHandlers: DisclaimerHandlers(
                             setActiveDisclaimer: { self.disclaimerState.activeDisclaimer = $0 },
+                            setAllowOutsideTapDismiss: { self.disclaimerState.allowOutsideTapDismiss = $0 },
+                            setCancelAction: { self.disclaimerState.onCancel = $0 },
                             setConfirmAction: { self.disclaimerState.onConfirm = $0 },
-                            setCancelAction: { self.disclaimerState.onCancel = $0 }
+                            setShowDisclaimerPage: { self.disclaimerState.showDisclaimerPage = $0 }
                         ))
                     } else {
                         ModelDownloadView()
@@ -433,33 +426,30 @@ struct ContentView: View {
             .onAppear {
                 disclaimerState.showInitialDisclaimer()
             }
-            .sheet(isPresented: $showInfoPage) {
-                InfoView()
-            }
 
-            if let disclaimer = disclaimerState.activeDisclaimer {
-                Color.black.opacity(0.3).edgesIgnoringSafeArea(.all)
-                DisclaimerPage(
-                    title: disclaimer.title,
-                    message: disclaimer.text,
-                    isPresented: $disclaimerState.showDisclaimerPage,
-                    confirm: DisclaimerPage.PageButton(
-                        text: disclaimer.buttonText,
-                        onTap: {
-                            disclaimerState.onConfirm?()
-                        }
-                    ),
-                    cancel: disclaimerState.onCancel.map { cancelAction in
-                        DisclaimerPage.PageButton(
-                            text: "Cancel",
-                            onTap: {
-                                cancelAction()
-                                disclaimerState.activeDisclaimer = nil
-                            }
-                        )
+            InfoView(isPresented: $showInfoPage)
+
+            DisclaimerPage(
+                allowOutsideTapDismiss: disclaimerState.allowOutsideTapDismiss,
+                isPresented: $disclaimerState.showDisclaimerPage,
+                message: disclaimerState.activeDisclaimer?.text ?? "",
+                title: disclaimerState.activeDisclaimer?.title ?? "",
+                confirm: DisclaimerPage.PageButton(
+                    text: disclaimerState.activeDisclaimer?.buttonText ?? "",
+                    onTap: {
+                        disclaimerState.onConfirm?()
                     }
-                )
-            }
+                ),
+                cancel: disclaimerState.onCancel.map { cancelAction in
+                    DisclaimerPage.PageButton(
+                        text: "Cancel",
+                        onTap: {
+                            cancelAction()
+                            disclaimerState.activeDisclaimer = nil
+                        }
+                    )
+                }
+            )
         }
     }
 

@@ -30,40 +30,32 @@ struct InfoButton: View {
 }
 
 struct InfoView: View {
-    @Environment(\.dismiss) var dismiss
+    @Binding var isPresented: Bool
+
+    init(isPresented: Binding<Bool>) {
+        self._isPresented = isPresented
+    }
 
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+        ModalView(
+            isPresented: $isPresented,
+            allowOutsideTapDismiss: true,
+            showCloseButton: true
+        ) {
+            VStack(alignment: .leading, spacing: 16) {
 
-                    Ai2Logo()
-                        .frame(maxWidth: .infinity, alignment: .center)
-                                 
-                    Text(.init(InfoText.body))
-                        .font(.body())
-                        .padding(.horizontal)
-                }
-                .padding()
+                Ai2Logo()
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                Text(.init(InfoText.body))
+                    .font(.body())
+                    .padding(.horizontal)
             }
-            .background(Color("BackgroundColor"))
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle")
-                            .font(.system(size: 20))
-                            .frame(width: 40, height: 40)
-                            .foregroundColor(Color("TextColor"))
-                    }
-                    .clipShape(Circle())
-                }
-            }.toolbarBackground(
-                Color("BackgroundColor"), for: .navigationBar
-            )
+            .padding()
         }
     }
 }
 
 #Preview("InfoView") {
-    InfoView()
+    InfoView(isPresented: .constant(true))
 }
