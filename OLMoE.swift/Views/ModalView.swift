@@ -5,23 +5,16 @@ struct ModalView<Content: View>: View {
     let content: Content
     @Binding var isPresented: Bool
     let showCloseButton: Bool
+    @State var contentHeight: CGFloat = .infinity
 
     init(isPresented: Binding<Bool>,
-        allowOutsideTapDismiss: Bool = true,
-        showCloseButton: Bool = true,
-        @ViewBuilder content: () -> Content) {
+         allowOutsideTapDismiss: Bool = true,
+         showCloseButton: Bool = true,
+         @ViewBuilder content: () -> Content) {
         self.allowOutsideTapDismiss = allowOutsideTapDismiss
         self.content = content()
         self._isPresented = isPresented
         self.showCloseButton = showCloseButton
-    }
-
-    func calculateWidth(screenWidth: CGFloat) -> CGFloat {
-        let minWidth: CGFloat = 300
-        let maxWidth: CGFloat = 600
-        let margin: CGFloat = 24
-        let idealWidth = screenWidth - 2 * margin
-        return max(minWidth, min(idealWidth, maxWidth))
     }
 
     var body: some View {
@@ -55,10 +48,21 @@ struct ModalView<Content: View>: View {
                             content
                                 .padding()
                                 .frame(maxWidth: .infinity)
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.clear
+                                            .onAppear() {
+                                                contentHeight = geo.size.height
+                                            }
+                                    })
                         }
+                        .id(UUID()) // Force unique ID so onAppear gets updated height and scrolls to top
                         .background(Color("Surface"))
                     }
-                    .frame(maxWidth: calculateWidth(screenWidth: proxy.size.width), maxHeight: 600)
+                    .frame(
+                        minWidth: 300,
+                        maxWidth: proxy.size.width - 24,
+                        maxHeight: min(contentHeight, proxy.size.height - 100))
                     .background(Color("Surface"))
                     .cornerRadius(12)
                     .padding(.horizontal, 20)
