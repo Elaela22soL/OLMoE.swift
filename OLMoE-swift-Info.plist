@@ -8,5 +8,10 @@
 	<string>$(API_URL)</string>
 	<key>APP_ATTEST_TEMP_CHALLENGE</key>
 	<string>$(APP_ATTEST_TEMP_CHALLENGE)</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Manrope-VariableFont_wght.ttf</string>
+		<string>pp-telegraf.ttf</string>
+	</array>
 </dict>
 </plist>

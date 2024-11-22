@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import os
 import DeviceCheck
 import CryptoKit
 
@@ -18,17 +19,17 @@ class Bot: LLM {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM d, yyyy"
         let currentDate = dateFormatter.string(from: Date())
-        
+
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "h:mm a"
         let currentTime = timeFormatter.string(from: Date())
-        
+
         let systemPrompt = "You are OLMoE (Open Language Mixture of Expert), a small language model running on \(deviceName). You have been developed at the Allen Institute for AI (Ai2) in Seattle, WA, USA. Today is \(currentDate). The time is \(currentTime)."
-    
+
         guard FileManager.default.fileExists(atPath: Bot.modelFileURL.path) else {
             fatalError("Model file not found. Please download it first.")
         }
-        
+
 //        self.init(from: Bot.modelFileURL, template: .OLMoE(systemPrompt))
         self.init(from: Bot.modelFileURL, template: .OLMoE())
     }
@@ -37,7 +38,6 @@ class Bot: LLM {
 struct BotView: View {
     @StateObject var bot: Bot
     @State var input = ""
-    @State private var textEditorHeight: CGFloat = 40
     @State private var isGenerating = false
     @State private var scrollToBottom = false
     @State private var isSharing = false
@@ -46,6 +46,7 @@ struct BotView: View {
     @State private var isSharingConfirmationVisible = false
     @State private var isDeleteHistoryConfirmationVisible = false
     @FocusState private var isTextEditorFocused: Bool
+    let disclaimerHandlers: DisclaimerHandlers
 
     private var hasValidInput: Bool {
         !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -54,15 +55,16 @@ struct BotView: View {
     private var isInputDisabled: Bool {
         isGenerating || isSharing
     }
-    
+
     private var isDeleteButtonDisabled: Bool {
         isInputDisabled || bot.history.isEmpty
     }
-    
-    init(_ bot: Bot) {
+
+    init(_ bot: Bot, disclaimerHandlers: DisclaimerHandlers) {
         _bot = StateObject(wrappedValue: bot)
+        self.disclaimerHandlers = disclaimerHandlers
     }
-    
+
     func respond() {
         isGenerating = true
         Task {
@@ -75,45 +77,41 @@ struct BotView: View {
             }
         }
     }
-    
+
     func stop() {
         bot.stop()
         input = "" // Clear the input
         isGenerating = false
     }
-    
+
     func deleteHistory() {
         Task { @MainActor in
             await bot.clearHistory()
             bot.setOutput(to: "")
         }
     }
-    
+
     func shareConversation() {
         isSharing = true
+        disclaimerHandlers.setShowDisclaimerPage(false)
         Task {
             do {
                 // App Attest Service
                 let service = DCAppAttestService.shared
-                
+
                 // TODO: Move attest logic into it's own class
                 // TODO: Make attest available on simulator
-                // TODO: Deploy lambda to prod
                 let challengeString = Configuration.challenge
                 let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
-                let userDefaults = UserDefaults.standard
-                let keyIDKey = "appAttestKeyID"
-                var keyID: String? = nil //userDefaults.string(forKey: keyIDKey)
-                let attestationDoneKey = "appAttestAttestationDone"
-                let attestationDone = userDefaults.bool(forKey: attestationDoneKey)
+                var keyID: String? = nil
                 var attestationObjectBase64: String? = nil
 
                 #if targetEnvironment(simulator)
-                // Simulator bypass
-                keyID = "simulatorTest-\(keyIDKey)"
-                userDefaults.set(true, forKey: attestationDoneKey)
-                // Create a mock assertion
-                attestationObjectBase64 = "mock_attestation".data(using: .utf8)?.base64EncodedString()
+                await MainActor.run {
+                    print("Share not available in simulator")
+                    isSharing = false
+                }
+                return
 
                 #else
                 guard service.isSupported else {
@@ -135,34 +133,28 @@ struct BotView: View {
                             }
                         }
                     }
-                    // Store key ID in local storage
-                    userDefaults.set(keyID, forKey: keyIDKey)
-                    userDefaults.set(false, forKey: attestationDoneKey)
                 }
 
-                if !attestationDone {
-                    let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
-                        // attestation happens here
-                        service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
-                            if let error = error {
-                                continuation.resume(throwing: error)
-                            } else if let attestation = attestation {
-                                continuation.resume(returning: attestation)
-                            } else {
-                                continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
-                            }
+                let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
+                    // attestation happens here
+                    service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        } else if let attestation = attestation {
+                            continuation.resume(returning: attestation)
+                        } else {
+                            continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
                         }
                     }
-                    attestationObjectBase64 = attestationObject.base64EncodedString()
-                    userDefaults.set(true, forKey: attestationDoneKey)
                 }
+                attestationObjectBase64 = attestationObject.base64EncodedString()
 
                 #endif
 
                 // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
-                
+
                 let modelName = "olmoe-1b-7b-0924-instruct-q4_k_m"
                 let systemFingerprint = "\(modelName)-\(AppInfo.shared.appId)"
 
@@ -181,9 +173,9 @@ struct BotView: View {
                 if let attestationObjectBase64 = attestationObjectBase64 {
                     payload["attestation_object"] = attestationObjectBase64
                 }
-                
+
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
-                
+
 
                 guard let url = URL(string: apiUrl), !apiUrl.isEmpty else {
                     print("Invalid URL")
@@ -230,6 +222,48 @@ struct BotView: View {
         }
     }
 
+    @ViewBuilder
+    func shareButton() -> some View {
+        Button(action: {
+            isTextEditorFocused = false
+            disclaimerHandlers.setActiveDisclaimer(Disclaimers.ShareDisclaimer())
+            disclaimerHandlers.setCancelAction({ disclaimerHandlers.setShowDisclaimerPage(false) })
+            disclaimerHandlers.setAllowOutsideTapDismiss(true)
+            disclaimerHandlers.setConfirmAction({ shareConversation() })
+            disclaimerHandlers.setShowDisclaimerPage(true)
+        }) {
+            HStack {
+                if isSharing {
+                    SpinnerView(color: Color("AccentColor"))
+                } else {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+            .foregroundColor(Color("TextColor"))
+        }
+        .disabled(isSharing || bot.history.isEmpty || isGenerating)
+        .opacity(isSharing || bot.history.isEmpty || isGenerating ? 0.5 : 1)
+    }
+
+    @ViewBuilder
+    func trashButton() -> some View {
+        Button(action: {
+            isTextEditorFocused = false
+            isDeleteHistoryConfirmationVisible = true
+            stop()
+        }) {
+            Image(systemName: "trash.fill")
+                .foregroundColor(Color("TextColor"))
+        }.alert("Delete history?", isPresented: $isDeleteHistoryConfirmationVisible, actions: {
+            Button("Delete", action: deleteHistory)
+            Button("Cancel", role: .cancel) {
+                isDeleteHistoryConfirmationVisible = false
+            }
+        })
+        .disabled(isDeleteButtonDisabled)
+        .opacity(isDeleteButtonDisabled ? 0.5 : 1)
+    }
+
     var body: some View {
         GeometryReader { geometry in
             contentView(in: geometry)
@@ -240,40 +274,17 @@ struct BotView: View {
             }
         })
     }
-    
+
     private func contentView(in geometry: GeometryProxy) -> some View {
         ZStack {
             Color("BackgroundColor")
                 .edgesIgnoringSafeArea(.all)
-            
+
             VStack(alignment: .leading) {
                 if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
                     ScrollViewReader { proxy in
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 10) {
-                                // Display history
-                                ForEach(bot.history, id: \.content) { chat in
-                                    if chat.content != bot.output {
-                                        Text(chat.role == .user ? "User: " : "Bot: ")
-                                            .fontWeight(.bold)
-                                            .foregroundColor(Color("TextColor"))
-                                        + Text(chat.content)
-                                            .foregroundColor(Color("TextColor"))
-                                    }
-                                }
-                                .opacity(0.5)
-                                .font(.manrope().monospaced())
-                                
-                                // Display current output
-                                Text(bot.output)
-                                    .monospaced()
-                                    .foregroundColor(Color("TextColor"))
-                                    .id("bottomID") // Unique ID for scrolling
-                                Color.clear.frame(height: 1).id("bottomID2")
-                                
-                            }
-                        }
-                        .onChange(of: bot.output) { _ in
+                        ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating)
+                        .onChange(of: bot.output) { _, _ in
                             if isGenerating {
                                 withAnimation {
                                     proxy.scrollTo("bottomID", anchor: .bottom)
@@ -283,9 +294,9 @@ struct BotView: View {
                                     proxy.scrollTo("bottomID2", anchor: .bottom)
                                 }
                             }
-                            
+
                         }
-                        .onChange(of: scrollToBottom) { newValue in
+                        .onChange(of: scrollToBottom) { _, newValue in
                             if newValue {
                                 withAnimation {
                                     proxy.scrollTo("bottomID", anchor: .bottom)
@@ -305,127 +316,25 @@ struct BotView: View {
                             Image("Splash")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: min(geometry.size.width - 160, 290))
+                                .frame(width: max(140, min(geometry.size.width - 160, 290)))
                             Spacer()
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 Spacer()
-                
-                HStack(alignment: .bottom, spacing: 8) {
-                    ZStack(alignment: .topLeading) {
-                        TextEditor(text: $input)
-                            .frame(height: max(40, textEditorHeight))
-                            .scrollContentBackground(.hidden)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .foregroundStyle(.thinMaterial)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color("TextColor").opacity(0.2), lineWidth: 1)
-                            )
-                            .foregroundColor(Color("TextColor"))
-                            .font(.manrope())
-                            .focused($isTextEditorFocused)
-                            .onChange(of: isTextEditorFocused, { _, isFocused in
-                                if isFocused {
-                                    textEditorHeight = 120
-                                } else {
-                                    textEditorHeight = 40
-                                    self.hideKeyboard()
-                                }
-                            })
-                            .disabled(isInputDisabled)
-                            .opacity(isInputDisabled ? 0.6 : 1)
-                        
-                        if input.isEmpty {
-                            Text("Message")
-                                .padding([.horizontal], 4)
-                                .padding([.vertical], 8)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    VStack(spacing: 8) {
-                        Button(action: {
-                            isTextEditorFocused = false
-                            isSharingConfirmationVisible = true
-                        }) {
-                            HStack {
-                                if isSharing {
-                                    SpinnerView(color: Color("AccentColor"))
-                                } else {
-                                    Image(systemName: "square.and.arrow.up")
-                                }
-                            }
-                            .foregroundColor(Color("TextColor"))
-                            .font(.system(size: 24))
-                            .frame(width: 40, height: 40)
-                        }
-                        .popover(isPresented: $isSharingConfirmationVisible, content: {
-                            DisclaimerPage(
-                                title: Disclaimers.ShareDisclaimer().title,
-                                message: Disclaimers.ShareDisclaimer().text,
-                                confirm: DisclaimerPage.PageButton(
-                                    text: Disclaimers.ShareDisclaimer().buttonText,
-                                    onTap: {
-                                        shareConversation()
-                                        isSharingConfirmationVisible = false
-                                   }
-                               ),
-                               cancel: DisclaimerPage.PageButton(
-                                    text: "Cancel",
-                                    onTap: {
-                                        isSharingConfirmationVisible = false
-                                    }
-                               )
-                           )
-                           .presentationBackground(Color("BackgroundColor"))
-                        })
-                        .disabled(isSharing || bot.history.isEmpty)
-                        ZStack {
-                            if isGenerating {
-                                Button(action: stop) {
-                                    Image(systemName: "stop.fill")
-                                }
-                            } else {
-                                Button(action: respond) {
-                                    Image(systemName: "paperplane.fill")
-                                }
-                                .disabled(!hasValidInput)
-                                .foregroundColor(hasValidInput ? Color("AccentColor") : Color("AccentColor").opacity(0.5))
-                            }
-                        }
-                        .onTapGesture {
-                            isTextEditorFocused = false
-                        }
-                        .font(.system(size: 24))
-                        .frame(width: 40, height: 40)
-                        
-                        Button(action: {
-                            isTextEditorFocused = false
-                            isDeleteHistoryConfirmationVisible = true
-                            stop()
-                        }) {
-                            Image(systemName: "trash.fill")
-                                .foregroundColor(Color("TextColor"))
-                                .font(.system(size: 24))
-                                .frame(width: 40, height: 40)
-                        }.alert("Delete history?", isPresented: $isDeleteHistoryConfirmationVisible, actions: {
-                            Button("Delete", action: deleteHistory)
-                            Button("Cancel", role: .cancel) {
-                                isDeleteHistoryConfirmationVisible = false
-                            }
-                        })
-                        .disabled(isDeleteButtonDisabled)
-                        .opacity(isDeleteButtonDisabled ? 0.5 : 1)
-                    }
-                }
-                .padding(.horizontal)
-                .frame(maxWidth: .infinity)
+
+                MessageInputView(
+                    input: $input,
+                    isGenerating: $isGenerating,
+                    isTextEditorFocused: $isTextEditorFocused,
+                    isInputDisabled: isInputDisabled,
+                    hasValidInput: hasValidInput,
+                    respond: respond,
+                    stop: stop
+                )
             }
-            .padding()
+            .padding(12)
         }
         .sheet(isPresented: $showShareSheet, content: {
             if let url = shareURL {
@@ -435,6 +344,13 @@ struct BotView: View {
         .gesture(TapGesture().onEnded({
             isTextEditorFocused = false
         }))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                shareButton()
+                trashButton()
+            }
+        }
     }
 }
 
@@ -461,78 +377,82 @@ struct ActivityViewController: UIViewControllerRepresentable {
 
 struct ContentView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
+    @StateObject private var disclaimerState = DisclaimerState()
     @State private var bot: Bot?
-    @AppStorage("hasSeenDisclaimer") private var hasSeenDisclaimer : Bool = false
-    @State private var showDisclaimerPage : Bool = false
     @State private var showInfoPage : Bool = false
-    @State private var disclaimerPageIndex: Int = 0
     @State private var isSupportedDevice: Bool = isDeviceSupported()
     @State private var useMockedModelResponse: Bool = false
-    
-    let disclaimers: [Disclaimer] = [
-        Disclaimers.MainDisclaimer(),
-        Disclaimers.AdditionalDisclaimer()
-    ]
-    
+
+    let logger = Logger(subsystem: "com.allenai.olmoe", category: "ContentView")
+
     var body: some View {
-        VStack {
-            if !isSupportedDevice && !useMockedModelResponse {
-                UnsupportedDeviceView(
-                    proceedAnyway: { isSupportedDevice = true },
-                    proceedMocked: {
-                        bot?.loopBackTestResponse = true
-                        useMockedModelResponse = true                        
+        ZStack {
+            NavigationStack {
+                VStack {
+                    if !isSupportedDevice && !useMockedModelResponse {
+                        UnsupportedDeviceView(
+                            proceedAnyway: { isSupportedDevice = true },
+                            proceedMocked: {
+                                bot?.loopBackTestResponse = true
+                                useMockedModelResponse = true
+                            }
+                        )
+                    } else if let bot = bot {
+                        BotView(bot, disclaimerHandlers: DisclaimerHandlers(
+                            setActiveDisclaimer: { self.disclaimerState.activeDisclaimer = $0 },
+                            setAllowOutsideTapDismiss: { self.disclaimerState.allowOutsideTapDismiss = $0 },
+                            setCancelAction: { self.disclaimerState.onCancel = $0 },
+                            setConfirmAction: { self.disclaimerState.onConfirm = $0 },
+                            setShowDisclaimerPage: { self.disclaimerState.showDisclaimerPage = $0 }
+                        ))
+                    } else {
+                        ModelDownloadView()
                     }
-                )
-            } else if let bot = bot {
-                BotView(bot)
-            } else {
-                ModelDownloadView()
+                }
+                .onChange(of: downloadManager.isModelReady) { newValue in
+                    if newValue && bot == nil {
+                        initializeBot()
+                    }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    AppToolbar(
+                        leadingContent: {
+                            InfoButton(action: { showInfoPage = true })
+                        }
+                    )
+                }
             }
-        }
-        .onChange(of: downloadManager.isModelReady) { newValue in
-            if newValue && bot == nil {
-                initializeBot()
+            .onAppear {
+                disclaimerState.showInitialDisclaimer()
             }
-        }
-        .popover(isPresented: $showDisclaimerPage) {
-            let page = disclaimers[disclaimerPageIndex]
+
+            InfoView(isPresented: $showInfoPage)
+
             DisclaimerPage(
-                title: page.title,
-                message: page.text,
+                allowOutsideTapDismiss: disclaimerState.allowOutsideTapDismiss,
+                isPresented: $disclaimerState.showDisclaimerPage,
+                message: disclaimerState.activeDisclaimer?.text ?? "",
+                title: disclaimerState.activeDisclaimer?.title ?? "",
                 confirm: DisclaimerPage.PageButton(
-                    text: page.buttonText,
+                    text: disclaimerState.activeDisclaimer?.buttonText ?? "",
                     onTap: {
-                        nextDisclaimerPage()
-                    })
+                        disclaimerState.onConfirm?()
+                    }
+                ),
+                cancel: disclaimerState.onCancel.map { cancelAction in
+                    DisclaimerPage.PageButton(
+                        text: "Cancel",
+                        onTap: {
+                            cancelAction()
+                            disclaimerState.activeDisclaimer = nil
+                        }
+                    )
+                }
             )
-            .interactiveDismissDisabled(true)
-            .presentationBackground(Color("BackgroundColor"))
-        }
-        .overlay(
-            InfoButton(action: { showInfoPage = true })
-            , alignment: .topTrailing
-        )
-        .sheet(isPresented: $showInfoPage) {
-            InfoView()
-        }
-        .onAppear(perform: checkModelAndInitializeBot)
-        .onAppear {
-            if !hasSeenDisclaimer {
-                showDisclaimerPage = true
-            }
         }
     }
 
-    private func nextDisclaimerPage() {
-        disclaimerPageIndex = min(disclaimers.count, disclaimerPageIndex + 1)
-        if disclaimerPageIndex >= disclaimers.count {
-            disclaimerPageIndex = 0
-            showDisclaimerPage = false
-            hasSeenDisclaimer = true
-        }
-    }
-        
     private func checkModelAndInitializeBot() {
         if FileManager.default.fileExists(atPath: Bot.modelFileURL.path) {
             downloadManager.isModelReady = true

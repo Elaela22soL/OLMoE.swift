@@ -8,6 +8,8 @@ __pycache__/
 
 # Environment
 .env
+.env.json
+.venv/
 
 # IDEs
 .vscode/
@@ -16,6 +18,8 @@ __pycache__/
 # OS
 .DS_Store
 
+# Xcode
+build/
 
 # user data in xcode
 *.xcuserstate
@@ -29,8 +33,10 @@ __pycache__/
 OLMoE.swift.xcodeproj/project.xcworkspace/xcuserdata/
 OLMoE.swift.xcodeproj/xcuserdata
 
+# Cursor
 .cursorrules
 
+# Misc
 no_commit/
 
 *.example.xcconfig

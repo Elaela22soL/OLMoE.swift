@@ -144,6 +144,27 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
     }
 }
 
+
+struct Ai2Logo: View {
+    var body: some View {
+        HStack {
+            Image("Ai2 Logo")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 18)
+                .padding([.horizontal], 4)
+            
+            Divider()
+                .background(Color("DividerTeal"))
+                .frame(width: 1, height: 20)
+            
+            Text("allenai.org")
+                .font(.manrope())
+                .padding([.horizontal], 4)
+        }.padding()
+    }
+}
+
 struct ModelDownloadView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
     
@@ -153,30 +174,46 @@ struct ModelDownloadView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
+                                    
                 if downloadManager.isModelReady {
                     Text("Model is ready to use!")
                         .foregroundColor(Color("TextColor"))
+                        .font(.title())
                     Button("Flush Model", action: downloadManager.flushModel)
-                        .padding()
-                        .background(Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                        .font(.manrope())
+                        .buttonStyle(.PrimaryButton)
                 } else if downloadManager.isDownloading {
                     ProgressView("Downloading...", value: downloadManager.downloadProgress, total: 1.0)
                         .progressViewStyle(LinearProgressViewStyle())
                         .padding()
                         .foregroundColor(Color("TextColor"))
-                    Text("\(Int(downloadManager.downloadProgress * 100))% - \(formatSize(downloadManager.downloadedSize)) / \(formatSize(downloadManager.totalSize))")
-                        .foregroundColor(Color("TextColor"))
-                        .font(.manrope())
+                        .font(.body())
+                    HStack {
+                        Text("\(Int(downloadManager.downloadProgress * 100))%")
+                            .foregroundColor(Color("TextColor"))
+                            .font(.body())
+                        
+                        Divider()
+                            .frame(height: 20)
+                            .background(Color("DividerTeal"))
+                        
+                        Text("\(formatSize(downloadManager.downloadedSize)) / \(formatSize(downloadManager.totalSize))")
+                            .foregroundColor(Color("TextColor"))
+                            .font(.body())
+                    }
                 } else {
+                    Text("Welcome")
+                        .font(.telegraf(size: 48))
+                    
+                    Text("To get started, download the latest AI model.")
+                        .multilineTextAlignment(.center)
+                        .font(.body())
+                        .padding([.bottom], 4)
+                    
+                    Spacer()
+                        .frame(height: 16)
+                    
                     Button("Download Model", action: downloadManager.startDownload)
-                        .padding()
-                        .background(Color.accentColor)
-                        .foregroundColor(Color.textColorButton)
-                        .cornerRadius(8)
-                        .font(.manrope(.bold))
+                        .buttonStyle(.PrimaryButton)
                 }
 
                 if let error = downloadManager.downloadError {
@@ -185,6 +222,10 @@ struct ModelDownloadView: View {
                         .padding()
                 }
             }
+            .padding()
+            
+            Ai2Logo()
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         }
         .onAppear {
             if FileManager.default.fileExists(atPath: Bot.modelFileURL.path) {

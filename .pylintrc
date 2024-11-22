@@ -1,0 +1,27 @@
+[MESSAGES CONTROL]
+disable=
+    missing-class-docstring,
+    missing-function-docstring,
+    unused-import,
+    not-callable,
+    import-error,
+    no-member,
+    no-value-for-parameter,
+    multiple-statements,
+    no-self-argument,
+    redefined-builtin,
+    relative-beyond-top-level
+ignore-paths=
+    ^__tests__/electron/,
+    ^__tests__/src/,
+    ^.next/,
+    ^.yarn/,
+    ^build/,
+    ^coverage/,
+    ^electron/,
+    ^node_modules/,
+    ^python/visidata/,
+    ^src/
+
+[FORMAT]
+max-line-length=240

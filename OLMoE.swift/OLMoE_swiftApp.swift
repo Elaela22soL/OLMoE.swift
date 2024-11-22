@@ -8,7 +8,10 @@ struct OLMoE_swiftApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .font(.manrope())
+                .environment(\.font, .manrope())
+                .environment(\.colorScheme, .dark)
+                .preferredColorScheme(.dark)
+                
         }
     }
 }

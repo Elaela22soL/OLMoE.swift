@@ -1,6 +1,5 @@
 # AWS Lambda to enable logging to S3
 
-
 ## Setup
 
 1. Install AWS CLI
@@ -11,6 +10,14 @@
 ```shell
 pip install --upgrade aws-sam-cli
 ```
+
+## Set environment variables
+
+```
+cp .env.example.json .env.json
+```
+
+Copy and paste env vars from 1Password into `.env.json`
 
 ## Run locally
 
@@ -23,7 +30,9 @@ AWS_PROFILE=llm sam build
 Then, run the lambda locally:
 
 ```shell
-AWS_PROFILE=llm sam local invoke S3LoggingFunction -e tests/test_event.json
+AWS_PROFILE=llm sam local invoke OlmoeAttestS3LoggingFunction -e tests/dev_attest.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
+# or
+AWS_PROFILE=llm sam local invoke OlmoeAttestS3LoggingFunction -e tests/prod_attest.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
 ## Deploy
@@ -31,13 +40,13 @@ AWS_PROFILE=llm sam local invoke S3LoggingFunction -e tests/test_event.json
 If you have not deployed before, you will need to deploy:
 
 ```shell
-AWS_PROFILE=llm sam deploy --guided
+AWS_PROFILE=llm sam deploy --guided --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
 After that, you can deploy changes with:
 
 ```shell
-AWS_PROFILE=llm sam deploy
+AWS_PROFILE=llm sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
 ## API Gateway Spec
@@ -45,7 +54,7 @@ AWS_PROFILE=llm sam deploy
 You can log traces from any application using the API Gateway endpoint.
 
 - **Method**: POST
-- **URL**: https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod
+- **URL**: <https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod>
 - **Body**:
 
 ```json
