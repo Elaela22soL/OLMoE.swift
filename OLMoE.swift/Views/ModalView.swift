@@ -53,7 +53,9 @@ struct ModalView<Content: View>: View {
 
                         ScrollView {
                             content
-                                .padding()
+                                .padding(.horizontal, 12)
+                                .padding(.bottom, 24)
+                                .padding(.top, showCloseButton ? 0 : 24)
                                 .frame(maxWidth: .infinity)
                         }
                         .background(Color("Surface"))

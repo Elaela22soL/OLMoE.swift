@@ -43,15 +43,12 @@ struct InfoView: View {
             showCloseButton: true
         ) {
             VStack(alignment: .leading, spacing: 16) {
-
                 Ai2Logo()
                     .frame(maxWidth: .infinity, alignment: .center)
 
                 Text(.init(InfoText.body))
                     .font(.body())
-                    .padding(.horizontal)
             }
-            .padding()
         }
     }
 }
