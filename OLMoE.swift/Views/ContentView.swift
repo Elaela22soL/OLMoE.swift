@@ -283,7 +283,7 @@ struct BotView: View {
             VStack(alignment: .leading) {
                 if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
                     ScrollViewReader { proxy in
-                        ChatView(history: bot.history, output: bot.output)
+                        ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating)
                         .onChange(of: bot.output) { _ in
                             if isGenerating {
                                 withAnimation {
