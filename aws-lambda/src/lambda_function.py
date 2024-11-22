@@ -1,3 +1,4 @@
+import os
 import json
 from dataclasses import dataclass, field
 import boto3  # type: ignore
@@ -12,9 +13,9 @@ from pyattest.attestation import Attestation, PyAttestException
 s3 = boto3.client("s3")
 
 # Configure these variables
-BUCKET_NAME = "olmo-interactions-share"
-S3_LOG_PREFIX = "logs"
-S3_SHARE_PREFIX = "share"
+BUCKET_NAME = os.environ['BUCKET_NAME']
+S3_LOG_PREFIX = os.environ['S3_LOG_PREFIX']
+S3_SHARE_PREFIX = os.environ['S3_SHARE_PREFIX']
 
 with open("chat_template.html", "r") as f:
     CHAT_TEMPLATE = f.read()
