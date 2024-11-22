@@ -62,7 +62,6 @@ struct MessageInputView: View {
                 .fill(Color("Surface"))
                 .foregroundStyle(.thinMaterial)
         )
-        .padding(12)
         .frame(maxWidth: .infinity)
     }
 }

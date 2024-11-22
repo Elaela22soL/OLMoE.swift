@@ -283,8 +283,8 @@ struct BotView: View {
             VStack(alignment: .leading) {
                 if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
                     ScrollViewReader { proxy in
-                        ChatView(history: bot.history, output: bot.output)
-                        .onChange(of: bot.output) { _ in
+                        ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating)
+                        .onChange(of: bot.output) { _, _ in
                             if isGenerating {
                                 withAnimation {
                                     proxy.scrollTo("bottomID", anchor: .bottom)
@@ -296,7 +296,7 @@ struct BotView: View {
                             }
 
                         }
-                        .onChange(of: scrollToBottom) { newValue in
+                        .onChange(of: scrollToBottom) { _, newValue in
                             if newValue {
                                 withAnimation {
                                     proxy.scrollTo("bottomID", anchor: .bottom)
@@ -334,7 +334,7 @@ struct BotView: View {
                     stop: stop
                 )
             }
-            .padding()
+            .padding(12)
         }
         .sheet(isPresented: $showShareSheet, content: {
             if let url = shareURL {

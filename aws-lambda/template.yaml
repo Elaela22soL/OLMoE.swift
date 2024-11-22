@@ -2,6 +2,20 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: S3 Logging Lambda Function
 
+Parameters:
+  BucketName:
+    Type: String
+  S3LogPrefix:
+    Type: String
+  S3SharePrefix:
+    Type: String
+  CertificateAsBytes:
+    Type: String
+  AppId:
+    Type: String
+  TempChallenge:
+    Type: String
+
 Resources:
   OlmoeAttestS3LoggingFunction:
     Type: AWS::Serverless::Function
@@ -14,10 +28,15 @@ Resources:
       MemorySize: 256
       Environment:
         Variables:
-          BUCKET_NAME: olmo-interactions-share
+          BUCKET_NAME: !Ref BucketName
+          S3_LOG_PREFIX: !Ref S3LogPrefix
+          S3_SHARE_PREFIX: !Ref S3SharePrefix
+          CERTIFICATE_AS_BYTES: !Ref CertificateAsBytes
+          APP_ID: !Ref AppId
+          TEMP_CHALLENGE: !Ref TempChallenge
       Policies:
         - S3CrudPolicy:
-            BucketName: olmo-interactions-share
+            BucketName: !Ref BucketName
 
 Outputs:
   OlmoeAttestS3LoggingFunction:

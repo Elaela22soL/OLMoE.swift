@@ -14,7 +14,6 @@ struct InfoButton: View {
         Button(action: action) {
             Image(systemName: "info.circle")
                 .foregroundColor(Color("TextColor"))
-                .padding()
         }
         .clipShape(Circle())
         .background(
