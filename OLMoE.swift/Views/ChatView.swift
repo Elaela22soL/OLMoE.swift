@@ -14,7 +14,7 @@ public struct UserChatBubble: View {
         HStack(alignment: .top) {
             Spacer()
 
-            Text(text)
+            Text(text.trimmingCharacters(in: .whitespacesAndNewlines))
                 .padding(12)
                 .background(Color("Surface"))
                 .cornerRadius(12)
@@ -41,7 +41,7 @@ public struct BotChatBubble: View {
             if isGenerating && text.isEmpty {
                 TypingIndicator()
             } else {
-                Text(text)
+                Text(text.trimmingCharacters(in: .whitespacesAndNewlines))
                     .padding(.top, -2)
                     .background(Color("BackgroundColor"))
                     .frame(maxWidth: .infinity, alignment: .leading)
