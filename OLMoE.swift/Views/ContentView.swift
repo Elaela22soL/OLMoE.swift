@@ -7,8 +7,6 @@
 
 import SwiftUI
 import os
-import DeviceCheck
-import CryptoKit
 
 class Bot: LLM {
     static let modelFileName = "olmoe-1b-7b-0924-instruct-q4_k_m.gguf"
@@ -96,61 +94,9 @@ struct BotView: View {
         disclaimerHandlers.setShowDisclaimerPage(false)
         Task {
             do {
-                // App Attest Service
-                let service = DCAppAttestService.shared
-
-                // TODO: Move attest logic into it's own class
-                // TODO: Make attest available on simulator
                 let challengeString = Configuration.challenge
-                let clientDataHash = Data(SHA256.hash(data: Data(challengeString.utf8)))
-                var keyID: String? = nil
-                var attestationObjectBase64: String? = nil
-
-                #if targetEnvironment(simulator)
-                await MainActor.run {
-                    print("Share not available in simulator")
-                    isSharing = false
-                }
-                return
-
-                #else
-                guard service.isSupported else {
-                    print("App Attest not supported on this device")
-                    isSharing = false
-                    return
-                }
-
-                if keyID == nil {
-                    // Generate a new key
-                    keyID = try await withCheckedThrowingContinuation { continuation in
-                        service.generateKey { newKeyID, error in
-                            if let error = error {
-                                continuation.resume(throwing: error)
-                            } else if let newKeyID = newKeyID {
-                                continuation.resume(returning: newKeyID)
-                            } else {
-                                continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
-                            }
-                        }
-                    }
-                }
-
-                let attestationObject: Data = try await withCheckedThrowingContinuation { continuation in
-                    // attestation happens here
-                    service.attestKey(keyID!, clientDataHash: clientDataHash) { attestation, error in
-                        if let error = error {
-                            continuation.resume(throwing: error)
-                        } else if let attestation = attestation {
-                            continuation.resume(returning: attestation)
-                        } else {
-                            continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
-                        }
-                    }
-                }
-                attestationObjectBase64 = attestationObject.base64EncodedString()
-
-                #endif
-
+                let attestationResult = try await AppAttestManager.performAttest(challengeString: challengeString)
+                
                 // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
@@ -162,20 +108,16 @@ struct BotView: View {
                     ["role": chat.role == .user ? "user" : "assistant", "content": chat.content]
                 }
 
-                var payload: [String: Any] = [
+                let payload: [String: Any] = [
                     "model": modelName,
                     "system_fingerprint": systemFingerprint,
                     "created": Int(Date().timeIntervalSince1970),
                     "messages": messages,
-                    "key_id": keyID!
+                    "key_id": attestationResult.keyID,
+                    "attestation_object": attestationResult.attestationObjectBase64
                 ]
 
-                if let attestationObjectBase64 = attestationObjectBase64 {
-                    payload["attestation_object"] = attestationObjectBase64
-                }
-
                 let jsonData = try JSONSerialization.data(withJSONObject: payload)
-
 
                 guard let url = URL(string: apiUrl), !apiUrl.isEmpty else {
                     print("Invalid URL")
@@ -213,7 +155,12 @@ struct BotView: View {
                     print("Failed to share conversation")
                 }
             } catch {
-                print("Error sharing conversation: \(error)")
+                let attestError = error as NSError
+                if attestError.domain == "AppAttest" {
+                    print("Error: \(attestError.localizedDescription)")
+                } else {
+                    print("Error sharing conversation: \(error)")
+                }
             }
 
             await MainActor.run {
