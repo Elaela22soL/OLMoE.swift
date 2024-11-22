@@ -38,7 +38,7 @@ public struct BotChatBubble: View {
                 .background(Color("Surface"))
                 .clipShape(Circle())
             
-            if isGenerating && text.isEmpty {
+            if isGenerating && text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 TypingIndicator()
             } else {
                 Text(text.trimmingCharacters(in: .whitespacesAndNewlines))
