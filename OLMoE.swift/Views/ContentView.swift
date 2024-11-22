@@ -426,9 +426,8 @@ struct ContentView: View {
             .onAppear {
                 disclaimerState.showInitialDisclaimer()
             }
-            .sheet(isPresented: $showInfoPage) {
-                InfoView()
-            }
+
+            InfoView(isPresented: $showInfoPage)
 
             DisclaimerPage(
                 allowOutsideTapDismiss: disclaimerState.allowOutsideTapDismiss,

@@ -42,12 +42,13 @@ struct ModalView<Content: View>: View {
                             HStack {
                                 Spacer()
                                 Button(action: { isPresented = false }) {
-                                    Image(systemName: "xmark.circle.fill")
+                                    Image(systemName: "xmark.circle")
+                                        .font(.system(size: 20))
+                                        .frame(width: 40, height: 40)
                                         .foregroundColor(Color("TextColor"))
                                 }
+                                .clipShape(Circle())
                             }
-                            .padding()
-                            .background(Color("Surface"))
                         }
 
                         ScrollView {
@@ -106,8 +107,8 @@ struct ModalView<Content: View>: View {
       VStack(spacing: 16) {
           Text("Complex Title")
                 .font(.title)
-        Text("This modal can only be closed programmatically")
-            .padding()
+          Text("This modal can only be closed programmatically")
+              .padding()
         }
     }
 }
