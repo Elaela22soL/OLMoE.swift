@@ -284,7 +284,7 @@ struct BotView: View {
                 if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
                     ScrollViewReader { proxy in
                         ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating)
-                        .onChange(of: bot.output) { _ in
+                        .onChange(of: bot.output) { _, _ in
                             if isGenerating {
                                 withAnimation {
                                     proxy.scrollTo("bottomID", anchor: .bottom)
@@ -296,7 +296,7 @@ struct BotView: View {
                             }
 
                         }
-                        .onChange(of: scrollToBottom) { newValue in
+                        .onChange(of: scrollToBottom) { _, newValue in
                             if newValue {
                                 withAnimation {
                                     proxy.scrollTo("bottomID", anchor: .bottom)
