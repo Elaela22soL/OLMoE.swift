@@ -10,14 +10,14 @@ import SwiftUI
 struct PrimaryButton: ButtonStyle {
     func makeBody(configuration: ButtonStyle.Configuration) -> some View {
         configuration.label
+            .frame(minWidth: 100)
             .padding(.vertical, 12)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 12)
             .background(Color.accentColor)
             .cornerRadius(12)
             .font(.manrope(size: 14))
             .fontWeight(.semibold)
             .foregroundColor(Color("TextColorButton"))
-            .frame(maxWidth: .infinity)
     }
 }
 
@@ -30,14 +30,14 @@ extension ButtonStyle where Self == PrimaryButton {
 struct SecondaryButton: ButtonStyle {
     func makeBody(configuration: ButtonStyle.Configuration) -> some View {
         configuration.label
+            .frame(minWidth: 100)
             .padding(.vertical, 12)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 12)
             .background(Color.background)
             .cornerRadius(12)
             .font(.manrope(size: 14))
             .fontWeight(.semibold)
             .foregroundColor(Color("AccentColor"))
-            .frame(maxWidth: .infinity)
             .preferredColorScheme(.dark)
     }
 }

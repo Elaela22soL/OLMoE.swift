@@ -104,7 +104,6 @@ struct DisclaimerPage: View {
 
                 Text(.init(message))
                     .font(.body())
-                    .padding(.horizontal, 20)
 
                 HStack(spacing: 12) {
                     if let cancel = cancel {
@@ -119,7 +118,6 @@ struct DisclaimerPage: View {
                     }
                     .buttonStyle(.PrimaryButton)
                 }
-                .padding(.horizontal, 20)
             }
         }
     }
