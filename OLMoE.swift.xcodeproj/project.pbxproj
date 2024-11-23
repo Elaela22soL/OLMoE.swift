@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		489FD75C2CF13E4E0011E908 /* AttestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489FD75B2CF13E4E0011E908 /* AttestManager.swift */; };
 		A0117FEC2C990EAB00035007 /* OLMoE_swiftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */; };
 		A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0117FEF2C990EAC00035007 /* Assets.xcassets */; };
 		A0117FF42C990EAC00035007 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0117FF32C990EAC00035007 /* Preview Assets.xcassets */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		489FD75B2CF13E4E0011E908 /* AttestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttestManager.swift; sourceTree = "<group>"; };
 		A0117FE82C990EAB00035007 /* OLMoE.swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OLMoE.swift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OLMoE_swiftApp.swift; sourceTree = "<group>"; };
 		A0117FEF2C990EAC00035007 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 		B26FDB402CEAD47700E1D57C /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				489FD75B2CF13E4E0011E908 /* AttestManager.swift */,
 				A01180002C990F7600035007 /* LLM.swift */,
 				B26FDB5D2CEAD5CB00E1D57C /* Model.swift */,
 				B26FDB5B2CEAD5C400E1D57C /* Context.swift */,
@@ -215,6 +218,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				489FD75C2CF13E4E0011E908 /* AttestManager.swift in Sources */,
 				B26FDB4C2CEAD53700E1D57C /* HuggingFaceError.swift in Sources */,
 				B26FDB522CEAD54C00E1D57C /* Role.swift in Sources */,
 				B26FDB5C2CEAD5C400E1D57C /* Context.swift in Sources */,
