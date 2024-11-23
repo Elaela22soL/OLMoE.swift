@@ -49,7 +49,6 @@ struct ModalView<Content: View>: View {
                                 .padding(.horizontal, 12)
                                 .padding(.bottom, 24)
                                 .padding(.top, showCloseButton ? 0 : 24)
-                                .frame(maxWidth: .infinity)
                                 .background(
                                     GeometryReader { geo in
                                         Color.clear
@@ -63,8 +62,8 @@ struct ModalView<Content: View>: View {
                     }
                     .frame(
                         minWidth: 300,
-                        maxWidth: proxy.size.width - 24,
-                        maxHeight: min(contentHeight, proxy.size.height - 100))
+                        maxWidth: min(350, proxy.size.width - 24),
+                        maxHeight: min(contentHeight, proxy.size.height - 100) + 24)
                     .background(Color("Surface"))
                     .cornerRadius(12)
                     .padding(.horizontal, 20)
