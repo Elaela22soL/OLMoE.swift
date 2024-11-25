@@ -59,7 +59,7 @@ struct ModalView<Content: View>: View {
                         .frame(maxHeight: min(contentHeight, proxy.size.height - 100))
                         .padding(.bottom, 24)
                     }
-                    .frame(minWidth: 300, maxWidth: min(302, proxy.size.width - 48))
+                    .frame(minWidth: 300, maxWidth: min(600, proxy.size.width - 48))
                     .padding(.horizontal, 12)
                     .background(Color("Surface"))
                     .cornerRadius(12)
