@@ -21,7 +21,7 @@ struct ModalView<Content: View>: View {
         if isPresented {
             GeometryReader { proxy in
                 ZStack {
-                    Color.black.opacity(0.3)
+                    Color.black.opacity(0.5)
                         .edgesIgnoringSafeArea(.all)
                         .contentShape(Rectangle())  // Make entire overlay tappable
                         .onTapGesture {
@@ -46,10 +46,7 @@ struct ModalView<Content: View>: View {
 
                         ScrollView {
                             content
-                                .padding(.horizontal, 12)
-                                .padding(.bottom, 24)
                                 .padding(.top, showCloseButton ? 0 : 24)
-                                .frame(maxWidth: .infinity)
                                 .background(
                                     GeometryReader { geo in
                                         Color.clear
@@ -59,15 +56,13 @@ struct ModalView<Content: View>: View {
                                     })
                         }
                         .id(UUID()) // Force unique ID so onAppear gets updated height and scrolls to top
-                        .background(Color("Surface"))
+                        .frame(maxHeight: min(contentHeight, proxy.size.height - 100))
+                        .padding(.bottom, 24)
                     }
-                    .frame(
-                        minWidth: 300,
-                        maxWidth: proxy.size.width - 24,
-                        maxHeight: min(contentHeight, proxy.size.height - 100))
+                    .frame(minWidth: 300, maxWidth: min(302, proxy.size.width - 48))
+                    .padding(.horizontal, 12)
                     .background(Color("Surface"))
                     .cornerRadius(12)
-                    .padding(.horizontal, 20)
                 }
             }
         }
