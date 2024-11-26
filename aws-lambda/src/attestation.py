@@ -10,7 +10,7 @@ CERTIFICATE_AS_BYTES = os.environ['CERTIFICATE_AS_BYTES'].encode()
 CERTIFICATE = base64.decodebytes(CERTIFICATE_AS_BYTES)
 
 APP_ID = os.environ['APP_ID']
-IS_PRODUCTION = True
+IS_PRODUCTION = os.environ.get('ENV', 'prod').lower() == 'prod'
 
 def verify_attest(key_id: str, attestation_object: str) -> bool:
     """
