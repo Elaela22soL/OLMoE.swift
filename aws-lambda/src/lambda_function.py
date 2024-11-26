@@ -1,13 +1,9 @@
 import os
 import json
-import secrets
-import hashlib
-import hmac
 from datetime import datetime
-import base64
 import boto3  # type: ignore
-from attestation import verify_attest
 
+from attestation import verify_attest, generate_challenge
 from entities.trace import Trace
 from entities.routes import LambdaRouter, Route
 
@@ -23,72 +19,39 @@ with open("chat_template.html", "r") as f:
     CHAT_TEMPLATE = f.read()
 
 def lambda_handler(event, context):
+    """
+    Handle the incoming request, and route it to the appropriate handler
+    """
     try:
-        route = LambdaRouter.route(event)
-
-        match route:
-            case Route.GENERATE_CHALLENGE:
-                return generate_challenge(event)
+        match LambdaRouter.get_route(event):
+            case Route.ISSUE_CHALLENGE:
+                return handle_issue_challenge(event)
             case Route.WRITE_TRACE_TO_S3:
-                return write_to_s3(event)
+                return handle_write_to_s3(event)
             case _:
-                return {
-                    "statusCode": 500,
-                    "body": json.dumps({
-                        "outcome": "failure",
-                        "error": "Invalid request body"
-                    })
-                }
+                return { "statusCode": 500, "body": json.dumps({ "outcome": "failure", "error": "Invalid request body" }) }
     except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({
-                "outcome": "failure",
-                "error": f"{type(e).__name__}: {e}"
-            })
-        }
+        return { "statusCode": 500, "body": json.dumps({ "outcome": "failure", "error": f"{type(e).__name__}: {e}" }) }
 
-    # return {"statusCode": status_code, "body": json.dumps(body)}
-
-def generate_challenge(event):
-    """Generate a challenge for the given key_id"""
+def handle_issue_challenge(event):
+    """
+    Respond to a request for a challenge
+    """
     key_id = event.get('key_id')
     if not key_id or not isinstance(key_id, str):
-        return {
-            "statusCode": 400,
-            "body": json.dumps({"error": "Invalid key_id"})
-        }
+        return { "statusCode": 400, "body": json.dumps({"error": "Invalid key_id"}) }
 
     try:
-        random_bytes = secrets.token_bytes(32)
-        secret_key = os.environ.get('HMAC_SHA_KEY')
-        message = f"{key_id}:{random_bytes.hex()}".encode('utf-8')
+        challenge_base64 = generate_challenge(key_id)
 
-        # Generate HMAC
-        hmac_obj = hmac.new(
-            key=secret_key.encode('utf-8'),
-            msg=message,
-            digestmod=hashlib.sha256
-        )
-        challenge = hmac_obj.hexdigest()
-        challenge_base64 = base64.b64encode(bytes.fromhex(challenge)).decode('utf-8')
-
-        return {
-            "statusCode": 200,
-            "body": json.dumps({
-                "challenge": challenge_base64
-            })
-        }
+        return { "statusCode": 200, "body": json.dumps({ "challenge": challenge_base64 }) }
     except Exception:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({
-                "error": "Failed to generate challenge"
-            })
-        }
+        return { "statusCode": 500, "body": json.dumps({ "error": "Failed to generate challenge" }) }
 
-
-def write_to_s3(event):
+def handle_write_to_s3(event):
+    """
+    Respond to a request to write a trace to S3, and return a URL to the trace
+    """
     key_id = event.get('key_id')
     attestation_object = event.get('attestation_object')
 
