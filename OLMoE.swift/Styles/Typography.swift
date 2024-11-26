@@ -8,4 +8,8 @@ extension Font {
     static func body() -> Font {
         .manrope(.medium, size: 14)
     }
+    
+    static func subheader() -> Font {
+        .manrope(.medium, size: 18)
+    }
 }

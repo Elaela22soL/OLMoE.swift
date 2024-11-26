@@ -32,25 +32,27 @@ struct InfoView: View {
     @Binding var isPresented: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Spacer()
-                Button(action: { isPresented = false }) {
-                    Image(systemName: "xmark.circle")
-                        .font(.system(size: 20))
-                        .frame(width: 40, height: 40)
-                        .foregroundColor(Color("TextColor"))
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                HStack {
+                    Spacer()
+                    Button(action: { isPresented = false }) {
+                        Image(systemName: "xmark.circle")
+                            .font(.system(size: 20))
+                            .frame(width: 40, height: 40)
+                            .foregroundColor(Color("TextColor"))
+                    }
+                    .clipShape(Circle())
                 }
-                .clipShape(Circle())
+                
+                ForEach(InfoText.content) { text in
+                    HeaderTextPairView(header: text.header, text: text.text)
+                }
             }
-            Ai2Logo()
-                .frame(maxWidth: .infinity, alignment: .center)
-
-            Text(.init(InfoText.body))
-                .font(.body())
-        }
-        .onTapGesture {
-            isPresented = false
+            .onTapGesture {
+                isPresented = false
+            }
+            .padding([.bottom], 24)
         }
     }
 }

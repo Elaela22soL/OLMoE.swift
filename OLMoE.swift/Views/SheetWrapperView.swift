@@ -22,7 +22,6 @@ struct SheetWrapper<Content: View>: View {
                 content
             }
             .padding(.horizontal, 12)
-            .padding(.bottom, 24)
         }
     }
 }
