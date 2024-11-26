@@ -13,8 +13,6 @@ Parameters:
     Type: String
   AppId:
     Type: String
-  TempChallenge:
-    Type: String
   HmacShaKey:
     Type: String
 
@@ -35,7 +33,6 @@ Resources:
           S3_SHARE_PREFIX: !Ref S3SharePrefix
           CERTIFICATE_AS_BYTES: !Ref CertificateAsBytes
           APP_ID: !Ref AppId
-          TEMP_CHALLENGE: !Ref TempChallenge
           HMAC_SHA_KEY: !Ref HmacShaKey
       Policies:
         - S3CrudPolicy:
