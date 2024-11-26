@@ -6,6 +6,7 @@ import boto3  # type: ignore
 from attestation import verify_attest, generate_challenge
 from entities.trace import Trace
 from entities.routes import LambdaRouter, Route
+from entities.response import ApiResponse
 
 # Initialize S3 client
 s3 = boto3.client("s3")
@@ -29,9 +30,9 @@ def lambda_handler(event, context):
             case Route.WRITE_TRACE_TO_S3:
                 return handle_write_to_s3(event)
             case _:
-                return { "statusCode": 500, "body": json.dumps({ "outcome": "failure", "error": "Invalid request body" }) }
+                return ApiResponse.error("Invalid request body", 400)
     except Exception as e:
-        return { "statusCode": 500, "body": json.dumps({ "outcome": "failure", "error": f"{type(e).__name__}: {e}" }) }
+        return ApiResponse.error(f"{type(e).__name__}: {e}")
 
 def handle_issue_challenge(event):
     """
@@ -39,14 +40,14 @@ def handle_issue_challenge(event):
     """
     key_id = event.get('key_id')
     if not key_id or not isinstance(key_id, str):
-        return { "statusCode": 400, "body": json.dumps({"error": "Invalid key_id"}) }
+        return ApiResponse.error("Invalid key_id", 400)
 
     try:
         challenge_base64 = generate_challenge(key_id)
 
-        return { "statusCode": 200, "body": json.dumps({ "challenge": challenge_base64 }) }
+        return ApiResponse.success({ "challenge": challenge_base64 })
     except Exception:
-        return { "statusCode": 500, "body": json.dumps({ "error": "Failed to generate challenge" }) }
+        return ApiResponse.error("Failed to generate challenge")
 
 def handle_write_to_s3(event):
     """
@@ -56,7 +57,7 @@ def handle_write_to_s3(event):
     attestation_object = event.get('attestation_object')
 
     if not verify_attest(key_id, attestation_object):
-            return {"statusCode": 500, "body": json.dumps({"outcome": "failure", "error": "Attestation verification failed"})}
+        return ApiResponse.error("Attestation verification failed")
         
     body = { k:v for k,v in event.items() if k not in ['key_id', 'attestation_object'] }
 
@@ -74,11 +75,4 @@ def handle_write_to_s3(event):
     html_key = f"{S3_SHARE_PREFIX}/{log.system_fingerprint}/{date_prefix}/{log.id}.html"
     s3.put_object(Bucket=BUCKET_NAME, Key=html_key, Body=html, ContentType="text/html")
 
-    return {
-        "statusCode": 200,
-        "body": json.dumps({
-            "outcome": "success",
-            "error": None,
-            "url": f"https://{BUCKET_NAME}.s3.amazonaws.com/{html_key}",
-        })
-    }
+    return ApiResponse.success({ "url": f"https://{BUCKET_NAME}.s3.amazonaws.com/{html_key}" })
