@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "GetChallenge - Run AWS Lambda locally",
+            "type": "node",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "runtimeExecutable": "bash",
+            "cwd": "${workspaceFolder}/aws-lambda",
+            "runtimeArgs": [
+                "-c",
+                "AWS_PROFILE=ai2 sam build && sam local invoke OlmoeAttestS3LoggingFunction -e tests/get_challenge.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')"
+            ]
+        },
+        {
+            "name": "ShareTrace - Run AWS Lambda locally",
+            "type": "node",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "runtimeExecutable": "bash",
+            "cwd": "${workspaceFolder}/aws-lambda",
+            "runtimeArgs": [
+                "-c",
+                "AWS_PROFILE=ai2 sam build && sam local invoke OlmoeAttestS3LoggingFunction -e tests/prod_attest.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')"
+            ]
+        }
+    ]
+}
