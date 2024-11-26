@@ -77,47 +77,27 @@ struct DisclaimerPage: View {
     let confirm: PageButton
     let cancel: PageButton?
 
-    init(allowOutsideTapDismiss: Bool,
-         isPresented: Binding<Bool>,
-         message: String,
-         title: String,
-         confirm: PageButton,
-         cancel: PageButton? = nil) {
-        self.allowOutsideTapDismiss = allowOutsideTapDismiss
-        self._isPresented = isPresented
-        self.message = message
-        self.title = title
-        self.confirm = confirm
-        self.cancel = cancel
-    }
-
     var body: some View {
-        ModalView(
-            isPresented: $isPresented,
-            allowOutsideTapDismiss: allowOutsideTapDismiss,
-            showCloseButton: false
-        ) {
-            VStack(spacing: 20) {
-                Text(title)
-                    .font(.title())
-                    .multilineTextAlignment(.center)
+        VStack(spacing: 20) {
+            Text(title)
+                .font(.title())
+                .multilineTextAlignment(.center)
 
-                Text(.init(message))
-                    .font(.body())
+            Text(.init(message))
+                .font(.body())
 
-                HStack(spacing: 12) {
-                    if let cancel = cancel {
-                        Button(cancel.text) {
-                            cancel.onTap()
-                        }
-                        .buttonStyle(.SecondaryButton)
+            HStack(spacing: 12) {
+                if let cancel = cancel {
+                    Button(cancel.text) {
+                        cancel.onTap()
                     }
-
-                    Button(confirm.text) {
-                        confirm.onTap()
-                    }
-                    .buttonStyle(.PrimaryButton)
+                    .buttonStyle(.SecondaryButton)
                 }
+
+                Button(confirm.text) {
+                    confirm.onTap()
+                }
+                .buttonStyle(.PrimaryButton)
             }
         }
     }
