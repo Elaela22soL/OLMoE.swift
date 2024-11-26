@@ -15,6 +15,12 @@ Parameters:
     Type: String
   HmacShaKey:
     Type: String
+  Env:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+    Default: prod
 
 Resources:
   OlmoeAttestS3LoggingFunction:
@@ -34,6 +40,7 @@ Resources:
           CERTIFICATE_AS_BYTES: !Ref CertificateAsBytes
           APP_ID: !Ref AppId
           HMAC_SHA_KEY: !Ref HmacShaKey
+          ENV: !Ref Env
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref BucketName

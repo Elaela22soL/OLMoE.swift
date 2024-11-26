@@ -30,10 +30,10 @@ AWS_PROFILE=llm sam build
 Then, run the lambda locally:
 
 ```shell
-AWS_PROFILE=llm sam local invoke OlmoeAttestS3LoggingFunction -e tests/dev_attest.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
-# or
 AWS_PROFILE=llm sam local invoke OlmoeAttestS3LoggingFunction -e tests/prod_attest.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
+
+If you are using vscode, you can simply run the Test tasks with `Cmd + Shift + P` -> "Run Task"
 
 ## Deploy
 
@@ -48,6 +48,7 @@ After that, you can deploy changes with:
 ```shell
 AWS_PROFILE=llm sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
+Alternatively you can simply call the vscode task to deploy
 
 ## API Gateway Spec
 
