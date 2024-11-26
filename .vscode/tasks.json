@@ -2,9 +2,22 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build Lambda",
+            "type": "shell",
+            "command": "AWS_PROFILE=ai2 sam build",
+            "options": {
+                "cwd": "${workspaceFolder}/aws-lambda"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "Deploy Lambda",
             "type": "shell",
-            "command": "AWS_PROFILE=ai2 sam build && sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
+            "command": "AWS_PROFILE=ai2 sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
             "options": {
                 "cwd": "${workspaceFolder}/aws-lambda"
             },

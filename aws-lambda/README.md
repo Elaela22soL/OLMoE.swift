@@ -27,6 +27,8 @@ First, build the image:
 AWS_PROFILE=llm sam build
 ```
 
+or if you are using vscode press `Cmd + Shift + B`
+
 Then, run the lambda locally:
 
 ```shell
