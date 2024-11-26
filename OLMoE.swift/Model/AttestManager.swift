@@ -16,9 +16,6 @@ class AppAttestManager {
     }
     
     static func requestChallenge(keyID: String) async throws -> String? {
-        #if targetEnvironment(simulator)
-            throw NSError(domain: "AppAttest", code: -1, userInfo: [NSLocalizedDescriptionKey: "App Attest not supported on simulator."])
-        #else
         let jsonData = try JSONSerialization.data(withJSONObject: [
             "key_id": keyID
         ])
@@ -47,14 +44,11 @@ class AppAttestManager {
                 return nil
             }
             
-            print("Challenge: \(challenge)")
             return challenge
         } catch {
             print("Failed to decode JSON: \(error.localizedDescription)")
             return nil
         }
-        
-        #endif
     }
     
     static func performAttest() async throws -> AttestationResult {
@@ -67,7 +61,18 @@ class AppAttestManager {
             throw NSError(domain: "AppAttest", code: -1, userInfo: [NSLocalizedDescriptionKey: "App Attest not supported on this device."])
         }
 
-        // Generate a new key if none exists
+        let keyID: String = try await withCheckedThrowingContinuation { continuation in
+            service.generateKey { newKeyID, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let newKeyID = newKeyID {
+                    continuation.resume(returning: newKeyID)
+                } else {
+                    continuation.resume(throwing: NSError(domain: "AppAttest", code: -1, userInfo: nil))
+                }
+            }
+        }
+        
         guard let challenge = try await requestChallenge(keyID: keyID) else {
             throw NSError(domain: "AppAttest", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to request challenge"])
         }
