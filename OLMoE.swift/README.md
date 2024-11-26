@@ -1,5 +1,10 @@
 # OLMoE Swift
 
+## Requirements
+
+- Xcode 15.4+
+- iOS 17+
+
 ## Configuration
 
 1. Rename `BuildConfig/release.example.xcconfig` to `release.xcconfig`.
@@ -12,7 +17,9 @@
     ```
 
 3. Open the project in Xcode.
+
 4. Select the project in the Project Navigator.
+
 5. Go to Info -> Select Project OLMoE Swift
 
     ![config 1](https://github.com/user-attachments/assets/2a1d2404-60fa-4f0c-ac68-198273afd8c4)

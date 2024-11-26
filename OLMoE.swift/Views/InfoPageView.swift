@@ -31,23 +31,26 @@ struct InfoButton: View {
 struct InfoView: View {
     @Binding var isPresented: Bool
 
-    init(isPresented: Binding<Bool>) {
-        self._isPresented = isPresented
-    }
-
     var body: some View {
-        ModalView(
-            isPresented: $isPresented,
-            allowOutsideTapDismiss: true,
-            showCloseButton: true
-        ) {
-            VStack(alignment: .leading, spacing: 16) {
-                Ai2Logo()
-                    .frame(maxWidth: .infinity, alignment: .center)
-
-                Text(.init(InfoText.body))
-                    .font(.body())
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Spacer()
+                Button(action: { isPresented = false }) {
+                    Image(systemName: "xmark.circle")
+                        .font(.system(size: 20))
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(Color("TextColor"))
+                }
+                .clipShape(Circle())
             }
+            Ai2Logo()
+                .frame(maxWidth: .infinity, alignment: .center)
+
+            Text(.init(InfoText.body))
+                .font(.body())
+        }
+        .onTapGesture {
+            isPresented = false
         }
     }
 }

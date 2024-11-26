@@ -372,30 +372,37 @@ struct ContentView: View {
             .onAppear {
                 disclaimerState.showInitialDisclaimer()
             }
-
-            InfoView(isPresented: $showInfoPage)
-
-            DisclaimerPage(
-                allowOutsideTapDismiss: disclaimerState.allowOutsideTapDismiss,
-                isPresented: $disclaimerState.showDisclaimerPage,
-                message: disclaimerState.activeDisclaimer?.text ?? "",
-                title: disclaimerState.activeDisclaimer?.title ?? "",
-                confirm: DisclaimerPage.PageButton(
-                    text: disclaimerState.activeDisclaimer?.buttonText ?? "",
-                    onTap: {
-                        disclaimerState.onConfirm?()
-                    }
-                ),
-                cancel: disclaimerState.onCancel.map { cancelAction in
-                    DisclaimerPage.PageButton(
-                        text: "Cancel",
-                        onTap: {
-                            cancelAction()
-                            disclaimerState.activeDisclaimer = nil
+            .sheet(isPresented: $showInfoPage) {
+                SheetWrapper {
+                    InfoView(isPresented: $showInfoPage)
+                }
+            }
+            .sheet(isPresented: $disclaimerState.showDisclaimerPage) {
+                SheetWrapper {
+                    DisclaimerPage(
+                        allowOutsideTapDismiss: disclaimerState.allowOutsideTapDismiss,
+                        isPresented: $disclaimerState.showDisclaimerPage,
+                        message: disclaimerState.activeDisclaimer?.text ?? "",
+                        title: disclaimerState.activeDisclaimer?.title ?? "",
+                        confirm: DisclaimerPage.PageButton(
+                            text: disclaimerState.activeDisclaimer?.buttonText ?? "",
+                            onTap: {
+                                disclaimerState.onConfirm?()
+                            }
+                        ),
+                        cancel: disclaimerState.onCancel.map { cancelAction in
+                            DisclaimerPage.PageButton(
+                                text: "Cancel",
+                                onTap: {
+                                    cancelAction()
+                                    disclaimerState.activeDisclaimer = nil
+                                }
+                            )
                         }
                     )
                 }
-            )
+                .interactiveDismissDisabled(!disclaimerState.allowOutsideTapDismiss)
+            }
         }
     }
 

@@ -7,13 +7,13 @@
 3. Install Docker
 4. Install SAM CLI:
 
-```shell
+```sh
 pip install --upgrade aws-sam-cli
 ```
 
 ## Set environment variables
 
-```
+```sh
 cp .env.example.json .env.json
 ```
 
@@ -23,7 +23,7 @@ Copy and paste env vars from 1Password into `.env.json`
 
 First, build the image:
 
-```shell
+```sh
 AWS_PROFILE=llm sam build
 ```
 
@@ -39,13 +39,13 @@ If you are using vscode, you can simply run the Test tasks with `Cmd + Shift + P
 
 If you have not deployed before, you will need to deploy:
 
-```shell
+```sh
 AWS_PROFILE=llm sam deploy --guided --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
 After that, you can deploy changes with:
 
-```shell
+```sh
 AWS_PROFILE=llm sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 Alternatively you can simply call the vscode task to deploy
@@ -118,7 +118,7 @@ You can log traces from any application using the API Gateway endpoint.
 
 ## Example request with cURL
 
-```shell
+```sh
 export API_KEY="YOUR_API_KEY"
 export API_URL="https://ziv3vcg14i.execute-api.us-east-1.amazonaws.com/prod"
 

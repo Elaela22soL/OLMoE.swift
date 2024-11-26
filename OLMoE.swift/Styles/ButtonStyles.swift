@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct PrimaryButton: ButtonStyle {
+    var minWidth: CGFloat?
+
     func makeBody(configuration: ButtonStyle.Configuration) -> some View {
         configuration.label
-            .frame(minWidth: 100)
+            .frame(minWidth: minWidth ?? 100)
             .padding(.vertical, 12)
             .padding(.horizontal, 12)
             .background(Color.accentColor)
@@ -28,9 +30,11 @@ extension ButtonStyle where Self == PrimaryButton {
 }
 
 struct SecondaryButton: ButtonStyle {
+    var minWidth: CGFloat?
+
     func makeBody(configuration: ButtonStyle.Configuration) -> some View {
         configuration.label
-            .frame(minWidth: 100)
+            .frame(minWidth: minWidth ?? 100)
             .padding(.vertical, 12)
             .padding(.horizontal, 12)
             .background(Color.background)

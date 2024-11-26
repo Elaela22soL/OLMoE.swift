@@ -108,7 +108,7 @@ public struct ChatView: View {
     let exampleHistory: [Chat] = [
         (role: .user, content: "Hi there!"),
         (role: .bot, content: "Hello! How can I help you?"),
-        (role: .user, content: "Give me a very long answer"),
+        (role: .user, content: "Give me a very long answer (this question has a whole lot of text!)"),
     ]
 
     ChatView(
