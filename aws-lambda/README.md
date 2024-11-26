@@ -27,27 +27,32 @@ First, build the image:
 AWS_PROFILE=llm sam build
 ```
 
+or if you are using vscode press `Cmd + Shift + B`
+
 Then, run the lambda locally:
 
-```sh
-AWS_PROFILE=llm sam local invoke OlmoeAttestS3LoggingFunction -e tests/dev_attest.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
-# or
+```shell
 AWS_PROFILE=llm sam local invoke OlmoeAttestS3LoggingFunction -e tests/prod_attest.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
+If you are using vscode, you can simply run the Test tasks with `Cmd + Shift + P` -> "Run Task"
+
 ## Deploy
 
-If you have not deployed before, you will need to deploy:
+First make sure to build the lambda before deploying. THen if you have not deployed before, that means you don't have a samconfig.toml file, you will need to deploy using the `--guided` flag:
 
+. Then:
 ```sh
 AWS_PROFILE=llm sam deploy --guided --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
-After that, you can deploy changes with:
+After that, a `samconfig.toml` is generated, you can now deploy changes to the source code normally:
 
 ```sh
 AWS_PROFILE=llm sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
+
+Alternatively you can simply call the vscode task to deploy
 
 ## API Gateway Spec
 

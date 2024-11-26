@@ -12,7 +12,8 @@ __pycache__/
 .venv/
 
 # IDEs
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 .idea/
 
 # OS

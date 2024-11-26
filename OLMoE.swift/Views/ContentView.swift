@@ -94,9 +94,8 @@ struct BotView: View {
         disclaimerHandlers.setShowDisclaimerPage(false)
         Task {
             do {
-                let challengeString = Configuration.challenge
-                let attestationResult = try await AppAttestManager.performAttest(challengeString: challengeString)
-
+                let attestationResult = try await AppAttestManager.performAttest()
+                
                 // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
