@@ -6,8 +6,8 @@ class Message:
     content: str
 
     def __post_init__(self):
-        assert self.role in ["system", "user", "assistant"], "Invalid role"
-        assert self.content is not None, "Content is required"
+        assert self.role in ["system", "user", "assistant"], "Invalid message format"
+        assert self.content is not None, "Invalid message format"
 
     def to_dict(self):
         return {

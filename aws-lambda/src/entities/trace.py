@@ -22,24 +22,24 @@ class Trace:
     usage: dict = field(default_factory=dict)
 
     def __post_init__(self):
-        assert len(self.messages) > 0, "Messages are required"
+        assert len(self.messages) > 0, "Invalid trace format"
         self.messages = [Message(**message) for message in self.messages]
 
         self.system_fingerprint = self.system_fingerprint or self.model
 
-        assert isinstance(self.created, int), "Created must be an int"
+        assert isinstance(self.created, int), "Invalid trace format"
         try:
             datetime.fromtimestamp(self.created)
         except (ValueError, TypeError, OverflowError):
             raise ValueError(f"Invalid timestamp: {self.created}")
 
-        assert isinstance(self.choices, list), "Choices must be a list"
-        assert all(isinstance(choice, dict) for choice in self.choices), "Each choice must be a dict"
-        assert isinstance(self.usage, dict), "Usage must be a dict"
-        assert isinstance(self.model, str), "Model must be a string"
-        assert isinstance(self.id, str), "ID must be a string"
-        assert isinstance(self.object, str), "Object must be a string"
-        assert isinstance(self.system_fingerprint, str), "System fingerprint must be a string"
+        assert isinstance(self.choices, list), "Invalid trace format"
+        assert all(isinstance(choice, dict) for choice in self.choices), "Invalid trace format"
+        assert isinstance(self.usage, dict), "Invalid trace format"
+        assert isinstance(self.model, str), "Invalid trace format"
+        assert isinstance(self.id, str), "Invalid trace format"
+        assert isinstance(self.object, str), "Invalid trace format"
+        assert isinstance(self.system_fingerprint, str), "Invalid trace format"
 
     @classmethod
     def from_dict(cls, log: dict):
