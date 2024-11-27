@@ -8,6 +8,7 @@ from attestation import verify_attest, generate_challenge
 from entities.trace import Trace
 from entities.routes import LambdaRouter, Route
 from entities.response import ApiResponse
+from constants.response_messages import ResponseMessages
 
 # Initialize S3 client
 s3 = boto3.client("s3")
@@ -18,7 +19,7 @@ S3_LOG_PREFIX = os.environ['S3_LOG_PREFIX']
 S3_SHARE_PREFIX = os.environ['S3_SHARE_PREFIX']
 MAX_REQUEST_SIZE_BYTES = os.environ.get('MAX_REQUEST_SIZE_BYTES', 51200) # default to 50KB
 
-with open("chat_template.html", "r") as f:
+with open("chat_template.html", "r", encoding="utf-8") as f:
     CHAT_TEMPLATE = f.read()
 
 def lambda_handler(event, context):
@@ -29,7 +30,7 @@ def lambda_handler(event, context):
         # Validate request body size
         body_size = len(str(event).encode('utf-8'))
         if body_size > int(MAX_REQUEST_SIZE_BYTES):
-            return ApiResponse.error("Invalid request body", HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+            return ApiResponse.error(ResponseMessages.INVALID_REQUEST_BODY.value, HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
             
         match LambdaRouter.get_route(event):
             case Route.ISSUE_CHALLENGE:
@@ -37,7 +38,7 @@ def lambda_handler(event, context):
             case Route.WRITE_TRACE_TO_S3:
                 return handle_write_to_s3(event)
             case _:
-                return ApiResponse.error("Invalid request body", HTTPStatus.BAD_REQUEST)
+                return ApiResponse.error(ResponseMessages.INVALID_REQUEST_BODY.value, HTTPStatus.BAD_REQUEST)
     except Exception as e:
         return ApiResponse.error(f"{type(e).__name__}: {e}")
 
@@ -47,14 +48,14 @@ def handle_issue_challenge(event):
     """
     key_id = event.get('key_id')
     if not key_id or not isinstance(key_id, str):
-        return ApiResponse.error("Invalid key_id", HTTPStatus.BAD_REQUEST)
+        return ApiResponse.error(ResponseMessages.INVALID_KEY_ID.value, HTTPStatus.BAD_REQUEST)
 
     try:
         challenge_base64 = generate_challenge(key_id)
 
         return ApiResponse.success({ "challenge": challenge_base64 })
     except Exception:
-        return ApiResponse.error("Failed to generate challenge")
+        return ApiResponse.error(ResponseMessages.FAILED_TO_GENERATE_CHALLENGE.value)
 
 def handle_write_to_s3(event):
     """
@@ -64,7 +65,7 @@ def handle_write_to_s3(event):
     attestation_object = event.get('attestation_object')
 
     if not verify_attest(key_id, attestation_object):
-        return ApiResponse.error("Attestation verification failed")
+        return ApiResponse.error(ResponseMessages.ATTESTATION_VERIFICATION_FAILED.value)
         
     body = { k:v for k,v in event.items() if k not in ['key_id', 'attestation_object'] }
 

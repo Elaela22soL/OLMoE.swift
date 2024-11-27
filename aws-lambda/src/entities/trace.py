@@ -1,6 +1,7 @@
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
+from constants.response_messages import ResponseMessages
 
 from .message import Message
 
@@ -22,24 +23,24 @@ class Trace:
     usage: dict = field(default_factory=dict)
 
     def __post_init__(self):
-        assert len(self.messages) > 0, "Invalid trace format"
+        assert len(self.messages) > 0, ResponseMessages.INVALID_TRACE_FORMAT.value
         self.messages = [Message(**message) for message in self.messages]
 
         self.system_fingerprint = self.system_fingerprint or self.model
 
-        assert isinstance(self.created, int), "Invalid trace format"
+        assert isinstance(self.created, int), ResponseMessages.INVALID_TRACE_FORMAT.value
         try:
             datetime.fromtimestamp(self.created)
-        except (ValueError, TypeError, OverflowError):
-            raise ValueError(f"Invalid timestamp: {self.created}")
+        except (ValueError, TypeError, OverflowError) as exc:
+            raise ValueError(ResponseMessages.INVALID_TRACE_FORMAT.value) from exc
 
-        assert isinstance(self.choices, list), "Invalid trace format"
-        assert all(isinstance(choice, dict) for choice in self.choices), "Invalid trace format"
-        assert isinstance(self.usage, dict), "Invalid trace format"
-        assert isinstance(self.model, str), "Invalid trace format"
-        assert isinstance(self.id, str), "Invalid trace format"
-        assert isinstance(self.object, str), "Invalid trace format"
-        assert isinstance(self.system_fingerprint, str), "Invalid trace format"
+        assert isinstance(self.choices, list), ResponseMessages.INVALID_TRACE_FORMAT.value
+        assert all(isinstance(choice, dict) for choice in self.choices), ResponseMessages.INVALID_TRACE_FORMAT.value
+        assert isinstance(self.usage, dict), ResponseMessages.INVALID_TRACE_FORMAT.value
+        assert isinstance(self.model, str), ResponseMessages.INVALID_TRACE_FORMAT.value
+        assert isinstance(self.id, str), ResponseMessages.INVALID_TRACE_FORMAT.value
+        assert isinstance(self.object, str), ResponseMessages.INVALID_TRACE_FORMAT.value
+        assert isinstance(self.system_fingerprint, str), ResponseMessages.INVALID_TRACE_FORMAT.value
 
     @classmethod
     def from_dict(cls, log: dict):

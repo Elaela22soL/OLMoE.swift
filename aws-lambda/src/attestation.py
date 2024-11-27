@@ -6,6 +6,8 @@ import hmac
 from pyattest.configs.apple import AppleConfig
 from pyattest.attestation import Attestation, PyAttestException
 
+from constants.response_messages import ResponseMessages
+
 CERTIFICATE_AS_BYTES = os.environ['CERTIFICATE_AS_BYTES'].encode()
 CERTIFICATE = base64.decodebytes(CERTIFICATE_AS_BYTES)
 
@@ -31,10 +33,10 @@ def verify_attest(key_id: str, attestation_object: str) -> bool:
         attestation.verify()
         return True
     except PyAttestException:
-        print("Error verifying attestation")
+        print(ResponseMessages.ERROR_VERIFYING_ATTESTATION.value)
         return False
     except Exception as e:
-        print("Error while parsing attestation object", e)
+        print(ResponseMessages.ERROR_PARSING_ATTESTATION.value, e)
         return False
     
 def generate_challenge(key_id: str) -> str:
