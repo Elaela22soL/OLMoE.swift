@@ -58,7 +58,8 @@ open class LLM: ObservableObject {
     private var params: llama_context_params
     private var isFull = false
     private var updateProgress: (Double) -> Void = { _ in }
-    
+    private var savedState: Data?
+
     public init(
         from path: String,
         stopSequence: String? = nil,
@@ -420,6 +421,11 @@ open class LLM: ObservableObject {
     }
     
     open func respond(to input: String) async {
+        // Restore the state before generating a response
+        if let savedState = self.savedState {
+            restoreState(from: savedState)
+        }
+
         await respond(to: input) { [self] response in
             await setOutput(to: "")
             for await responseDelta in response {
@@ -431,7 +437,11 @@ open class LLM: ObservableObject {
             await setOutput(to: trimmedOutput.isEmpty ? "..." : trimmedOutput)
             return output
         }
+
+        // Save the state after generating a response
+        self.savedState = saveState()
     }
+
 
     private var multibyteCharacter: [CUnsignedChar] = []
     private func decode(_ token: Token) -> String {
@@ -449,3 +459,48 @@ open class LLM: ObservableObject {
         model.encode(text)
     }
 }
+
+
+extension LLM {
+    public func saveState() -> Data? {
+        // Ensure the context exists
+        guard let contextPointer = self.context?.pointer else {
+            print("Error: llama_context pointer is nil.")
+            return nil
+        }
+
+        // Get the size of the state
+        let stateSize = llama_state_get_size(contextPointer)
+        guard stateSize > 0 else {
+            print("Error: Unable to retrieve state size.")
+            return nil
+        }
+
+        // Allocate a buffer for the state data
+        var stateData = Data(count: stateSize)
+        stateData.withUnsafeMutableBytes { (pointer: UnsafeMutableRawBufferPointer) in
+            if let baseAddress = pointer.baseAddress {
+                let bytesWritten = llama_state_get_data(contextPointer, baseAddress.assumingMemoryBound(to: UInt8.self), stateSize)
+                assert(bytesWritten == stateSize, "Error: Written state size does not match expected size.")
+            }
+        }
+        return stateData
+    }
+
+    public func restoreState(from stateData: Data) {
+        // Ensure the context exists
+        guard let contextPointer = self.context?.pointer else {
+            print("Error: llama_context pointer is nil.")
+            return
+        }
+
+        // Set the state data
+        stateData.withUnsafeBytes { (pointer: UnsafeRawBufferPointer) in
+            if let baseAddress = pointer.baseAddress {
+                let bytesRead = llama_state_set_data(contextPointer, baseAddress.assumingMemoryBound(to: UInt8.self), stateData.count)
+                assert(bytesRead == stateData.count, "Error: Read state size does not match expected size.")
+            }
+        }
+    }
+}
+
