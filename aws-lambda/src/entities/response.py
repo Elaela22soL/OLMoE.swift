@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 import json
 from typing import Optional
+from http import HTTPStatus
 
 @dataclass
 class ApiResponse:
     """Standardized API response handler"""
-    status_code: int = 200
+    status_code: int = HTTPStatus.OK
     body: dict = None
 
     def to_dict(self) -> dict:
@@ -21,12 +22,12 @@ class ApiResponse:
         if data:
             body.update(data)
         return cls(
-            status_code=200,
+            status_code=HTTPStatus.OK,
             body=body
         ).to_dict()
 
     @classmethod
-    def error(cls, message: str = "", status_code: int = 500) -> dict:
+    def error(cls, message: str = "", status_code: int = HTTPStatus.INTERNAL_SERVER_ERROR) -> dict:
         return cls(
             status_code=status_code,
             body={"outcome": "failure", "error": message}

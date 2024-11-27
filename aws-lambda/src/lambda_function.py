@@ -1,4 +1,5 @@
 import os
+from http import HTTPStatus
 import json
 from datetime import datetime
 import boto3  # type: ignore
@@ -30,7 +31,7 @@ def lambda_handler(event, context):
             case Route.WRITE_TRACE_TO_S3:
                 return handle_write_to_s3(event)
             case _:
-                return ApiResponse.error("Invalid request body", 400)
+                return ApiResponse.error("Invalid request body", HTTPStatus.BAD_REQUEST)
     except Exception as e:
         return ApiResponse.error(f"{type(e).__name__}: {e}")
 
@@ -40,7 +41,7 @@ def handle_issue_challenge(event):
     """
     key_id = event.get('key_id')
     if not key_id or not isinstance(key_id, str):
-        return ApiResponse.error("Invalid key_id", 400)
+        return ApiResponse.error("Invalid key_id", HTTPStatus.BAD_REQUEST)
 
     try:
         challenge_base64 = generate_challenge(key_id)
