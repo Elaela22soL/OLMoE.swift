@@ -21,8 +21,6 @@ struct SheetWrapper<Content: View>: View {
             VStack {
                 content
             }
-            .padding(.horizontal, 12)
-            .padding(.bottom, 24)
         }
     }
 }

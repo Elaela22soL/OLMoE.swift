@@ -29,9 +29,7 @@ class DisclaimerState: ObservableObject {
     private var disclaimerPageIndex: Int = 0
 
     let disclaimers: [Disclaimer] = [
-        Disclaimers.LimitationDisclaimer(),
-        Disclaimers.PrivacyDisclaimer(),
-        Disclaimers.AcknowledgementDisclaimer()
+        Disclaimers.FullDisclaimer()
     ]
 
     func showInitialDisclaimer() {
@@ -74,31 +72,45 @@ struct DisclaimerPage: View {
     @Binding var isPresented: Bool
     let message: String
     let title: String
+    let titleText: [HeaderTextPair]
     let confirm: PageButton
     let cancel: PageButton?
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text(title)
-                .font(.title())
-                .multilineTextAlignment(.center)
+        ScrollView {
+            VStack(spacing: 20) {
+                if !title.isEmpty {
+                    Text(title)
+                        .font(.title())
+                        .multilineTextAlignment(.center)
+                }
 
-            Text(.init(message))
-                .font(.body())
+                if !message.isEmpty {
+                    Text(.init(message))
+                        .font(.body())
+                        .multilineTextAlignment(.leading)
+                }
 
-            HStack(spacing: 12) {
-                if let cancel = cancel {
-                    Button(cancel.text) {
-                        cancel.onTap()
+                ForEach(titleText) { t in
+                    HeaderTextPairView(header: t.header, text: t.text)
+                }
+
+                HStack(spacing: 12) {
+                    if let cancel = cancel {
+                        Button(cancel.text) {
+                            cancel.onTap()
+                        }
+                        .buttonStyle(.SecondaryButton)
                     }
-                    .buttonStyle(.SecondaryButton)
-                }
 
-                Button(confirm.text) {
-                    confirm.onTap()
+                    Button(confirm.text) {
+                        confirm.onTap()
+                    }
+                    .buttonStyle(.PrimaryButton)
                 }
-                .buttonStyle(.PrimaryButton)
             }
+            .padding([.horizontal], 12)
+            .padding([.vertical], 24)
         }
     }
 }
@@ -109,6 +121,7 @@ struct DisclaimerPage: View {
         isPresented: .constant(true),
         message: "Message",
         title: "Title",
+        titleText: [HeaderTextPair](),
         confirm: (text: "Confirm", onTap: { print("Confirmed") }),
         cancel: (text: "Cancel", onTap: { print("Cancelled") })
     )

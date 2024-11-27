@@ -384,6 +384,7 @@ struct ContentView: View {
                         isPresented: $disclaimerState.showDisclaimerPage,
                         message: disclaimerState.activeDisclaimer?.text ?? "",
                         title: disclaimerState.activeDisclaimer?.title ?? "",
+                        titleText: disclaimerState.activeDisclaimer?.headerTextContent ?? [],
                         confirm: DisclaimerPage.PageButton(
                             text: disclaimerState.activeDisclaimer?.buttonText ?? "",
                             onTap: {
