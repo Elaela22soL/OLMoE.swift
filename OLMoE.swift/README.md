@@ -10,6 +10,8 @@
 1) Log in to [Apple Developer](https://developer.apple.com).
     To find the Team ID, see: [Locate your team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/).
 
+1) Follow and deploy the lambda function as described in the [lambda README](../aws-lambda/README.md)
+
 1) Rename `BuildConfig/release.example.xcconfig` to `release.xcconfig`.
 
 1) Populate the `release.xcconfig` file with your API key and endpoint.
