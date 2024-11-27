@@ -16,6 +16,7 @@ s3 = boto3.client("s3")
 BUCKET_NAME = os.environ['BUCKET_NAME']
 S3_LOG_PREFIX = os.environ['S3_LOG_PREFIX']
 S3_SHARE_PREFIX = os.environ['S3_SHARE_PREFIX']
+MAX_REQUEST_SIZE_BYTES = os.environ.get('MAX_REQUEST_SIZE_BYTES', 51200) # default to 50KB
 
 with open("chat_template.html", "r") as f:
     CHAT_TEMPLATE = f.read()
@@ -25,6 +26,11 @@ def lambda_handler(event, context):
     Handle the incoming request, and route it to the appropriate handler
     """
     try:
+        # Validate request body size
+        body_size = len(str(event).encode('utf-8'))
+        if body_size > int(MAX_REQUEST_SIZE_BYTES):
+            return ApiResponse.error("Invalid request body", HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+            
         match LambdaRouter.get_route(event):
             case Route.ISSUE_CHALLENGE:
                 return handle_issue_challenge(event)
