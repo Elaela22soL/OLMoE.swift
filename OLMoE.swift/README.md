@@ -9,7 +9,8 @@
 
 1. Rename `BuildConfig/release.example.xcconfig` to `release.xcconfig`.
 
-2. Go to One Password, in the vault "Allen Institute" search for "AWS Gateway API Key" and "AWS Lambda Endpoint - Prod", copy and paste them in the newly renamed file
+2. Follow and deploy the lambda function as described [here](../aws-lambda/README.md)
+Fill in the configuration values for the API key and URL for your lambda
 
     ```plaintext
     API_KEY=your_api_key_here
