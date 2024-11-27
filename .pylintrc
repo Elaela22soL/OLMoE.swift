@@ -12,16 +12,15 @@ disable=
     redefined-builtin,
     relative-beyond-top-level
 ignore-paths=
-    ^__tests__/electron/,
-    ^__tests__/src/,
-    ^.next/,
-    ^.yarn/,
+    ^.github/,
+    ^.venv/,
+    ^.vscode/,
+    ^aws-lambda/__tests__/,
     ^build/,
     ^coverage/,
-    ^electron/,
-    ^node_modules/,
-    ^python/visidata/,
-    ^src/
+    ^doc_assets/,
+    ^OLMoE.swift/,
+    ^OLMoE.swift.xcodeproj/
 
 [FORMAT]
 max-line-length=240
