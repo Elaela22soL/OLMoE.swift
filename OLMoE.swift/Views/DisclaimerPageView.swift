@@ -84,17 +84,17 @@ struct DisclaimerPage: View {
                         .font(.title())
                         .multilineTextAlignment(.center)
                 }
-                
+
                 if !message.isEmpty {
                     Text(.init(message))
                         .font(.body())
                         .multilineTextAlignment(.leading)
                 }
-                
+
                 ForEach(titleText) { t in
                     HeaderTextPairView(header: t.header, text: t.text)
                 }
-                
+
                 HStack(spacing: 12) {
                     if let cancel = cancel {
                         Button(cancel.text) {
@@ -102,16 +102,16 @@ struct DisclaimerPage: View {
                         }
                         .buttonStyle(.SecondaryButton)
                     }
-                    
+
                     Button(confirm.text) {
                         confirm.onTap()
                     }
                     .buttonStyle(.PrimaryButton)
                 }
             }
+            .padding([.horizontal], 12)
             .padding([.vertical], 24)
         }
-        .padding([.bottom], 24)
     }
 }
 

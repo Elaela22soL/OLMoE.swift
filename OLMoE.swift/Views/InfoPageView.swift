@@ -44,13 +44,11 @@ struct InfoView: View {
                     }
                     .clipShape(Circle())
                 }
-                
+
                 ForEach(InfoText.content) { text in
                     HeaderTextPairView(header: text.header, text: text.text)
+                        .padding([.horizontal], 12)
                 }
-            }
-            .onTapGesture {
-                isPresented = false
             }
             .padding([.bottom], 24)
         }
