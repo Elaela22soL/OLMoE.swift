@@ -93,9 +93,7 @@ struct ScrollState {
         let sizeDelta = contentHeight - scrollViewHeight
         let offsetDelta = abs(sizeDelta) + scrollOffset
         let isAtBottom = !needsScroll || offsetDelta < ScrollState.BottomScrollThreshold
-        self.isAtBottom = isAtBottom
-        
-        //print("UPDATE: Bottom? \(isAtBottom) : delta: \(offsetDelta), on scroll - offset: \(Int(scrollOffset)), scrollHeight: \(Int(scrollViewHeight)), contentHeight: \(Int(contentHeight))")
+        self.isAtBottom = isAtBottom        
     }
 }
 

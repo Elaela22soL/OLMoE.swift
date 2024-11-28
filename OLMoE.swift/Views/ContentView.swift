@@ -74,7 +74,6 @@ struct BotView: View {
             let originalInput = input
             input = "" // Clear the input after sending
             await bot.respond(to: originalInput)
-            //scrollToBottom = true
             await MainActor.run {
                 isGenerating = false
             }
