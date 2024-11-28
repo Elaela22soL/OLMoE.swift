@@ -223,18 +223,13 @@ struct BotView: View {
             Button(action: {
                 scrollToBottom = true
             }) {
-                Image(systemName: "arrow.down.circle")
+                Image(systemName: "arrow.down")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        RadialGradient(
-                            gradient: Gradient(colors: [
-                                Color("BackgroundColor").opacity(0.7), Color.clear,
-                            ]),
-                            center: .center,
-                            startRadius: 10,
-                            endRadius: 60))
+                    .frame(width: 30, height: 30)
+                    .padding(12)
+                    .foregroundColor(Color("BackgroundColor"))
+                    .background(Color("LightGreen"))
                     .clipShape(Circle())
             }
             .opacity(shouldShowScrollButton() ? 1 : 0)
@@ -245,6 +240,7 @@ struct BotView: View {
                 : .easeOut(duration: 0.3).delay(0.1),
                 value: shouldShowScrollButton())
         }
+        .padding([.bottom], 4)
     }
 
     var body: some View {
