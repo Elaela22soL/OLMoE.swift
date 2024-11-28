@@ -258,7 +258,6 @@ struct BotView: View {
                     ZStack {
                         VStack{
                             Spacer()
-                                .frame(height: geometry.size.height * 0.272)
                             Image("Ai2Icon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
