@@ -2,6 +2,8 @@
 
 An AWS Lambda function to facilitate logging and storing chat traces in an S3 bucket, with support for Apple App Attestation to ensure secure and legitimate access.
 
+Note: This Lambda function is specifically designed for sharing chats as URLs and is optional. It is not required for the core functionality of the app, so setting it up is only necessary if you intend to use the chat-sharing feature.
+
 ## Table of Contents
 
 - [Requirements](#requirements)
