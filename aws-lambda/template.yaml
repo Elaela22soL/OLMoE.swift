@@ -20,6 +20,7 @@ Parameters:
     AllowedValues:
       - dev
       - prod
+      - test
     Default: prod
   MaxRequestSizeBytes:
     Type: Number

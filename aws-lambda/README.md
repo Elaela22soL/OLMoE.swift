@@ -44,10 +44,14 @@ cp .env.example.json .env.json
 |`S3LogPrefix`|String|"logs"|The prefix for log files in the S3 bucket.|
 |`S3SharePrefix`|String|"share"|The prefix for shared files in the S3 bucket.|
 |`CertificateAsBytes`|String|None|Apple App Attestation Root CA, added to `.env.json` as a single line of text without comments or newlines.|
-|`AppId`|String|None|The application ID in the format `{DEVELOPMENT_TEAM_ID}.{PRODUCT_BUNDLE_IDENTIFIER}`. To obtain these values, open file `OLMoE.swift.xcodeproj/project.pbxproj` and search for `DEVELOPMENT_TEAM`, you'll find a 10 characters long alphanumeric id i.e, ABC1234567. Search for `PRODUCT_BUNDLE_IDENTIFIER`, you should have a bundle identifier in this format: com.domain.app_name. Your `AppId` environment variable value is the concatenation of these two ids joined by a period. For example: "ABC1234567.com.domain.app_name"|
 |`HmacShaKey`|String|None|The HMAC SHA key for signing Apple Attest challenges.|
 |`Env`|String|"prod"|The environment (e.g., `prod` or `dev`).|
 |`MaxRequestSizeBytes`|Integer|50KB|The maximum allowed request size in bytes.|                                                                                                               |
+|`AppId`|String|None|The application ID in the format `{DEVELOPMENT_TEAM_ID}.{PRODUCT_BUNDLE_IDENTIFIER}`. To obtain your team Id refer to [Locate your team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/). Your Product Bundle Identifier should be in this format: com.domain.app_name (See image below). Your `AppId` environment variable value is the concatenation of these two ids joined by a period. For example: "ABC1234567.com.domain.app_name" |
+
+Your PRODUCT_BUNDLE_IDENTIFIER can be found here: 
+
+![Find bundle identifier](https://github.com/user-attachments/assets/45caa505-b699-4283-b561-aa2707078610)
 
 ## Build
 
@@ -70,7 +74,7 @@ This projects implements [Apples Attestation](https://developer.apple.com/docume
 
 [![attest/challenge flow](https://github.com/user-attachments/assets/d532612b-41de-4cf6-af8b-c443a94686b9)](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity)
 
-There are two execution paths for the lambda that can be tested separately
+There are two execution paths for the lambda that can be tested separately. Bear in mind, attestation is disabled on local invoke since a valid keyId and attestation object need to be retrieved from a a physical device running a legitimate instance of the app.
 
 1. Get the Attest Challenge
 
