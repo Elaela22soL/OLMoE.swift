@@ -1,4 +1,8 @@
-# AWS Lambda to enable logging to S3
+# AWS Lambda to Enable Logging to S3
+
+An AWS Lambda function to facilitate logging and storing chat traces in an S3 bucket, with support for Apple App Attestation to ensure secure and legitimate access.
+
+## Table of Contents
 
 - [Requirements](#requirements)
 - [Setup](#setup)
@@ -8,35 +12,52 @@
 - [Testing and Local Invoke](#testing-and-local-invoke)
 - [Deploy](#deploy)
 
-# Requirements
-- Python 3.11
-- AWS Account with configured credentials
-- AWS CLI
-- AWS SAM CLI (aws-sam-cli)
-- Docker
-- S3 Bucket to store chat traces
 
-# Setup
+---
 
-## AWS CLI and SAM CLI
+## Requirements
 
-1. Install [AWS CLI](https://aws.amazon.com/cli/)
-2. Log in and configure the default profile for the AWS CLI.
-3. Install either Docker or OrbStack
-4. Install SAM CLI:
+To work with this project, ensure the following prerequisites are met:
 
-```sh
-pip install --upgrade aws-sam-cli
-```
+- **Python 3.11**
+- **AWS Account** with configured credentials
+- **AWS CLI**: Command Line Interface for AWS
+- **AWS SAM CLI**: For building and deploying serverless applications
+- **Docker**: For local invocation and builds
+- **S3 Bucket**: For storing chat traces
 
-## Environment variables
+---
 
-1. Create an .env.json file by copying the provided example JSON file:
+## Setup
+
+### AWS CLI and SAM CLI
+
+1. **Install AWS CLI**  
+   Follow the instructions [here](https://aws.amazon.com/cli/).
+
+2. **Configure AWS CLI**  
+   Log in and configure the default profile for AWS CLI.
+   ```bash
+   aws configure
+   ```
+
+3. **Install Docker or OrbStack**  
+   Ensure Docker is installed and running on your system.
+
+4. **Install SAM CLI**  
+   Use the following command:
+   ```sh
+   pip install --upgrade aws-sam-cli
+  ```
+
+### Environment variables
+
+1. Create an .env.json file:
 ```sh
 cp .env.example.json .env.json
 ```
 
-2. The following environment variables need to be set in the `.env.json` file:
+2. Populate the `.env.json` file with the required environment variables:
 
 |Variable|Data Type|Default|Description|
 |---|---|---|---|
@@ -55,59 +76,63 @@ Your PRODUCT_BUNDLE_IDENTIFIER can be found here:
 
 ## Build
 
-1. Before deploying or invoking the lambda locally you need to build using SAM CLI:
+1. Build the Lambda function using SAM CLI:
 ```sh
 sam build
 ```
 
 Alternatively, if you are using vscode press `Cmd + Shift + B` to build
 
-2. Then make sure package dependencies are installed by running:
+2. Install Python dependencies:
 ```sh
 pip install -r src/requirements.txt -t .aws-sam/build
 ```
-Install packages only once, run again if you make changes to `src/requirements.txt`
+**Note**: Install dependencies only once unless `src/requirements.txt` changes.
 
-# Testing and Local invoke
+## Testing and Local Invocation
 
-This projects implements [Apples Attestation](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity) to establish application integrity to ensure that requests our lambda receives come from legitimate instances of our app.
+This Lambda implements [Apple's App Attestation](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity) to ensure requests originate from verified app instances.
 
 [![attest/challenge flow](https://github.com/user-attachments/assets/d532612b-41de-4cf6-af8b-c443a94686b9)](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity)
+
+### Testing Execution Paths
 
 There are two execution paths for the lambda that can be tested separately. Bear in mind, attestation is disabled on local invoke since a valid keyId and attestation object need to be retrieved from a a physical device running a legitimate instance of the app.
 
 1. Get the Attest Challenge
 
-If you are using vscode, you can simply run the Test tasks with `Cmd + Shift + P` -> `Run Task` -> `Test GetChallenge`
 
-Or manually run:
+- Using VS Code `Cmd + Shift + P` -> `Run Task` -> `Test GetChallenge`
+
+- Or manually:
 ```shell
 sam local invoke OlmoeAttestS3LoggingFunction -e tests/get_challenge.json --parameter-overrides $(cat .env.test.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
 2. Share conversation trace
 
-`Cmd + Shift + P` -> `Run Task` -> `Test ShareTrace`
+- Using VS Code: `Cmd + Shift + P` -> `Run Task` -> `Test ShareTrace`
 
-Manual execution:
+- Or manually:
 ```shell
 sam local invoke OlmoeAttestS3LoggingFunction -e tests/prod_attest.json --parameter-overrides $(cat .env.test.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
-# Deploy
+## Deploy
 
-First make sure to build the lambda before deploying. Then if you have not deployed before, that means you don't have a samconfig.toml file, you will need to deploy using the `--guided` flag:
+1. Ensure the Lambda is built before deploying.
 
-. Then:
+2.	First-time deployment (no samconfig.toml):
 ```sh
 sam deploy --guided --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
 
-After that, a `samconfig.toml` is generated, you can now deploy changes to the source code normally:
+3.	Subsequent deployments:
 
+-	Visual Studio Code:
 `Cmd + Shift + P` -> `Run Task` -> `Deploy Lambda`
 
-Manual execution:
+- Or manually:
 ```sh
 sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 ```
