@@ -21,6 +21,9 @@ Parameters:
       - dev
       - prod
     Default: prod
+  MaxRequestSizeBytes:
+    Type: Number
+    Default: 51200 # 50KB
 
 Resources:
   OlmoeAttestS3LoggingFunction:
@@ -41,6 +44,7 @@ Resources:
           APP_ID: !Ref AppId
           HMAC_SHA_KEY: !Ref HmacShaKey
           ENV: !Ref Env
+          MAX_REQUEST_SIZE_BYTES: !Ref MaxRequestSizeBytes
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref BucketName
