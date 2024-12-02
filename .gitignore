@@ -30,6 +30,8 @@ build/
 
 # ignore secrets
 *.xcconfig
+!*.example.xcconfig
+
 
 OLMoE.swift.xcodeproj/project.xcworkspace/xcuserdata/
 OLMoE.swift.xcodeproj/xcuserdata
@@ -39,5 +41,3 @@ OLMoE.swift.xcodeproj/xcuserdata
 
 # Misc
 no_commit/
-
-*.example.xcconfig
