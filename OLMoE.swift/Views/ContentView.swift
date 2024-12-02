@@ -43,6 +43,7 @@ struct BotView: View {
     @State private var showShareSheet = false
     @State private var isSharingConfirmationVisible = false
     @State private var isDeleteHistoryConfirmationVisible = false
+    @State private var isScrolledToBottom = true
     @FocusState private var isTextEditorFocused: Bool
     let disclaimerHandlers: DisclaimerHandlers
 
@@ -63,13 +64,16 @@ struct BotView: View {
         self.disclaimerHandlers = disclaimerHandlers
     }
 
+    func shouldShowScrollButton() -> Bool {
+        return !isScrolledToBottom
+    }
+    
     func respond() {
         isGenerating = true
         Task {
             let originalInput = input
             input = "" // Clear the input after sending
             await bot.respond(to: originalInput)
-            scrollToBottom = true
             await MainActor.run {
                 isGenerating = false
             }
@@ -95,7 +99,7 @@ struct BotView: View {
         Task {
             do {
                 let attestationResult = try await AppAttestManager.performAttest()
-                
+
                 // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
@@ -209,6 +213,34 @@ struct BotView: View {
         .disabled(isDeleteButtonDisabled)
         .opacity(isDeleteButtonDisabled ? 0.5 : 1)
     }
+    
+    @ViewBuilder
+    func scrollToBottomButton() -> some View {
+        VStack {
+            Spacer()
+            
+            Button(action: {
+                scrollToBottom = true
+            }) {
+                Image(systemName: "arrow.down")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 30, height: 30)
+                    .padding(12)
+                    .foregroundColor(Color("BackgroundColor"))
+                    .background(Color("LightGreen"))
+                    .clipShape(Circle())
+            }
+            .opacity(shouldShowScrollButton() ? 1 : 0)
+            .transition(.opacity)
+            .animation(
+                shouldShowScrollButton()
+                ? .easeIn(duration: 0.1)
+                : .easeOut(duration: 0.3).delay(0.1),
+                value: shouldShowScrollButton())
+        }
+        .padding([.bottom], 4)
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -229,37 +261,37 @@ struct BotView: View {
             VStack(alignment: .leading) {
                 if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
                     ScrollViewReader { proxy in
-                        ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating)
-                        .onChange(of: bot.output) { _, _ in
-                            if isGenerating {
-                                withAnimation {
-                                    proxy.scrollTo("bottomID", anchor: .bottom)
+                        ZStack {
+                            ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
+                                .onChange(of: bot.output) { _, _ in
+                                    if isScrolledToBottom {
+                                        let scrollId = isGenerating ? ChatView.BottomID1 : ChatView.BottomID2
+                                        withAnimation {
+                                            proxy.scrollTo(scrollId, anchor: .bottom)
+                                        }
+                                    }
+                                    
                                 }
-                            } else {
-                                withAnimation {
-                                    proxy.scrollTo("bottomID2", anchor: .bottom)
+                                .onChange(of: scrollToBottom) { _, newValue in
+                                    if newValue {
+                                        withAnimation {
+                                            proxy.scrollTo(ChatView.BottomID1, anchor: .bottom)
+                                        }
+                                        scrollToBottom = false
+                                    }
                                 }
-                            }
-
+                                .gesture(TapGesture().onEnded({
+                                    isTextEditorFocused = false
+                                }))
+                            
+                            scrollToBottomButton()
                         }
-                        .onChange(of: scrollToBottom) { _, newValue in
-                            if newValue {
-                                withAnimation {
-                                    proxy.scrollTo("bottomID", anchor: .bottom)
-                                }
-                                scrollToBottom = false
-                            }
-                        }
-                        .gesture(TapGesture().onEnded({
-                            isTextEditorFocused = false
-                        }))
                     }
                 } else {
                     ZStack {
                         VStack{
                             Spacer()
-                                .frame(height: geometry.size.height * 0.1)
-                            Image("Splash")
+                            Image("Ai2Icon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: max(140, min(geometry.size.width - 160, 290)))
@@ -268,6 +300,7 @@ struct BotView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+                
                 Spacer()
 
                 MessageInputView(
