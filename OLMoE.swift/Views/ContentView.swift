@@ -99,7 +99,7 @@ struct BotView: View {
         Task {
             do {
                 let attestationResult = try await AppAttestManager.performAttest()
-                
+
                 // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
@@ -291,8 +291,7 @@ struct BotView: View {
                     ZStack {
                         VStack{
                             Spacer()
-                                .frame(height: geometry.size.height * 0.1)
-                            Image("Splash")
+                            Image("Ai2Icon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: max(140, min(geometry.size.width - 160, 290)))
