@@ -243,7 +243,7 @@
 		A0117FF52C990EAC00035007 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 487932D72CEBB63D00A741C5 /* BuildConfig */;
-			baseConfigurationReferenceRelativePath = release.xcconfig;
+			baseConfigurationReferenceRelativePath = build.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -307,7 +307,7 @@
 		A0117FF62C990EAC00035007 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 487932D72CEBB63D00A741C5 /* BuildConfig */;
-			baseConfigurationReferenceRelativePath = release.xcconfig;
+			baseConfigurationReferenceRelativePath = build.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -362,7 +362,7 @@
 		A0117FF82C990EAC00035007 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 487932D72CEBB63D00A741C5 /* BuildConfig */;
-			baseConfigurationReferenceRelativePath = release.xcconfig;
+			baseConfigurationReferenceRelativePath = build.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -407,7 +407,7 @@
 		A0117FF92C990EAC00035007 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 487932D72CEBB63D00A741C5 /* BuildConfig */;
-			baseConfigurationReferenceRelativePath = release.xcconfig;
+			baseConfigurationReferenceRelativePath = build.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

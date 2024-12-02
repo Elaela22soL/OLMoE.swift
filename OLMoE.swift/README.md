@@ -12,9 +12,9 @@
 
 1) Follow and deploy the lambda function as described in the [lambda README](../aws-lambda/README.md)
 
-1) Rename `BuildConfig/release.example.xcconfig` to `release.xcconfig`.
+1) Rename `BuildConfig/build.example.xcconfig` to `build.xcconfig`.
 
-1) Populate the `release.xcconfig` file with your API key and endpoint.
+1) Populate the `build.xcconfig` file with your API key and endpoint.
 
     The `API_URL` should be the endpoint to access the lambda function.
     In our example, we used an AWS API Gateway endpoint that forwards requests to the lambda function.
@@ -48,12 +48,12 @@
 
 1) Select the project in the Project Navigator.
 
-1) In configurations ensure "Debug and Release" is set to use `release.xcconfig`
+1) In configurations ensure "Debug and Release" is set to use `build.xcconfig`
 
-    ![set Debug and Release to use `release.xcconfig`](../doc_assets/Set_Debug_and_Release.png)
+    ![set the configuration file to `build.xcconfig`](../doc_assets/Configuration_File.png)
 
 ### Ensure the correct team is selected
 
-1) In "Signing & Capabilities" ensure your correct team and bundle identifier match the ones in `release.xcconfig`
+1) In "Signing & Capabilities" ensure your correct team and bundle identifier match the ones in `build.xcconfig`
 
     ![Select Project OLMoE Swift](../doc_assets/Validate_Team_and_Bundle_ID.png)
