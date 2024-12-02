@@ -372,7 +372,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
 				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM_ID}";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -417,7 +417,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
 				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM_ID}";
 				ENABLE_HARDENED_RUNTIME = YES;
