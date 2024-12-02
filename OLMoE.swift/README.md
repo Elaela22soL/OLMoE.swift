@@ -7,23 +7,67 @@
 
 ## Configuration
 
-1. Rename `BuildConfig/release.example.xcconfig` to `release.xcconfig`.
+1) Log in to [Apple Developer](https://developer.apple.com).
+    To find the Team ID, see: [Locate your team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/).
 
-2. Go to One Password, in the vault "Allen Institute" search for "AWS Gateway API Key" and "AWS Lambda Endpoint - Prod", copy and paste them in the newly renamed file
+1) Follow and deploy the lambda function as described in the [lambda README](../aws-lambda/README.md)
 
-    ```plaintext
+1) Rename `BuildConfig/build.example.xcconfig` to `build.xcconfig`.
+
+1) Populate the `build.xcconfig` file with your API key and endpoint.
+
+    The `API_URL` should be the endpoint to access the lambda function.
+    In our example, we used an AWS API Gateway endpoint that forwards requests to the lambda function.
+
+    The `API_KEY` is the key to access the API Gateway endpoint.
+
+    The `DEVELOPMENT_TEAM_ID` is your team ID you located in step 1.
+
+    The `PRODUCT_BUNDLE_IDENTIFIER` is the bundle identifier for the app.
+    This can be assigned your unique identifier or the default value.
+
+    ```ini
     API_KEY=your_api_key_here
     API_URL=api_url
+    DEVELOPMENT_TEAM_ID=your_team_id
+    PRODUCT_BUNDLE_IDENTIFIER=com.example.apple-samplecode.OLMoE.swift.${DEVELOPMENT_TEAM_ID}
+
     ```
 
-3. Open the project in Xcode.
+1) Open the project in Xcode.
 
-4. Select the project in the Project Navigator.
+1) Ensure the target device is set to an appropriate device (ie iPhone 15 Pro or higher)
 
-5. Go to Info -> Select Project OLMoE Swift
+    ![Select Project OLMoE Swift](../doc_assets/Set_Target_Device.png)
 
-    ![config 1](https://github.com/user-attachments/assets/2a1d2404-60fa-4f0c-ac68-198273afd8c4)
+1) Run the project
 
-6. In configurations set Debug and Release to use release.xcconfig
+## Trouble-shooting
 
-    ![config 2](https://github.com/user-attachments/assets/6ca124c1-0a7c-42f4-b922-50ef5c9e2924)
+### Ensure the correct configuration is being used
+
+1) Select the project in the Project Navigator.
+
+1) In configurations ensure "Debug and Release" is set to use `build.xcconfig`
+
+    ![set the configuration file to `build.xcconfig`](../doc_assets/Configuration_File.png)
+
+### Ensure the correct team is selected
+
+1) In "Signing & Capabilities" ensure your correct team and bundle identifier match the ones in `build.xcconfig`
+
+    ![Select Project OLMoE Swift](../doc_assets/Validate_Team_and_Bundle_ID.png)
+
+### Running on a physical device
+
+1) Ensure the device is connected to your mac via USB.
+
+1) In the Signing & Capabilities section, click on "Enable Development Signing"
+
+    ![Enable Development Signing](../doc_assets/Enable_Development_Signing.png)
+
+1) Select your device in the device dropdown menu.
+
+    ![Select Device](../doc_assets/Select_Device.png)
+
+1) Run the project.

@@ -1,0 +1,71 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "(The model requires ~6 GB and this device has: %@ GB available.)" : {
+     
+    },
+    "%@ / %@" : {
+     
+    },
+    "%lld%%" : {
+
+    },
+    "allenai.org" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete history?" : {
+
+    },
+    "Device Not Supported" : {
+
+    },
+    "Download Model" : {
+
+    },
+    "Downloading..." : {
+
+    },
+    "Flush Model" : {
+
+    },
+    "Message" : {
+
+    },
+    "Model is ready to use!" : {
+
+    },
+    "Proceed Anyway" : {
+
+    },
+    "Proceed With Mocked Model" : {
+
+    },
+    "This app requires a device with at least 8GB of RAM." : {
+
+    },
+    "To get started, download the latest AI model." : {
+
+    },
+    "Welcome" : {
+
+    },
+    "Welcome chat message" : {
+      "comment" : "Default chat bubble when conversation is empty",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hello! This can be some kind of default welcome message."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
