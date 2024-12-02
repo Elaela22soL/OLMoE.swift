@@ -7,12 +7,13 @@ from pyattest.configs.apple import AppleConfig
 from pyattest.attestation import Attestation, PyAttestException
 
 from constants.response_messages import ResponseMessages
+from constants.deployment_environment import DeploymentEnvironment
 
 CERTIFICATE_AS_BYTES = os.environ['CERTIFICATE_AS_BYTES'].encode()
 CERTIFICATE = base64.decodebytes(CERTIFICATE_AS_BYTES)
 
 APP_ID = os.environ['APP_ID']
-IS_PRODUCTION = os.environ.get('ENV', 'prod').lower() == 'prod'
+DEPLOYMENT_ENV = DeploymentEnvironment.from_env()
 
 def verify_attest(key_id: str, attestation_object: str) -> bool:
     """
@@ -24,7 +25,7 @@ def verify_attest(key_id: str, attestation_object: str) -> bool:
     config = AppleConfig(
         key_id=key_id_bytes,
         app_id=APP_ID,
-        production=IS_PRODUCTION,
+        production=DEPLOYMENT_ENV == DeploymentEnvironment.PROD,
         root_ca=CERTIFICATE
     )
     attestation = Attestation(attest, nonce, config)
