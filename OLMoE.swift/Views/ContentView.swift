@@ -58,6 +58,10 @@ struct BotView: View {
     private var isDeleteButtonDisabled: Bool {
         isInputDisabled || bot.history.isEmpty
     }
+    
+    private var isChatEmpty: Bool {
+        bot.history.isEmpty && !isGenerating && bot.output.isEmpty
+    }
 
     init(_ bot: Bot, disclaimerHandlers: DisclaimerHandlers) {
         _bot = StateObject(wrappedValue: bot)
@@ -259,7 +263,7 @@ struct BotView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading) {
-                if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
+                if !isChatEmpty {
                     ScrollViewReader { proxy in
                         ZStack {
                             ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
@@ -303,6 +307,10 @@ struct BotView: View {
                 }
                 
                 Spacer()
+                
+                if (isChatEmpty) {
+                    BotChatBubble(text: String(localized: "Welcome chat message", comment: "Default chat bubble when conversation is empty"))
+                }
 
                 MessageInputView(
                     input: $input,
