@@ -57,3 +57,17 @@
 1) In "Signing & Capabilities" ensure your correct team and bundle identifier match the ones in `build.xcconfig`
 
     ![Select Project OLMoE Swift](../doc_assets/Validate_Team_and_Bundle_ID.png)
+
+### Running on a physical device
+
+1) Ensure the device is connected to your mac via USB.
+
+1) In the Signing & Capabilities section, click on "Enable Development Signing"
+
+    ![Enable Development Signing](../doc_assets/Enable_Development_Signing.png)
+
+1) Select your device in the device dropdown menu.
+
+    ![Select Device](../doc_assets/Select_Device.png)
+
+1) Run the project.
