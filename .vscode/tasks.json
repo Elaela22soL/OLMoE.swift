@@ -4,7 +4,7 @@
         {
             "label": "Build Lambda",
             "type": "shell",
-            "command": "AWS_PROFILE=ai2 sam build",
+            "command": "sam build",
             "options": {
                 "cwd": "${workspaceFolder}/aws-lambda"
             },
@@ -17,7 +17,7 @@
         {
             "label": "Deploy Lambda",
             "type": "shell",
-            "command": "AWS_PROFILE=ai2 sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
+            "command": "sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
             "options": {
                 "cwd": "${workspaceFolder}/aws-lambda"
             },
@@ -26,7 +26,7 @@
         {
             "label": "Test GetChallenge",
             "type": "shell",
-            "command": "AWS_PROFILE=ai2 sam build && sam local invoke OlmoeAttestS3LoggingFunction -e tests/get_challenge.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
+            "command": "sam build && sam local invoke OlmoeAttestS3LoggingFunction -e tests/get_challenge.json --parameter-overrides $(cat .env.test.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
             "options": {
                 "cwd": "${workspaceFolder}/aws-lambda"
             },
@@ -35,7 +35,7 @@
         {
             "label": "Test ShareTrace",
             "type": "shell",
-            "command": "AWS_PROFILE=ai2 sam build && sam local invoke OlmoeAttestS3LoggingFunction -e tests/prod_attest.json --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
+            "command": "sam build && sam local invoke OlmoeAttestS3LoggingFunction -e tests/prod_attest.json --parameter-overrides $(cat .env.test.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
             "options": {
                 "cwd": "${workspaceFolder}/aws-lambda"
             },
