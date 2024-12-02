@@ -392,13 +392,14 @@ open class LLM: ObservableObject {
         inferenceTask = Task { [weak self] in
             guard let self = self else { return }
             
+            let historyBeforeInput = self.history
             await MainActor.run {
                 // Append user's message to history prior to response generation
                 self.history.append((.user, input))
             }
             
             self.input = input
-            let processedInput = self.preprocess(input, self.history)
+            let processedInput = self.preprocess(input, historyBeforeInput)            
             let responseStream = loopBackTestResponse ? self.getTestLoopbackResponse() : self.getResponse(from: processedInput)
             
             // Generate the output string using the async closure
