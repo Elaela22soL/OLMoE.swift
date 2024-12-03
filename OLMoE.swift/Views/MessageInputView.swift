@@ -15,7 +15,7 @@ struct MessageInputView: View {
     let hasValidInput: Bool
     let respond: () -> Void
     let stop: () -> Void
-    
+
     var body: some View {
         HStack(alignment: .top) {
             TextField("Message", text: $input, axis: .vertical)
@@ -33,7 +33,7 @@ struct MessageInputView: View {
                 .disabled(isInputDisabled)
                 .opacity(isInputDisabled ? 0.6 : 1)
                 .padding(12)
-            
+
             ZStack {
                 if isGenerating {
                     Button(action: stop) {
@@ -55,20 +55,21 @@ struct MessageInputView: View {
             .frame(width: 40, height: 40)
             .padding(.top, 2)
             .padding(.trailing, 4)
-            
+
         }
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: UIDevice.current.userInterfaceIdiom == .pad ? 80 : 40)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color("Surface"))
                 .foregroundStyle(.thinMaterial)
         )
-        .frame(maxWidth: .infinity)
     }
 }
 
 #Preview {
     @FocusState var isTextEditorFocused: Bool
-    
+
     MessageInputView(
         input: .constant("Message"),
         isGenerating: .constant(false),
