@@ -18,7 +18,7 @@ public struct UserChatBubble: View {
                 .padding(12)
                 .background(Color("Surface"))
                 .cornerRadius(12)
-                .frame(maxWidth: 296, alignment: .trailing)
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: .trailing)
                 .font(.body())
         }
     }
@@ -30,21 +30,21 @@ public struct BotChatBubble: View {
 
     public var body: some View {
         HStack(alignment: .top, spacing: 6) {
-            
+
             Image("BotProfilePicture")
                 .resizable()
                 .frame(width: 20, height: 20)
                 .padding(4)
                 .background(Color("Surface"))
                 .clipShape(Circle())
-            
+
             if isGenerating && text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 TypingIndicator()
             } else {
                 Text(text.trimmingCharacters(in: .whitespacesAndNewlines))
                     .padding(.top, -2)
                     .background(Color("BackgroundColor"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: .leading)
                     .font(.body())
             }
 
@@ -72,41 +72,41 @@ public struct TypingIndicator: View {
 struct ScrollState {
     static let BottomScrollThreshold = 120.0
     static let ScrollSpaceName: String = "scrollSpace"
-    
+
     public var scrollViewHeight: CGFloat = 0
     public var contentHeight: CGFloat = 0
     public var scrollOffset: CGFloat = 0
     public var isAtBottom: Bool = true
-    
+
     mutating func onScroll(scrollOffset: CGFloat) {
         self.scrollOffset = scrollOffset
         updateState()
     }
-    
+
     mutating func onContentResized(contentHeight: CGFloat) {
         self.contentHeight = contentHeight
         updateState()
     }
-    
+
     private mutating func updateState() {
         let needsScroll = contentHeight > scrollViewHeight
         let sizeDelta = contentHeight - scrollViewHeight
         let offsetDelta = abs(sizeDelta) + scrollOffset
         let isAtBottom = !needsScroll || offsetDelta < ScrollState.BottomScrollThreshold
-        self.isAtBottom = isAtBottom        
+        self.isAtBottom = isAtBottom
     }
 }
 
 public struct ChatView: View {
     public static let BottomID1 = "bottomID"
     public static let BottomID2 = "bottomID2"
-    
+
     public var history: [Chat]
     public var output: String
     @Binding var isGenerating: Bool
     @Binding var isScrolledToBottom: Bool
     @State private var scrollState = ScrollState()
-    
+
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -121,7 +121,7 @@ public struct ChatView: View {
                         }
                     }
                 }
-                
+
                 // Current output
                 BotChatBubble(text: output, isGenerating: isGenerating)
                     .id(ChatView.BottomID1) // Unique ID for scrolling
@@ -138,7 +138,7 @@ public struct ChatView: View {
         .coordinateSpace(name: ScrollState.ScrollSpaceName)
         .preferredColorScheme(.dark)
     }
-    
+
     @ViewBuilder
     private func scrollTracker() -> some View {
         GeometryReader { geo in
@@ -156,7 +156,7 @@ public struct ChatView: View {
                 }
         }
     }
-    
+
     @ViewBuilder
     private func scrollHeightTracker() -> some View {
         GeometryReader { proxy in
