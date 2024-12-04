@@ -77,6 +77,7 @@ struct BotView: View {
         Task {
             let originalInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
             input = "" // Clear the input after sending
+            scrollToBottom = true
             await bot.respond(to: originalInput)
             await MainActor.run {
                 bot.setOutput(to: "")
