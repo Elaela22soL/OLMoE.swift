@@ -30,7 +30,6 @@ public struct BotChatBubble: View {
 
     public var body: some View {
         HStack(alignment: .top, spacing: 6) {
-
             Image("BotProfilePicture")
                 .resizable()
                 .frame(width: 20, height: 20)
@@ -38,10 +37,10 @@ public struct BotChatBubble: View {
                 .background(Color("Surface"))
                 .clipShape(Circle())
 
-            if isGenerating && text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if isGenerating && text.isEmpty {
                 TypingIndicator()
             } else {
-                Text(text.trimmingCharacters(in: .whitespacesAndNewlines))
+                Text(text)
                     .padding(.top, -2)
                     .background(Color("BackgroundColor"))
                     .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: .leading)
@@ -97,8 +96,7 @@ struct ScrollState {
 }
 
 public struct ChatView: View {
-    public static let BottomID1 = "bottomID"
-    public static let BottomID2 = "bottomID2"
+    public static let BottomID = "bottomID"
 
     public var history: [Chat]
     public var output: String
@@ -110,8 +108,8 @@ public struct ChatView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 // History
-                ForEach(history, id: \.content) { chat in
-                    if chat.content != output {
+                ForEach(history) { chat in
+                    if !chat.content.isEmpty {
                         switch chat.role {
                         case .user:
                             UserChatBubble(text: chat.content)
@@ -122,10 +120,11 @@ public struct ChatView: View {
                 }
 
                 // Current output
-                BotChatBubble(text: output, isGenerating: isGenerating)
-                    .id(ChatView.BottomID1) // Unique ID for scrolling
+                if isGenerating {
+                    BotChatBubble(text: output, isGenerating: isGenerating)
+                }
 
-                Color.clear.frame(height: 1).id(ChatView.BottomID2)
+                Color.clear.frame(height: 1).id(ChatView.BottomID)
             }
             .font(.body.monospaced())
             .foregroundColor(Color("TextColor"))
@@ -171,9 +170,9 @@ public struct ChatView: View {
 #Preview("Replying") {
     let exampleOutput = "This is a bot response that spans multiple lines to better test spacing and alignment in the chat view during development previews in Xcode. This is a bot response that spans multiple lines to better test spacing and alignment in the chat view during development previews in Xcode."
     let exampleHistory: [Chat] = [
-        (role: .user, content: "Hi there!"),
-        (role: .bot, content: "Hello! How can I help you?"),
-        (role: .user, content: "Give me a very long answer (this question has a whole lot of text!)"),
+        Chat(role: .user, content: "Hi there!"),
+        Chat(role: .bot, content: "Hello! How can I help you?"),
+        Chat(role: .user, content: "Give me a very long answer (this question has a whole lot of text!)"),
     ]
 
     ChatView(
@@ -189,9 +188,9 @@ public struct ChatView: View {
 #Preview("Thinking") {
     let exampleOutput = ""
     let exampleHistory: [Chat] = [
-        (role: .user, content: "Hi there!"),
-        (role: .bot, content: "Hello! How can I help you?"),
-        (role: .user, content: "Give me a very long answer"),
+        Chat(role: .user, content: "Hi there!"),
+        Chat(role: .bot, content: "Hello! How can I help you?"),
+        Chat(role: .user, content: "Give me a very long answer"),
     ]
 
     ChatView(
