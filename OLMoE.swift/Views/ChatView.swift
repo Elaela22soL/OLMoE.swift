@@ -96,8 +96,7 @@ struct ScrollState {
 }
 
 public struct ChatView: View {
-    public static let BottomID1 = "bottomID"
-    public static let BottomID2 = "bottomID2"
+    public static let BottomID = "bottomID"
 
     public var history: [Chat]
     public var output: String
@@ -123,10 +122,9 @@ public struct ChatView: View {
                 // Current output
                 if isGenerating {
                     BotChatBubble(text: output, isGenerating: isGenerating)
-                        .id(ChatView.BottomID1) // Unique ID for scrolling
                 }
 
-                Color.clear.frame(height: 1).id(ChatView.BottomID2)
+                Color.clear.frame(height: 1).id(ChatView.BottomID)
             }
             .font(.body.monospaced())
             .foregroundColor(Color("TextColor"))

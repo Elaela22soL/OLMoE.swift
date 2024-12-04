@@ -270,9 +270,8 @@ struct BotView: View {
                             ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
                                 .onChange(of: bot.output) { _, _ in
                                     if isScrolledToBottom {
-                                        let scrollId = isGenerating ? ChatView.BottomID1 : ChatView.BottomID2
                                         withAnimation {
-                                            proxy.scrollTo(scrollId, anchor: .bottom)
+                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
                                         }
                                     }
                                     
@@ -280,7 +279,7 @@ struct BotView: View {
                                 .onChange(of: scrollToBottom) { _, newValue in
                                     if newValue {
                                         withAnimation {
-                                            proxy.scrollTo(ChatView.BottomID1, anchor: .bottom)
+                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
                                         }
                                         scrollToBottom = false
                                     }
