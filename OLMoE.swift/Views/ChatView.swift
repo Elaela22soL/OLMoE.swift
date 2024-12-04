@@ -47,7 +47,6 @@ public struct BotChatBubble: View {
                     .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: .leading)
                     .font(.body())
             }
-
             Spacer()
         }
     }
@@ -132,9 +131,7 @@ public struct ChatView: View {
             .foregroundColor(Color("TextColor"))
             .background(scrollTracker())
         }
-        .background(
-            scrollHeightTracker()
-        )
+        .background(scrollHeightTracker())
         .coordinateSpace(name: ScrollState.ScrollSpaceName)
         .preferredColorScheme(.dark)
     }
@@ -205,4 +202,12 @@ public struct ChatView: View {
     )
     .padding(12)
     .background(Color("BackgroundColor"))
+}
+
+#Preview("BotChatBubble") {
+    BotChatBubble(text: "Welcome chat message")
+}
+
+#Preview("UserChatBubble") {
+    UserChatBubble(text: "Hello Ai, please help me with your knowledge.")
 }
