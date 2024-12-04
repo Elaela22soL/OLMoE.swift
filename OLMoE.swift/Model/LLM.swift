@@ -56,7 +56,7 @@ open class LLM: ObservableObject {
 
     @Published public private(set) var output = ""
     @MainActor public func setOutput(to newOutput: consuming String) {
-        output = newOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+        output = newOutput.trimmingCharacters(in: .whitespaces)
     }
 
     private var context: Context!
