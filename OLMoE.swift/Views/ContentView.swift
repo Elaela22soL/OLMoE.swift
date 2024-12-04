@@ -75,10 +75,11 @@ struct BotView: View {
     func respond() {
         isGenerating = true
         Task {
-            let originalInput = input
+            let originalInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
             input = "" // Clear the input after sending
             await bot.respond(to: originalInput)
             await MainActor.run {
+                bot.setOutput(to: "")
                 isGenerating = false
             }
         }
@@ -261,7 +262,7 @@ struct BotView: View {
         ZStack {
             Color("BackgroundColor")
                 .edgesIgnoringSafeArea(.all)
-
+            
             VStack(alignment: .leading) {
                 if !isChatEmpty {
                     ScrollViewReader { proxy in
