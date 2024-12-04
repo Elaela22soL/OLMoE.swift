@@ -88,7 +88,6 @@ struct BotView: View {
 
     func stop() {
         bot.stop()
-        input = "" // Clear the input
         isGenerating = false
     }
 
@@ -96,6 +95,7 @@ struct BotView: View {
         Task { @MainActor in
             await bot.clearHistory()
             bot.setOutput(to: "")
+             input = "" // Clear the input
         }
     }
 
