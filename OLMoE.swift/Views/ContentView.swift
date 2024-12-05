@@ -74,6 +74,7 @@ struct BotView: View {
     
     func respond() {
         isGenerating = true
+        isTextEditorFocused = false
         Task {
             let originalInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
             input = "" // Clear the input after sending
