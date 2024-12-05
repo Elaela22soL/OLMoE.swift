@@ -41,7 +41,7 @@ public struct Template {
     public var preprocess: (_ input: String, _ history: [Chat]) -> String {
         return { [self] input, history in
             // If the state is restored, only preprocess the new input
-            if let savedState = self.savedState {
+            if self.savedState != nil {
                 // Return only the new user input formatted
                 return "\(user.prefix)\(input)\(user.suffix)"
             } else {

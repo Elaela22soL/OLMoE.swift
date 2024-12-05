@@ -75,10 +75,12 @@ struct BotView: View {
     func respond() {
         isGenerating = true
         Task {
-            let originalInput = input
+            let originalInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
             input = "" // Clear the input after sending
+            scrollToBottom = true
             await bot.respond(to: originalInput)
             await MainActor.run {
+                bot.setOutput(to: "")
                 isGenerating = false
             }
         }
@@ -86,14 +88,13 @@ struct BotView: View {
 
     func stop() {
         bot.stop()
-        input = "" // Clear the input
-        isGenerating = false
     }
 
     func deleteHistory() {
         Task { @MainActor in
             await bot.clearHistory()
             bot.setOutput(to: "")
+             input = "" // Clear the input
         }
     }
 
@@ -261,25 +262,23 @@ struct BotView: View {
         ZStack {
             Color("BackgroundColor")
                 .edgesIgnoringSafeArea(.all)
-
+            
             VStack(alignment: .leading) {
                 if !isChatEmpty {
                     ScrollViewReader { proxy in
                         ZStack {
-                            ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
+                            ChatView(history: bot.history, output: bot.output.trimmingCharacters(in: .whitespacesAndNewlines), isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
                                 .onChange(of: bot.output) { _, _ in
                                     if isScrolledToBottom {
-                                        let scrollId = isGenerating ? ChatView.BottomID1 : ChatView.BottomID2
                                         withAnimation {
-                                            proxy.scrollTo(scrollId, anchor: .bottom)
+                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
                                         }
                                     }
-                                    
                                 }
                                 .onChange(of: scrollToBottom) { _, newValue in
                                     if newValue {
                                         withAnimation {
-                                            proxy.scrollTo(ChatView.BottomID1, anchor: .bottom)
+                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
                                         }
                                         scrollToBottom = false
                                     }

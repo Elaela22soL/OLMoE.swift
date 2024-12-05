@@ -3,7 +3,18 @@ import llama
 
 public typealias Token = llama_token
 public typealias Model = OpaquePointer
-public typealias Chat = (role: Role, content: String)
+
+public struct Chat: Identifiable {
+    public var id: UUID? // Optional unique identifier
+    public var role: Role
+    public var content: String
+
+    public init(id: UUID? = UUID(), role: Role, content: String) {
+        self.id = id
+        self.role = role
+        self.content = content
+    }
+}
 
 @globalActor public actor InferenceActor {
     static public let shared = InferenceActor()
@@ -33,21 +44,21 @@ open class LLM: ObservableObject {
             }
         }
     }
-    
+
     public var topK: Int32
     public var topP: Float
     public var temp: Float
     private var sampler: UnsafeMutablePointer<llama_sampler>?
     public var historyLimit: Int
     public var path: [CChar]
-    
+
     public var loopBackTestResponse: Bool = false
-    
+
     @Published public private(set) var output = ""
     @MainActor public func setOutput(to newOutput: consuming String) {
-        output = newOutput
+        output = newOutput.trimmingCharacters(in: .whitespaces)
     }
-    
+
     private var context: Context!
     private var batch: llama_batch!
     private let maxTokenCount: Int
@@ -96,11 +107,11 @@ open class LLM: ObservableObject {
         self.stopSequence = stopSequence?.utf8CString
         self.stopSequenceLength = (self.stopSequence?.count ?? 1) - 1
         batch = llama_batch_init(Int32(self.maxTokenCount), 0, 1)
-        
+
         // sampler to run with default parameters
         let sparams = llama_sampler_chain_default_params()
         self.sampler = llama_sampler_chain_init(sparams)
-        
+
         if let sampler = self.sampler {
             llama_sampler_chain_add(sampler, llama_sampler_init_top_k(topK))
             llama_sampler_chain_add(sampler, llama_sampler_init_top_p(topP, 1))
@@ -109,11 +120,11 @@ open class LLM: ObservableObject {
         }
 
     }
-    
+
     deinit {
         llama_free_model(model)
     }
-    
+
     public convenience init(
         from url: URL,
         stopSequence: String? = nil,
@@ -137,7 +148,7 @@ open class LLM: ObservableObject {
             maxTokenCount: maxTokenCount
         )
     }
-    
+
     public convenience init(
         from huggingFaceModel: HuggingFaceModel,
         to url: URL = .modelsDirectory,
@@ -167,7 +178,7 @@ open class LLM: ObservableObject {
         )
         self.updateProgress = updateProgress
     }
-    
+
     public convenience init(
         from url: URL,
         template: Template,
@@ -193,9 +204,9 @@ open class LLM: ObservableObject {
         self.preprocess = template.preprocess
         self.template = template
     }
-    
+
     private var inferenceTask: Task<Void, Never>?
-    
+
     public func stop() {
         inferenceTask?.cancel()
         inferenceTask = nil
@@ -206,17 +217,17 @@ open class LLM: ObservableObject {
     private func predictNextToken() async -> Token {
         // Ensure context exists; otherwise, return end token
         guard let context = self.context else { return model.endToken }
-        
+
         // Check if the task has been canceled
         guard !Task.isCancelled else { return model.endToken }
-        
+
         guard let sampler = self.sampler else {
             fatalError("Sampler not initialized")
         }
-        
+
         // Sample the next token with a valid context
         let token = llama_sampler_sample(sampler, context.pointer, batch.n_tokens - 1)
-        
+
         batch.clear()
         batch.add(token, currentCount, [0], true)
         context.decode(batch)
@@ -225,14 +236,14 @@ open class LLM: ObservableObject {
 
 
 
-    
+
     private var currentCount: Int32!
     private var decoded = ""
-    
+
     open func recoverFromLengthy(_ input: borrowing String, to output:  borrowing AsyncStream<String>.Continuation) {
         output.yield("tl;dr")
     }
-    
+
     @InferenceActor
     public func clearHistory() async {
         history.removeAll()
@@ -241,7 +252,7 @@ open class LLM: ObservableObject {
         // For example, if you have a variable tracking the current conversation context:
         // currentContext = nil
     }
-    
+
     private func prepare(from input: borrowing String, to output: borrowing AsyncStream<String>.Continuation) -> Bool {
         guard !input.isEmpty else { return false }
         context = .init(model, params)
@@ -268,7 +279,7 @@ open class LLM: ObservableObject {
         context.decode(batch)
         return true
     }
-    
+
     @InferenceActor
     private func finishResponse(from response: inout [String], to output: borrowing AsyncStream<String>.Continuation) async {
         multibyteCharacter.removeAll()
@@ -286,7 +297,7 @@ open class LLM: ObservableObject {
             output.yield(restDelta)
         }
     }
-    
+
     private func process(_ token: Token, to output: borrowing AsyncStream<String>.Continuation) -> Bool {
         struct saved {
             static var stopSequenceEndIndex = 0
@@ -295,7 +306,7 @@ open class LLM: ObservableObject {
         guard token != model.endToken else { return false }
 
         let word = decode(token) // Decode the token directly
-        
+
         guard let stopSequence else {
             output.yield(word)
             return true
@@ -332,7 +343,7 @@ open class LLM: ObservableObject {
         return true
     }
 
-    
+
     private func getResponse(from input: String) -> AsyncStream<String> {
         AsyncStream<String> { output in
             Task { [weak self] in
@@ -342,14 +353,14 @@ open class LLM: ObservableObject {
                 guard self.prepare(from: input, to: output) else {
                     return output.finish()
                 }
-                
+
                 var response: [String] = []
                 while self.currentCount < self.maxTokenCount {
                     let token = await self.predictNextToken()
                     if !self.process(token, to: output) { return output.finish() }
                     self.currentCount += 1
                 }
-                
+
                 await self.finishResponse(from: &response, to: output)
                 output.finish()
             }
@@ -357,10 +368,10 @@ open class LLM: ObservableObject {
     }
 
 
-    
+
     private var input: String = ""
     private var isAvailable = true
-    
+
     @InferenceActor
     public func getCompletion(from input: borrowing String) async -> String {
         guard isAvailable else { fatalError("LLM is being used") }
@@ -373,7 +384,7 @@ open class LLM: ObservableObject {
         isAvailable = true
         return output
     }
-    
+
     private func getTestLoopbackResponse() -> AsyncStream<String> {
         return AsyncStream { continuation  in
             Task {
@@ -386,35 +397,37 @@ open class LLM: ObservableObject {
             }
         }
     }
-    
+
     @InferenceActor
     public func respond(to input: String, with makeOutputFrom: @escaping (AsyncStream<String>) async -> String) async {
         inferenceTask?.cancel() // Cancel any ongoing inference task
         inferenceTask = Task { [weak self] in
             guard let self = self else { return }
-            
+
             let historyBeforeInput = self.history
             await MainActor.run {
                 // Append user's message to history prior to response generation
-                self.history.append((.user, input))
+                self.history.append(Chat(role: .user, content: input))
             }
-            
+
             self.input = input
-            let processedInput = self.preprocess(input, historyBeforeInput)            
+            let processedInput = self.preprocess(input, historyBeforeInput)
             let responseStream = loopBackTestResponse ? self.getTestLoopbackResponse() : self.getResponse(from: processedInput)
-            
+
             // Generate the output string using the async closure
-            let output = await makeOutputFrom(responseStream)
-            
+            let output = (await makeOutputFrom(responseStream)).trimmingCharacters(in: .whitespacesAndNewlines)
+
             await MainActor.run {
-                // Update history and process the final output on the main actor
-                self.history.append((.bot, output))
-                
+                if !output.isEmpty {
+                    // Update history and process the final output on the main actor
+                    self.history.append(Chat(role: .bot, content: output))
+                }
+
                 // Maintain the history limit
                 if self.history.count > self.historyLimit {
                     self.history.removeFirst(min(2, self.history.count))
                 }
-                
+
                 self.postprocess(output)
             }
         }
@@ -450,11 +463,11 @@ open class LLM: ObservableObject {
         return model.decode(token, with: &multibyteCharacter)
     }
 
-    
+
     public func decode(_ tokens: [Token]) -> String {
         return tokens.map({model.decodeOnly($0)}).joined()
     }
-    
+
     @inlinable
     public func encode(_ text: borrowing String) -> [Token] {
         model.encode(text)
