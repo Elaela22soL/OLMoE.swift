@@ -88,7 +88,6 @@ struct BotView: View {
 
     func stop() {
         bot.stop()
-        isGenerating = false
     }
 
     func deleteHistory() {
