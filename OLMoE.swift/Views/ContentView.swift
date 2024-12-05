@@ -77,6 +77,7 @@ struct BotView: View {
         Task {
             let originalInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
             input = "" // Clear the input after sending
+            scrollToBottom = true
             await bot.respond(to: originalInput)
             await MainActor.run {
                 bot.setOutput(to: "")
@@ -87,7 +88,6 @@ struct BotView: View {
 
     func stop() {
         bot.stop()
-        input = "" // Clear the input
         isGenerating = false
     }
 
@@ -95,6 +95,7 @@ struct BotView: View {
         Task { @MainActor in
             await bot.clearHistory()
             bot.setOutput(to: "")
+             input = "" // Clear the input
         }
     }
 
@@ -267,14 +268,13 @@ struct BotView: View {
                 if !isChatEmpty {
                     ScrollViewReader { proxy in
                         ZStack {
-                            ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
+                            ChatView(history: bot.history, output: bot.output.trimmingCharacters(in: .whitespacesAndNewlines), isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
                                 .onChange(of: bot.output) { _, _ in
                                     if isScrolledToBottom {
                                         withAnimation {
                                             proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
                                         }
                                     }
-                                    
                                 }
                                 .onChange(of: scrollToBottom) { _, newValue in
                                     if newValue {
