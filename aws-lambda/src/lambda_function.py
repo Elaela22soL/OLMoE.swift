@@ -9,7 +9,7 @@ from entities.trace import Trace
 from entities.routes import LambdaRouter, Route
 from entities.response import ApiResponse
 from constants.response_messages import ResponseMessages
-
+from constants.deployment_environment import DeploymentEnvironment
 # Initialize S3 client
 s3 = boto3.client("s3")
 
@@ -18,6 +18,8 @@ BUCKET_NAME = os.environ['BUCKET_NAME']
 S3_LOG_PREFIX = os.environ['S3_LOG_PREFIX']
 S3_SHARE_PREFIX = os.environ['S3_SHARE_PREFIX']
 MAX_REQUEST_SIZE_BYTES = os.environ.get('MAX_REQUEST_SIZE_BYTES', 51200) # default to 50KB
+
+DEPLOYMENT_ENV = DeploymentEnvironment.from_env()
 
 with open("chat_template.html", "r", encoding="utf-8") as f:
     CHAT_TEMPLATE = f.read()
@@ -64,7 +66,7 @@ def handle_write_to_s3(event):
     key_id = event.get('key_id')
     attestation_object = event.get('attestation_object')
 
-    if not verify_attest(key_id, attestation_object):
+    if DEPLOYMENT_ENV != DeploymentEnvironment.TEST and not verify_attest(key_id, attestation_object):
         return ApiResponse.error(ResponseMessages.ATTESTATION_VERIFICATION_FAILED.value)
         
     body = { k:v for k,v in event.items() if k not in ['key_id', 'attestation_object'] }

@@ -58,6 +58,10 @@ struct BotView: View {
     private var isDeleteButtonDisabled: Bool {
         isInputDisabled || bot.history.isEmpty
     }
+    
+    private var isChatEmpty: Bool {
+        bot.history.isEmpty && !isGenerating && bot.output.isEmpty
+    }
 
     init(_ bot: Bot, disclaimerHandlers: DisclaimerHandlers) {
         _bot = StateObject(wrappedValue: bot)
@@ -99,7 +103,7 @@ struct BotView: View {
         Task {
             do {
                 let attestationResult = try await AppAttestManager.performAttest()
-                
+
                 // Prepare payload
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
@@ -259,7 +263,7 @@ struct BotView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading) {
-                if !bot.output.isEmpty || isGenerating || !bot.history.isEmpty {
+                if !isChatEmpty {
                     ScrollViewReader { proxy in
                         ZStack {
                             ChatView(history: bot.history, output: bot.output, isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
@@ -291,8 +295,7 @@ struct BotView: View {
                     ZStack {
                         VStack{
                             Spacer()
-                                .frame(height: geometry.size.height * 0.1)
-                            Image("Splash")
+                            Image("Ai2Icon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: max(140, min(geometry.size.width - 160, 290)))
@@ -303,6 +306,10 @@ struct BotView: View {
                 }
                 
                 Spacer()
+                
+                if (isChatEmpty) {
+                    BotChatBubble(text: String(localized: "Welcome chat message", comment: "Default chat bubble when conversation is empty"))
+                }
 
                 MessageInputView(
                     input: $input,

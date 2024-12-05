@@ -153,10 +153,6 @@ struct Ai2Logo: View {
                 .scaledToFit()
                 .frame(height: 18)
 
-            Rectangle()
-                .background(Color("TextColor"))
-                .frame(width: 1, height: 18)
-
             Text("allenai.org")
                 .font(.manrope(size: 14))
                 .foregroundColor(Color("TextColor"))

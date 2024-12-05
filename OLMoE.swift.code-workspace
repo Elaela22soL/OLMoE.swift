@@ -23,6 +23,7 @@
 		],
 		"python.languageServer": "Default",
 		"trailing-spaces.trimOnSave": true,
-		"workbench.editor.highlightModifiedTabs": true
+		"workbench.editor.highlightModifiedTabs": true,
+		"svg.preview.background": "editor"
 	}
 }
