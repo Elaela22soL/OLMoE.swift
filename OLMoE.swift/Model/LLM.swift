@@ -435,9 +435,14 @@ context.decode(batch)
 
                 self.postprocess(output)
             }
-        }
-        // Save the state after generating a response
+            
+            if Task.isCancelled {
+                return
+            }
+            // Save the state after generating a response
             self.savedState = saveState()
+        }
+
 
         await inferenceTask?.value
     }
@@ -446,12 +451,6 @@ context.decode(batch)
         // Restore the state before generating a response
         if let savedState = self.savedState {
             restoreState(from: savedState)
-        }
-
-        // Restore the state before generating a response
-        if let savedState = self.savedState {
-            restoreState(from: savedState)
-            nPast = Int32(history.reduce(0) { $0 + $1.content.count }) // Restore token count from history
         }
 
         await respond(to: input) { [self] response in
@@ -465,9 +464,6 @@ context.decode(batch)
             await setOutput(to: trimmedOutput.isEmpty ? "..." : trimmedOutput)
             return output
         }
-
-        // Save the state after generating a response
-        self.savedState = saveState()
     }
 
 
