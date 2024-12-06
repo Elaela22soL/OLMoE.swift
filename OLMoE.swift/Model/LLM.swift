@@ -69,7 +69,8 @@ open class LLM: ObservableObject {
     private var params: llama_context_params
     private var isFull = false
     private var updateProgress: (Double) -> Void = { _ in }
-    private var savedState: Data?
+    private var nPast: Int32 = 0 // Track number of tokens processed
+private var savedState: Data?
 
     public init(
         from path: String,
@@ -210,7 +211,6 @@ open class LLM: ObservableObject {
     public func stop() {
         inferenceTask?.cancel()
         inferenceTask = nil
-        context = nil // Clear context after canceling task
     }
 
     @InferenceActor
@@ -226,11 +226,13 @@ open class LLM: ObservableObject {
         }
 
         // Sample the next token with a valid context
-        let token = llama_sampler_sample(sampler, context.pointer, batch.n_tokens - 1)
+        let token = llama_sampler_sample(sampler, context.pointer, batch.n_tokens - 1) // Use batch token count for correct context
+
 
         batch.clear()
         batch.add(token, currentCount, [0], true)
-        context.decode(batch)
+        nPast += 1 // Increment the token count after predicting a new token
+context.decode(batch)
         return token
     }
 
@@ -247,7 +249,10 @@ open class LLM: ObservableObject {
     @InferenceActor
     public func clearHistory() async {
         history.removeAll()
+        nPast = 0 // Reset token count when clearing history
         await setOutput(to: "")
+        context = nil
+        savedState = nil
         // Reset any other state variables if necessary
         // For example, if you have a variable tracking the current conversation context:
         // currentContext = nil
@@ -431,6 +436,9 @@ open class LLM: ObservableObject {
                 self.postprocess(output)
             }
         }
+        // Save the state after generating a response
+            self.savedState = saveState()
+
         await inferenceTask?.value
     }
     
@@ -438,6 +446,12 @@ open class LLM: ObservableObject {
         // Restore the state before generating a response
         if let savedState = self.savedState {
             restoreState(from: savedState)
+        }
+
+        // Restore the state before generating a response
+        if let savedState = self.savedState {
+            restoreState(from: savedState)
+            nPast = Int32(history.reduce(0) { $0 + $1.content.count }) // Restore token count from history
         }
 
         await respond(to: input) { [self] response in
