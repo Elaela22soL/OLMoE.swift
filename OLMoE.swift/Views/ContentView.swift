@@ -267,7 +267,12 @@ struct BotView: View {
                 if !isChatEmpty {
                     ScrollViewReader { proxy in
                         ZStack {
-                            ChatView(history: bot.history, output: bot.output.trimmingCharacters(in: .whitespacesAndNewlines), isGenerating: $isGenerating, isScrolledToBottom: $isScrolledToBottom)
+                            ChatView(
+                                history: bot.history,
+                                output: bot.output.trimmingCharacters(in: .whitespacesAndNewlines),
+                                isGenerating: $isGenerating,
+                                isScrolledToBottom: $isScrolledToBottom
+                            )
                                 .onChange(of: bot.output) { _, _ in
                                     if isScrolledToBottom {
                                         withAnimation {
