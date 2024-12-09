@@ -70,7 +70,7 @@ open class LLM: ObservableObject {
     private var isFull = false
     private var updateProgress: (Double) -> Void = { _ in }
     private var nPast: Int32 = 0 // Track number of tokens processed
-private var savedState: Data?
+    private var savedState: Data?
 
     public init(
         from path: String,
@@ -260,7 +260,7 @@ context.decode(batch)
 
     private func prepare(from input: borrowing String, to output: borrowing AsyncStream<String>.Continuation) -> Bool {
         guard !input.isEmpty else { return false }
-        context = .init(model, params)
+        context = context ?? .init(model, params)
         var tokens = encode(input)
         var initialCount = tokens.count
         currentCount = Int32(initialCount)
@@ -353,7 +353,13 @@ context.decode(batch)
         AsyncStream<String> { output in
             Task { [weak self] in
                 guard let self = self else { return output.finish() } // Safely unwrap `self`
-                defer { self.context = nil }  // Use `self` safely now that it's unwrapped
+                // Use `self` safely now that it's unwrapped
+                
+                defer {
+                    if !FeatureFlags.useLLMCaching {
+                        self.context = nil
+                    }
+                }
 
                 guard self.prepare(from: input, to: output) else {
                     return output.finish()
@@ -440,7 +446,9 @@ context.decode(batch)
                 return
             }
             // Save the state after generating a response
-            self.savedState = saveState()
+            if FeatureFlags.useLLMCaching {
+                self.savedState = saveState()
+            }
         }
 
 
@@ -449,7 +457,7 @@ context.decode(batch)
     
     open func respond(to input: String) async {
         // Restore the state before generating a response
-        if let savedState = self.savedState {
+        if let savedState = FeatureFlags.useLLMCaching ? self.savedState : nil {
             restoreState(from: savedState)
         }
 
