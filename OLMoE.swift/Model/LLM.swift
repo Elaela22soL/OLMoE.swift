@@ -210,29 +210,31 @@ open class LLM: ObservableObject {
     }
 
     public func stop() {
-        inferenceTask?.cancel()
-        inferenceTask = nil
+        self.inferenceTask?.cancel()
+        self.inferenceTask = nil
+        self.batch.clear()
     }
 
     @InferenceActor
     private func predictNextToken() async -> Token {
         // Ensure context exists; otherwise, return end token
         guard let context = self.context else { return model.endToken }
-        print("context.pointer: \(context.pointer)")
-        print("context: \(String(describing: context))")
-        print("batch: \(String(describing: batch))")
-        print("batch.n_tokens: \(self.batch.n_tokens)")
-        print("self.totalTokenCount: \(self.totalTokenCount)")
 
         // Check if the task has been canceled
         guard !Task.isCancelled else { return model.endToken }
+
+        // Ensure the batch is valid
+        guard self.batch.n_tokens > 0 else {
+            print("Error: Batch is empty or invalid.")
+            return model.endToken
+        }
 
         guard let sampler = self.sampler else {
             fatalError("Sampler not initialized")
         }
 
         // Sample the next token with a valid context
-        let token = llama_sampler_sample(sampler, context.pointer, self.batch.n_tokens > 0 ? self.batch.n_tokens - 1 : 0) // Use batch token count for correct context
+        let token = llama_sampler_sample(sampler, context.pointer, self.batch.n_tokens - 1) // Use batch token count for correct context
 
 
         self.batch.clear()
@@ -399,8 +401,8 @@ open class LLM: ObservableObject {
 
     @InferenceActor
     public func respond(to input: String, with makeOutputFrom: @escaping (AsyncStream<String>) async -> String) async {
-        inferenceTask?.cancel() // Cancel any ongoing inference task
-        inferenceTask = Task { [weak self] in
+        self.inferenceTask?.cancel() // Cancel any ongoing inference task
+        self.inferenceTask = Task { [weak self] in
             guard let self = self else { return }
 
             let historyBeforeInput = self.history
@@ -411,7 +413,7 @@ open class LLM: ObservableObject {
 
             self.input = input
             let processedInput = self.preprocess(input, historyBeforeInput)
-            let responseStream = loopBackTestResponse ? self.getTestLoopbackResponse() : self.getResponse(from: processedInput)
+            let responseStream = self.loopBackTestResponse ? self.getTestLoopbackResponse() : self.getResponse(from: processedInput)
 
             // Generate the output string using the async closure
             let output = (await makeOutputFrom(responseStream)).trimmingCharacters(in: .whitespacesAndNewlines)
