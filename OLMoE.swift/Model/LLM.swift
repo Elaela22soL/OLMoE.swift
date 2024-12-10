@@ -44,14 +44,11 @@ open class LLM: ObservableObject {
             }
         }
     }
-
     public var topK: Int32
     public var topP: Float
     public var temp: Float
-    private var sampler: UnsafeMutablePointer<llama_sampler>?
     public var historyLimit: Int
     public var path: [CChar]
-
     public var loopBackTestResponse: Bool = false
 
     @Published public private(set) var output = ""
@@ -59,18 +56,25 @@ open class LLM: ObservableObject {
         output = newOutput.trimmingCharacters(in: .whitespaces)
     }
 
-    private var context: Context!
     private var batch: llama_batch!
-    private let maxTokenCount: Int
-    private let totalTokenCount: Int
+    private var context: Context!
+    private var currentCount: Int32!
+    private var decoded = ""
+    private var inferenceTask: Task<Void, Never>?
+    private var input: String = ""
+    private var isAvailable = true
     private let newlineToken: Token
+    private let maxTokenCount: Int
+    private var multibyteCharacter: [CUnsignedChar] = []
+    private var params: llama_context_params
+    private var sampler: UnsafeMutablePointer<llama_sampler>?
     private var stopSequence: ContiguousArray<CChar>?
     private var stopSequenceLength: Int
-    private var params: llama_context_params
+    private let totalTokenCount: Int
     private var isFull = false
     private var updateProgress: (Double) -> Void = { _ in }
     private var nPast: Int32 = 0 // Track number of tokens processed
-private var savedState: Data?
+    private var savedState: Data?
 
     public init(
         from path: String,
@@ -85,18 +89,18 @@ private var savedState: Data?
     ) {
         self.path = path.cString(using: .utf8)!
         var modelParams = llama_model_default_params()
-#if targetEnvironment(simulator)
-        modelParams.n_gpu_layers = 0
-#endif
+        #if targetEnvironment(simulator)
+            modelParams.n_gpu_layers = 0
+        #endif
         let model = llama_load_model_from_file(self.path, modelParams)!
-        params = llama_context_default_params()
+        self.params = llama_context_default_params()
         let processorCount = Int32(ProcessInfo().processorCount)
         self.maxTokenCount = Int(min(maxTokenCount, llama_n_ctx_train(model)))
-//        params.seed = seed
-        params.n_ctx = UInt32(self.maxTokenCount)
-        params.n_batch = params.n_ctx
-        params.n_threads = processorCount
-        params.n_threads_batch = processorCount
+        // self.params.seed = seed
+        self.params.n_ctx = UInt32(self.maxTokenCount)
+        self.params.n_batch = self.params.n_ctx
+        self.params.n_threads = processorCount
+        self.params.n_threads_batch = processorCount
         self.topK = topK
         self.topP = topP
         self.temp = temp
@@ -107,7 +111,7 @@ private var savedState: Data?
         self.newlineToken = model.newLineToken
         self.stopSequence = stopSequence?.utf8CString
         self.stopSequenceLength = (self.stopSequence?.count ?? 1) - 1
-        batch = llama_batch_init(Int32(self.maxTokenCount), 0, 1)
+        self.batch = llama_batch_init(Int32(self.maxTokenCount), 0, 1)
 
         // sampler to run with default parameters
         let sparams = llama_sampler_chain_default_params()
@@ -119,11 +123,10 @@ private var savedState: Data?
             llama_sampler_chain_add(sampler, llama_sampler_init_temp(temp))
             llama_sampler_chain_add(sampler, llama_sampler_init_dist(seed))
         }
-
     }
 
     deinit {
-        llama_free_model(model)
+        llama_free_model(self.model)
     }
 
     public convenience init(
@@ -206,8 +209,6 @@ private var savedState: Data?
         self.template = template
     }
 
-    private var inferenceTask: Task<Void, Never>?
-
     public func stop() {
         inferenceTask?.cancel()
         inferenceTask = nil
@@ -217,6 +218,11 @@ private var savedState: Data?
     private func predictNextToken() async -> Token {
         // Ensure context exists; otherwise, return end token
         guard let context = self.context else { return model.endToken }
+        print("context.pointer: \(context.pointer)")
+        print("context: \(String(describing: context))")
+        print("batch: \(String(describing: batch))")
+        print("batch.n_tokens: \(self.batch.n_tokens)")
+        print("self.totalTokenCount: \(self.totalTokenCount)")
 
         // Check if the task has been canceled
         guard !Task.isCancelled else { return model.endToken }
@@ -226,21 +232,15 @@ private var savedState: Data?
         }
 
         // Sample the next token with a valid context
-        let token = llama_sampler_sample(sampler, context.pointer, batch.n_tokens - 1) // Use batch token count for correct context
+        let token = llama_sampler_sample(sampler, context.pointer, self.batch.n_tokens > 0 ? self.batch.n_tokens - 1 : 0) // Use batch token count for correct context
 
 
-        batch.clear()
-        batch.add(token, currentCount, [0], true)
-        nPast += 1 // Increment the token count after predicting a new token
-context.decode(batch)
+        self.batch.clear()
+        self.batch.add(token, self.currentCount, [0], true)
+        self.nPast += 1 // Increment the token count after predicting a new token
+        context.decode(self.batch)
         return token
     }
-
-
-
-
-    private var currentCount: Int32!
-    private var decoded = ""
 
     open func recoverFromLengthy(_ input: borrowing String, to output:  borrowing AsyncStream<String>.Continuation) {
         output.yield("tl;dr")
@@ -348,7 +348,6 @@ context.decode(batch)
         return true
     }
 
-
     private func getResponse(from input: String) -> AsyncStream<String> {
         AsyncStream<String> { output in
             Task { [weak self] in
@@ -371,11 +370,6 @@ context.decode(batch)
             }
         }
     }
-
-
-
-    private var input: String = ""
-    private var isAvailable = true
 
     @InferenceActor
     public func getCompletion(from input: borrowing String) async -> String {
@@ -435,7 +429,7 @@ context.decode(batch)
 
                 self.postprocess(output)
             }
-            
+
             if Task.isCancelled {
                 return
             }
@@ -446,7 +440,7 @@ context.decode(batch)
 
         await inferenceTask?.value
     }
-    
+
     open func respond(to input: String) async {
         // Restore the state before generating a response
         if let savedState = self.savedState {
@@ -466,13 +460,10 @@ context.decode(batch)
         }
     }
 
-
-    private var multibyteCharacter: [CUnsignedChar] = []
     private func decode(_ token: Token) -> String {
         multibyteCharacter.removeAll(keepingCapacity: true) // Reset multibyte buffer
         return model.decode(token, with: &multibyteCharacter)
     }
-
 
     public func decode(_ tokens: [Token]) -> String {
         return tokens.map({model.decodeOnly($0)}).joined()
