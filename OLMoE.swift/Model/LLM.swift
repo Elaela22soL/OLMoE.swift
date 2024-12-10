@@ -262,7 +262,7 @@ open class LLM: ObservableObject {
 
     private func prepare(from input: borrowing String, to output: borrowing AsyncStream<String>.Continuation) -> Bool {
         guard !input.isEmpty else { return false }
-        context = .init(model, params)
+        context = context ?? .init(model, params)
         var tokens = encode(input)
         var initialCount = tokens.count
         currentCount = Int32(initialCount)
@@ -354,7 +354,13 @@ open class LLM: ObservableObject {
         AsyncStream<String> { output in
             Task { [weak self] in
                 guard let self = self else { return output.finish() } // Safely unwrap `self`
-                defer { self.context = nil }  // Use `self` safely now that it's unwrapped
+                // Use `self` safely now that it's unwrapped
+                
+                defer {
+                    if !FeatureFlags.useLLMCaching {
+                        self.context = nil
+                    }
+                }
 
                 guard self.prepare(from: input, to: output) else {
                     return output.finish()
@@ -436,7 +442,9 @@ open class LLM: ObservableObject {
                 return
             }
             // Save the state after generating a response
-            self.savedState = saveState()
+            if FeatureFlags.useLLMCaching {
+                self.savedState = saveState()
+            }
         }
 
 
@@ -445,7 +453,7 @@ open class LLM: ObservableObject {
 
     open func respond(to input: String) async {
         // Restore the state before generating a response
-        if let savedState = self.savedState {
+        if let savedState = FeatureFlags.useLLMCaching ? self.savedState : nil {
             restoreState(from: savedState)
         }
 
