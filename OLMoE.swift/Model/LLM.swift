@@ -218,10 +218,10 @@ open class LLM: ObservableObject {
     @InferenceActor
     private func predictNextToken() async -> Token {
         // Ensure context exists; otherwise, return end token
-        guard let context = self.context else { return model.endToken }
+        guard let context = self.context else { return self.model.endToken }
 
         // Check if the task has been canceled
-        guard !Task.isCancelled else { return model.endToken }
+        guard !Task.isCancelled else { return self.model.endToken }
 
         // Ensure the batch is valid
         guard self.batch.n_tokens > 0 else {
@@ -355,7 +355,7 @@ open class LLM: ObservableObject {
             Task { [weak self] in
                 guard let self = self else { return output.finish() } // Safely unwrap `self`
                 // Use `self` safely now that it's unwrapped
-                
+
                 defer {
                     if !FeatureFlags.useLLMCaching {
                         self.context = nil
