@@ -18,7 +18,6 @@ public struct Template {
     public let stopSequence: String?
     public let prefix: String
     public let shouldDropLast: Bool
-    public var savedState: Data?
 
     public init(
         prefix: String = "",
@@ -38,35 +37,34 @@ public struct Template {
         self.shouldDropLast = shouldDropLast
     }
     
-    public var preprocess: (_ input: String, _ history: [Chat]) -> String {
-        return { [self] input, history in
+    public var preprocess: (_ input: String, _ history: [Chat], _ llmInstance: LLM) -> String {
+        return { [self] input, history, llmInstance in
             // If the state is restored, only preprocess the new input
-            if self.savedState != nil {
-                // Return only the new user input formatted
-                return "\(user.prefix)\(input)\(user.suffix)"
-            } else {
-                // Full preprocessing for the first input or reset state
-                var processed = prefix
-                if let systemPrompt {
-                    processed += "\(system.prefix)\(systemPrompt)\(system.suffix)"
-                }
-                for chat in history {
-                    if chat.role == .user {
-                        processed += "\(user.prefix)\(chat.content)\(user.suffix)"
-                    } else {
-                        processed += "\(bot.prefix)\(chat.content)\(bot.suffix)"
-                    }
-                }
-                // Add the current user input
-                processed += "\(user.prefix)\(input)\(user.suffix)"
-                // Handle bot prefix for the new response
-                if shouldDropLast {
-                    processed += bot.prefix.dropLast()
-                } else {
-                    processed += bot.prefix
-                }
-                return processed
+        //    if llmInstance.savedState != nil {
+               // Return only the new user input formatted
+            //    return "\(user.prefix)\(input)\(user.suffix)"
+           
+            // Full preprocessing for the first input or reset state
+            var processed = prefix
+            if let systemPrompt {
+                processed += "\(system.prefix)\(systemPrompt)\(system.suffix)"
             }
+            for chat in history {
+                if chat.role == .user {
+                    processed += "\(user.prefix)\(chat.content)\(user.suffix)"
+                } else {
+                    processed += "\(bot.prefix)\(chat.content)\(bot.suffix)"
+                }
+            }
+            // Add the current user input
+            processed += "\(user.prefix)\(input)\(user.suffix)"
+            // Handle bot prefix for the new response
+            if shouldDropLast {
+                processed += bot.prefix.dropLast()
+            } else {
+                processed += bot.prefix
+            }
+            return processed
         }
     }
 

@@ -23,13 +23,13 @@ public struct Chat: Identifiable {
 open class LLM: ObservableObject {
     public var model: Model
     public var history: [Chat]
-    public var preprocess: (_ input: String, _ history: [Chat]) -> String = { input, _ in return input }
+    public var preprocess: (_ input: String, _ history: [Chat], _ llmInstance: LLM) -> String = { input, _, _ in return input }
     public var postprocess: (_ output: String) -> Void                    = { print($0) }
     public var update: (_ outputDelta: String?) -> Void                   = { _ in }
     public var template: Template? = nil {
         didSet {
             guard let template else {
-                preprocess = { input, _ in return input }
+                preprocess = { input, _, _ in return input }
                 stopSequence = nil
                 stopSequenceLength = 0
                 return
@@ -50,7 +50,8 @@ open class LLM: ObservableObject {
     public var historyLimit: Int
     public var path: [CChar]
     public var loopBackTestResponse: Bool = false
-
+    public var savedState: Data?
+    
     @Published public private(set) var output = ""
     @MainActor public func setOutput(to newOutput: consuming String) {
         output = newOutput.trimmingCharacters(in: .whitespaces)
@@ -74,7 +75,6 @@ open class LLM: ObservableObject {
     private var isFull = false
     private var updateProgress: (Double) -> Void = { _ in }
     private var nPast: Int32 = 0 // Track number of tokens processed
-    private var savedState: Data?
 
     public init(
         from path: String,
@@ -228,7 +228,13 @@ open class LLM: ObservableObject {
             print("Error: Batch is empty or invalid.")
             return model.endToken
         }
-
+        
+        // Check if the batch size is within limits
+        guard self.batch.n_tokens < self.maxTokenCount else {
+            print("Error: Batch token limit exceeded.")
+            return model.endToken
+        }
+        
         guard let sampler = self.sampler else {
             fatalError("Sampler not initialized")
         }
@@ -255,6 +261,7 @@ open class LLM: ObservableObject {
         await setOutput(to: "")
         context = nil
         savedState = nil
+        self.batch.clear()
         // Reset any other state variables if necessary
         // For example, if you have a variable tracking the current conversation context:
         // currentContext = nil
@@ -265,25 +272,28 @@ open class LLM: ObservableObject {
         context = context ?? .init(model, params)
         var tokens = encode(input)
         var initialCount = tokens.count
-        currentCount = Int32(initialCount)
-        if maxTokenCount <= currentCount {
-            while !history.isEmpty && maxTokenCount <= currentCount {
-                history.removeFirst(min(2, history.count))
-                tokens = encode(preprocess(self.input, history))
+        self.currentCount = Int32(initialCount)
+        print("prepare::self.currentCount", self.currentCount ?? "")
+        if self.maxTokenCount <= self.currentCount {
+            while !self.history.isEmpty && self.maxTokenCount <= self.currentCount {
+                self.history.removeFirst(min(2, self.history.count))
+                tokens = encode(preprocess(self.input, self.history, self))
                 initialCount = tokens.count
-                currentCount = Int32(initialCount)
+                self.currentCount = Int32(initialCount)
+                print("prepare::self.currentCount", self.currentCount ?? "")
+
             }
-            if maxTokenCount <= currentCount {
+            if self.maxTokenCount <= self.currentCount {
                 isFull = true
                 recoverFromLengthy(input, to: output)
                 return false
             }
         }
         for (i, token) in tokens.enumerated() {
-            batch.n_tokens = Int32(i)
-            batch.add(token, batch.n_tokens, [0], i == initialCount - 1)
+            self.batch.n_tokens = Int32(i)
+            self.batch.add(token, batch.n_tokens, [0], i == initialCount - 1)
         }
-        context.decode(batch)
+        self.context.decode(self.batch)
         return true
     }
 
@@ -293,10 +303,10 @@ open class LLM: ObservableObject {
         var input = ""
         if !history.isEmpty {
             history.removeFirst(min(2, history.count))
-            input = preprocess(self.input, history)
+            input = preprocess(self.input, history, self)
         } else {
             response.scoup(response.count / 3)
-            input = preprocess(self.input, history)
+            input = preprocess(self.input, history, self)
             input += response.joined()
         }
         let rest = getResponse(from: input)
@@ -365,11 +375,14 @@ open class LLM: ObservableObject {
                 guard self.prepare(from: input, to: output) else {
                     return output.finish()
                 }
-
                 var response: [String] = []
+                print("getResponse::self.currentCount", self.currentCount ?? "")
                 while self.currentCount < self.maxTokenCount {
+                    print("getResponse::llama_get_kv_cache_token_count", llama_get_kv_cache_token_count(self.context.pointer))
                     let token = await self.predictNextToken()
-                    if !self.process(token, to: output) { return output.finish() }
+                    if !self.process(token, to: output) {
+                        return output.finish()
+                    }
                     self.currentCount += 1
                 }
 
@@ -418,7 +431,7 @@ open class LLM: ObservableObject {
             }
 
             self.input = input
-            let processedInput = self.preprocess(input, historyBeforeInput)
+            let processedInput = self.preprocess(input, historyBeforeInput, self)
             let responseStream = self.loopBackTestResponse ? self.getTestLoopbackResponse() : self.getResponse(from: processedInput)
 
             // Generate the output string using the async closure
@@ -437,13 +450,14 @@ open class LLM: ObservableObject {
 
                 self.postprocess(output)
             }
-
-            if Task.isCancelled {
-                return
-            }
+            
             // Save the state after generating a response
             if FeatureFlags.useLLMCaching {
                 self.savedState = saveState()
+            }
+            
+            if Task.isCancelled {
+                return
             }
         }
 
