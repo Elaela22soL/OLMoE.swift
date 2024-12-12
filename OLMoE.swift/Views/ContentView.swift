@@ -276,14 +276,15 @@ struct BotView: View {
                                 .onChange(of: bot.output) { _, _ in
                                     if isScrolledToBottom {
                                         withAnimation {
-                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
+                                            // disable auto scroll for now
+//                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
                                         }
                                     }
                                 }
                                 .onChange(of: scrollToBottom) { _, newValue in
                                     if newValue {
                                         withAnimation {
-                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
+//                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
                                         }
                                         scrollToBottom = false
                                     }
