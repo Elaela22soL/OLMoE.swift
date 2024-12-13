@@ -72,7 +72,6 @@ open class LLM: ObservableObject {
     private var stopSequence: ContiguousArray<CChar>?
     private var stopSequenceLength: Int
     private let totalTokenCount: Int
-    private var isFull = false
     private var updateProgress: (Double) -> Void = { _ in }
     private var nPast: Int32 = 0 // Track number of tokens processed
 
@@ -127,60 +126,6 @@ open class LLM: ObservableObject {
 
     deinit {
         llama_free_model(self.model)
-    }
-
-    public convenience init(
-        from url: URL,
-        stopSequence: String? = nil,
-        history: [Chat] = [],
-        seed: UInt32 = .random(in: .min ... .max),
-        topK: Int32 = 40,
-        topP: Float = 0.95,
-        temp: Float = 0.8,
-        historyLimit: Int = 8,
-        maxTokenCount: Int32 = 2048
-    ) {
-        self.init(
-            from: url.path,
-            stopSequence: stopSequence,
-            history: history,
-            seed: seed,
-            topK: topK,
-            topP: topP,
-            temp: temp,
-            historyLimit: historyLimit,
-            maxTokenCount: maxTokenCount
-        )
-    }
-
-    public convenience init(
-        from huggingFaceModel: HuggingFaceModel,
-        to url: URL = .modelsDirectory,
-        as name: String? = nil,
-        history: [Chat] = [],
-        seed: UInt32 = .random(in: .min ... .max),
-        topK: Int32 = 40,
-        topP: Float = 0.95,
-        temp: Float = 0.8,
-        historyLimit: Int = 8,
-        maxTokenCount: Int32 = 2048,
-        updateProgress: @escaping (Double) -> Void = { print(String(format: "downloaded(%.2f%%)", $0 * 100)) }
-    ) async throws {
-        let url = try await huggingFaceModel.download(to: url, as: name) { progress in
-            Task { await MainActor.run { updateProgress(progress) } }
-        }
-        self.init(
-            from: url,
-            template: huggingFaceModel.template,
-            history: history,
-            seed: seed,
-            topK: topK,
-            topP: topP,
-            temp: temp,
-            historyLimit: historyLimit,
-            maxTokenCount: maxTokenCount
-        )
-        self.updateProgress = updateProgress
     }
 
     public convenience init(
@@ -248,10 +193,6 @@ open class LLM: ObservableObject {
         self.nPast += 1 // Increment the token count after predicting a new token
         context.decode(self.batch)
         return token
-    }
-
-    open func recoverFromLengthy(_ input: borrowing String, to output:  borrowing AsyncStream<String>.Continuation) {
-        output.yield("tl;dr")
     }
 
     @InferenceActor
@@ -487,10 +428,6 @@ open class LLM: ObservableObject {
     private func decode(_ token: Token) -> String {
         multibyteCharacter.removeAll(keepingCapacity: true) // Reset multibyte buffer
         return model.decode(token, with: &multibyteCharacter)
-    }
-
-    public func decode(_ tokens: [Token]) -> String {
-        return tokens.map({model.decodeOnly($0)}).joined()
     }
 
     @inlinable
