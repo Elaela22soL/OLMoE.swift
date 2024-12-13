@@ -40,31 +40,37 @@ public struct Template {
     public var preprocess: (_ input: String, _ history: [Chat], _ llmInstance: LLM) -> String {
         return { [self] input, history, llmInstance in
             // If the state is restored, only preprocess the new input
-        //    if llmInstance.savedState != nil {
-               // Return only the new user input formatted
-            //    return "\(user.prefix)\(input)\(user.suffix)"
-           
-            // Full preprocessing for the first input or reset state
-            var processed = prefix
-            if let systemPrompt {
-                processed += "\(system.prefix)\(systemPrompt)\(system.suffix)"
-            }
-            for chat in history {
-                if chat.role == .user {
-                    processed += "\(user.prefix)\(chat.content)\(user.suffix)"
-                } else {
-                    processed += "\(bot.prefix)\(chat.content)\(bot.suffix)"
-                }
-            }
-            // Add the current user input
-            processed += "\(user.prefix)\(input)\(user.suffix)"
-            // Handle bot prefix for the new response
-            if shouldDropLast {
-                processed += bot.prefix.dropLast()
-            } else {
+            if llmInstance.savedState != nil {
+                
+                // Return only the new user input formatted
+                var processed = prefix
+                processed += "\(user.prefix)\(input)\(user.suffix)"
                 processed += bot.prefix
+                
+                return processed
+            } else {
+                // Full preprocessing for the first input or reset state
+                var processed = prefix
+                if let systemPrompt {
+                    processed += "\(system.prefix)\(systemPrompt)\(system.suffix)"
+                }
+                for chat in history {
+                    if chat.role == .user {
+                        processed += "\(user.prefix)\(chat.content)\(user.suffix)"
+                    } else {
+                        processed += "\(bot.prefix)\(chat.content)\(bot.suffix)"
+                    }
+                }
+                // Add the current user input
+                processed += "\(user.prefix)\(input)\(user.suffix)"
+                // Handle bot prefix for the new response
+                if shouldDropLast {
+                    processed += bot.prefix.dropLast()
+                } else {
+                    processed += bot.prefix
+                }
+                return processed
             }
-            return processed
         }
     }
 
