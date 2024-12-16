@@ -34,7 +34,7 @@
     API_KEY=your_api_key_here
     API_URL=api_url
     BUNDLE_VERSION=10
-    BUNDLE_VERSION_PUBLIC=1.0.0.${BUNDLE_VERSION}
+    BUNDLE_VERSION_PUBLIC=1.0.0
     DEVELOPMENT_TEAM_ID=your_team_id
     PRODUCT_BUNDLE_IDENTIFIER=com.example.apple-samplecode.OLMoE.swift.${DEVELOPMENT_TEAM_ID}
     ```
