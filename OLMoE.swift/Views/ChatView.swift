@@ -106,8 +106,6 @@ public struct ChatView: View {
     @StateObject private var keyboardResponder = KeyboardResponder()
     @State var id = UUID()
     
-    @State private var newHeight: CGFloat = 0
-
     public var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -118,47 +116,35 @@ public struct ChatView: View {
                             switch chat.role {
                             case .user:
                                 UserChatBubble(text: chat.content)
-                                    .border(.red, width: 1)
-                                    .id(chat.id)
                             case .bot:
                                 BotChatBubble(text: chat.content)
                             }
                         }
                     }
-
+                    
                     // Current output
                     if isGenerating {
                         BotChatBubble(text: output, isGenerating: isGenerating)
                     }
+                    
                     Color.clear.frame(height: 1).id(ChatView.BottomID)
                 }
                 .font(.body.monospaced())
                 .foregroundColor(Color("TextColor"))
                 .background(scrollTracker())
-                .frame(minHeight: newHeight)
             }
             .background(scrollHeightTracker())
             .coordinateSpace(name: ScrollState.ScrollSpaceName)
             .preferredColorScheme(.dark)
-            .onAppear() {
-                // Scroll on refresh
-                proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
-            }
-            .onChange(of: keyboardResponder.keyboardHeight) { _, newHeight in
+            .onChange(of: keyboardResponder.keyboardHeight) { _,newHeight in
                 let keyboardIsVisible = newHeight > 0
                 if keyboardIsVisible {
                     id = UUID() // Trigger refresh by changing the id
                 }
             }
-            .onChange(of: history) { oldHistory, newHistory in
-                if let lastMessage = newHistory.last, lastMessage.role == .user {
-                    newHeight = scrollState.contentHeight + 1000
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        withAnimation {
-                            proxy.scrollTo(lastMessage.id, anchor: .top)
-                        }
-                    }
-                }
+            .onAppear() {
+                // Scroll on refresh
+                proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
             }
             .id(id)
         }

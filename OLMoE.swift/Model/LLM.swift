@@ -4,7 +4,7 @@ import llama
 public typealias Token = llama_token
 public typealias Model = OpaquePointer
 
-public struct Chat: Identifiable, Equatable {
+public struct Chat: Identifiable {
     public var id: UUID? // Optional unique identifier
     public var role: Role
     public var content: String
@@ -13,10 +13,6 @@ public struct Chat: Identifiable, Equatable {
         self.id = id
         self.role = role
         self.content = content
-    }
-
-    public static func == (lhs: Chat, rhs: Chat) -> Bool {
-        return lhs.id == rhs.id
     }
 }
 
