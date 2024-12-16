@@ -23,15 +23,20 @@
 
     The `DEVELOPMENT_TEAM_ID` is your team ID you located in step 1.
 
+    The `BUNDLE_VERSION` is the number used to identify the [current project version](https://developer.apple.com/documentation/xcode/build-settings-reference#Current-Project-Version) and the iteration of the [bundle version](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleversion).
+
+    The `BUNDLE_VERSION_PUBLIC` is the [public version](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleshortversionstring) number of the application and the [marketing version](https://developer.apple.com/documentation/xcode/build-settings-reference#Marketing-Version).
+
     The `PRODUCT_BUNDLE_IDENTIFIER` is the bundle identifier for the app.
     This can be assigned your unique identifier or the default value.
 
     ```ini
     API_KEY=your_api_key_here
     API_URL=api_url
+    BUNDLE_VERSION=10
+    BUNDLE_VERSION_PUBLIC=1.0.0
     DEVELOPMENT_TEAM_ID=your_team_id
     PRODUCT_BUNDLE_IDENTIFIER=com.example.apple-samplecode.OLMoE.swift.${DEVELOPMENT_TEAM_ID}
-
     ```
 
 1) Open the project in Xcode.
