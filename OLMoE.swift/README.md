@@ -25,7 +25,7 @@
 
     The `BUNDLE_VERSION` is the number used to identify the [current project version](https://developer.apple.com/documentation/xcode/build-settings-reference#Current-Project-Version) and the iteration of the [bundle version](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleversion).
 
-    The `BUNDLE_VERSION_PUBLIC` The [public version](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleshortversionstring) number of the application and the [marketing version](https://developer.apple.com/documentation/xcode/build-settings-reference#Marketing-Version).
+    The `BUNDLE_VERSION_PUBLIC` is the [public version](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleshortversionstring) number of the application and the [marketing version](https://developer.apple.com/documentation/xcode/build-settings-reference#Marketing-Version).
 
     The `PRODUCT_BUNDLE_IDENTIFIER` is the bundle identifier for the app.
     This can be assigned your unique identifier or the default value.
