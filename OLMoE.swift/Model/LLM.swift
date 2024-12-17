@@ -170,6 +170,7 @@ open class LLM: ObservableObject {
 
         // Check if the task has been canceled
         guard !Task.isCancelled else { return self.model.endToken }
+        guard self.inferenceTask != nil else { return self.model.endToken }
 
         // Ensure the batch is valid
         guard self.batch.n_tokens > 0 else {
@@ -245,6 +246,7 @@ open class LLM: ObservableObject {
             static var stopSequenceEndIndex = 0
             static var letters: [CChar] = []
         }
+        guard self.inferenceTask != nil else { return false }
         guard token != model.endToken else { return false }
 
         let word = decode(token) // Decode the token directly
