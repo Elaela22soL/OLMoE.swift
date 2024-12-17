@@ -152,7 +152,8 @@ open class LLM: ObservableObject {
         self.preprocess = template.preprocess
         self.template = template
     }
-
+    
+    @InferenceActor
     public func stop() {
         self.inferenceTask?.cancel()
         self.inferenceTask = nil
@@ -205,8 +206,10 @@ open class LLM: ObservableObject {
         // For example, if you have a variable tracking the current conversation context:
         // currentContext = nil
     }
-
+    
+    @InferenceActor
     private func tokenizeAndBatchInput(message input: borrowing String) -> Bool {
+        guard self.inferenceTask != nil else { return false }
         guard !input.isEmpty else { return false }
         context = context ?? .init(model, params)
         let tokens = encode(input)
@@ -221,6 +224,10 @@ open class LLM: ObservableObject {
             self.batch.add(token, self.nPast, [0], isLastToken)
             nPast += 1
         }
+        
+        // Check batch has not been cleared by a side effect (stop button) at the time of decoding
+        guard self.batch.n_tokens > 0 else { return false }
+        
         self.context.decode(self.batch)
         return true
     }
@@ -229,6 +236,7 @@ open class LLM: ObservableObject {
      Decodes a token, checks for the stop sequence, and yields decoded text.
       If the complete stop sequence is found, it stops yielding and returns false.
      */
+    @InferenceActor
     private func emitDecoded(token: Token, to output: borrowing AsyncStream<String>.Continuation) -> Bool {
         struct saved {
             static var stopSequenceEndIndex = 0
@@ -273,13 +281,16 @@ open class LLM: ObservableObject {
         }
         return true
     }
-
+    
+    @InferenceActor
     private func generateResponseStream(from input: String) -> AsyncStream<String> {
         AsyncStream<String> { output in
             Task { [weak self] in
                 guard let self = self else { return output.finish() } // Safely unwrap `self`
                 // Use `self` safely now that it's unwrapped
-
+                
+                guard self.inferenceTask != nil else { return output.finish() }
+                
                 defer {
                     if !FeatureFlags.useLLMCaching {
                         self.context = nil
@@ -306,6 +317,7 @@ open class LLM: ObservableObject {
      Halves the llama_kv_cache by removing the oldest half of tokens and shifting the newer half to the beginning.
      Updates `nPast` to reflect the reduced cache size.
     */
+    @InferenceActor
     private func trimKvCache() {
         let seq_id: Int32 = 0
         let beginning: Int32 = 0
