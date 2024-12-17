@@ -155,6 +155,8 @@ open class LLM: ObservableObject {
     
     @InferenceActor
     public func stop() {
+        guard self.inferenceTask != nil else { return }
+        
         self.inferenceTask?.cancel()
         self.inferenceTask = nil
         self.batch.clear()
