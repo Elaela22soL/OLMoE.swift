@@ -73,7 +73,8 @@ open class LLM: ObservableObject {
     private let totalTokenCount: Int
     private var updateProgress: (Double) -> Void = { _ in }
     private var nPast: Int32 = 0 // Track number of tokens processed
-
+    private var inputTokenCount: Int32 = 0
+    
     public init(
         from path: String,
         stopSequence: String? = nil,
@@ -215,9 +216,9 @@ open class LLM: ObservableObject {
         guard !input.isEmpty else { return false }
         context = context ?? .init(model, params)
         let tokens = encode(input)
-        let inputTokenCount = Int32(tokens.count)
-        print("inputTokenCount: ", inputTokenCount)
-        if self.maxTokenCount <= self.nPast + inputTokenCount {
+        self.inputTokenCount = Int32(tokens.count)
+        print("inputTokenCount: ", self.inputTokenCount)
+        if self.maxTokenCount <= self.nPast + self.inputTokenCount {
             self.trimKvCache()
         }
         for (i, token) in tokens.enumerated() {
@@ -390,6 +391,7 @@ open class LLM: ObservableObject {
                 self.postprocess(output)
             }
             
+            self.inputTokenCount = 0
             // Save the state after generating a response
             if FeatureFlags.useLLMCaching {
                 self.savedState = saveState()
@@ -420,8 +422,25 @@ open class LLM: ObservableObject {
             }
             update(nil)
             let trimmedOutput = output.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            
+            self.rollbackLastUserInputIfEmptyResponse(trimmedOutput)
+            
             await setOutput(to: trimmedOutput.isEmpty ? "..." : trimmedOutput)
             return output
+        }
+    }
+    
+    /**
+     If the model fails to produce a response (empty output), remove the last user input’s tokens
+     from the KV cache to prevent the model’s internal state from being "poisoned" by bad input.
+     */
+    private func rollbackLastUserInputIfEmptyResponse(_ response: String) {
+        if response.isEmpty && self.inputTokenCount > 0 {
+            let seq_id = Int32(0)
+            let startIndex = self.nPast - self.inputTokenCount
+            let endIndex = self.nPast
+            llama_kv_cache_seq_rm(self.context.pointer, seq_id, startIndex, endIndex)
         }
     }
 
