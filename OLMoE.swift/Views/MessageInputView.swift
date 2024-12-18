@@ -10,6 +10,7 @@ import SwiftUI
 struct MessageInputView: View {
     @Binding var input: String
     @Binding var isGenerating: Bool
+    @Binding var stopSubmitted: Bool
     @FocusState.Binding var isTextEditorFocused: Bool
     let isInputDisabled: Bool
     let hasValidInput: Bool
@@ -35,7 +36,7 @@ struct MessageInputView: View {
                 .padding(12)
 
             ZStack {
-                if isGenerating {
+                if isGenerating && !stopSubmitted {
                     Button(action: stop) {
                         Image("StopIcon")
                     }
@@ -73,6 +74,7 @@ struct MessageInputView: View {
     MessageInputView(
         input: .constant("Message"),
         isGenerating: .constant(false),
+        stopSubmitted: .constant(false),
         isTextEditorFocused: $isTextEditorFocused,
         isInputDisabled: false,
         hasValidInput: true,

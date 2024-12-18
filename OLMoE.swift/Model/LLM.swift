@@ -73,7 +73,8 @@ open class LLM: ObservableObject {
     private let totalTokenCount: Int
     private var updateProgress: (Double) -> Void = { _ in }
     private var nPast: Int32 = 0 // Track number of tokens processed
-
+    private var inputTokenCount: Int32 = 0
+    
     public init(
         from path: String,
         stopSequence: String? = nil,
@@ -152,8 +153,11 @@ open class LLM: ObservableObject {
         self.preprocess = template.preprocess
         self.template = template
     }
-
+    
+    @InferenceActor
     public func stop() {
+        guard self.inferenceTask != nil else { return }
+        
         self.inferenceTask?.cancel()
         self.inferenceTask = nil
         self.batch.clear()
@@ -166,6 +170,7 @@ open class LLM: ObservableObject {
 
         // Check if the task has been canceled
         guard !Task.isCancelled else { return self.model.endToken }
+        guard self.inferenceTask != nil else { return self.model.endToken }
 
         // Ensure the batch is valid
         guard self.batch.n_tokens > 0 else {
@@ -205,14 +210,16 @@ open class LLM: ObservableObject {
         // For example, if you have a variable tracking the current conversation context:
         // currentContext = nil
     }
-
+    
+    @InferenceActor
     private func tokenizeAndBatchInput(message input: borrowing String) -> Bool {
+        guard self.inferenceTask != nil else { return false }
         guard !input.isEmpty else { return false }
         context = context ?? .init(model, params)
         let tokens = encode(input)
-        let inputTokenCount = Int32(tokens.count)
-        print("inputTokenCount: ", inputTokenCount)
-        if self.maxTokenCount <= self.nPast + inputTokenCount {
+        self.inputTokenCount = Int32(tokens.count)
+        print("inputTokenCount: ", self.inputTokenCount)
+        if self.maxTokenCount <= self.nPast + self.inputTokenCount {
             self.trimKvCache()
         }
         for (i, token) in tokens.enumerated() {
@@ -221,6 +228,10 @@ open class LLM: ObservableObject {
             self.batch.add(token, self.nPast, [0], isLastToken)
             nPast += 1
         }
+        
+        // Check batch has not been cleared by a side effect (stop button) at the time of decoding
+        guard self.batch.n_tokens > 0 else { return false }
+        
         self.context.decode(self.batch)
         return true
     }
@@ -229,11 +240,13 @@ open class LLM: ObservableObject {
      Decodes a token, checks for the stop sequence, and yields decoded text.
       If the complete stop sequence is found, it stops yielding and returns false.
      */
+    @InferenceActor
     private func emitDecoded(token: Token, to output: borrowing AsyncStream<String>.Continuation) -> Bool {
         struct saved {
             static var stopSequenceEndIndex = 0
             static var letters: [CChar] = []
         }
+        guard self.inferenceTask != nil else { return false }
         guard token != model.endToken else { return false }
 
         let word = decode(token) // Decode the token directly
@@ -273,13 +286,16 @@ open class LLM: ObservableObject {
         }
         return true
     }
-
+    
+    @InferenceActor
     private func generateResponseStream(from input: String) -> AsyncStream<String> {
         AsyncStream<String> { output in
             Task { [weak self] in
                 guard let self = self else { return output.finish() } // Safely unwrap `self`
                 // Use `self` safely now that it's unwrapped
-
+                
+                guard self.inferenceTask != nil else { return output.finish() }
+                
                 defer {
                     if !FeatureFlags.useLLMCaching {
                         self.context = nil
@@ -306,6 +322,7 @@ open class LLM: ObservableObject {
      Halves the llama_kv_cache by removing the oldest half of tokens and shifting the newer half to the beginning.
      Updates `nPast` to reflect the reduced cache size.
     */
+    @InferenceActor
     private func trimKvCache() {
         let seq_id: Int32 = 0
         let beginning: Int32 = 0
@@ -376,6 +393,7 @@ open class LLM: ObservableObject {
                 self.postprocess(output)
             }
             
+            self.inputTokenCount = 0
             // Save the state after generating a response
             if FeatureFlags.useLLMCaching {
                 self.savedState = saveState()
@@ -406,8 +424,25 @@ open class LLM: ObservableObject {
             }
             update(nil)
             let trimmedOutput = output.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            
+            self.rollbackLastUserInputIfEmptyResponse(trimmedOutput)
+            
             await setOutput(to: trimmedOutput.isEmpty ? "..." : trimmedOutput)
             return output
+        }
+    }
+    
+    /**
+     If the model fails to produce a response (empty output), remove the last user input’s tokens
+     from the KV cache to prevent the model’s internal state from being "poisoned" by bad input.
+     */
+    private func rollbackLastUserInputIfEmptyResponse(_ response: String) {
+        if response.isEmpty && self.inputTokenCount > 0 {
+            let seq_id = Int32(0)
+            let startIndex = self.nPast - self.inputTokenCount
+            let endIndex = self.nPast
+            llama_kv_cache_seq_rm(self.context.pointer, seq_id, startIndex, endIndex)
         }
     }
 
