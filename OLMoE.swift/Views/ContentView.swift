@@ -37,6 +37,7 @@ struct BotView: View {
     @StateObject var bot: Bot
     @State var input = ""
     @State private var isGenerating = false
+    @State private var stopSubmitted = false
     @State private var scrollToBottom = false
     @State private var isSharing = false
     @State private var shareURL: URL?
@@ -75,6 +76,7 @@ struct BotView: View {
     func respond() {
         isGenerating = true
         isTextEditorFocused = false
+        stopSubmitted = false
         Task {
             let originalInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
             input = "" // Clear the input after sending
@@ -82,11 +84,13 @@ struct BotView: View {
             await MainActor.run {
                 bot.setOutput(to: "")
                 isGenerating = false
+                stopSubmitted = false
             }
         }
     }
 
     func stop() {
+        self.stopSubmitted = true
         bot.stop()
     }
 
@@ -318,6 +322,7 @@ struct BotView: View {
                 MessageInputView(
                     input: $input,
                     isGenerating: $isGenerating,
+                    stopSubmitted: $stopSubmitted,
                     isTextEditorFocused: $isTextEditorFocused,
                     isInputDisabled: isInputDisabled,
                     hasValidInput: hasValidInput,
