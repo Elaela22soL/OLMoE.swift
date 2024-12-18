@@ -68,7 +68,7 @@ public struct TypingIndicator: View {
 }
 
 struct ScrollState {
-    static let BottomScrollThreshold = 120.0
+    static let BottomScrollThreshold = 40.0
     static let ScrollSpaceName: String = "scrollSpace"
 
     public var scrollViewHeight: CGFloat = 0
@@ -102,51 +102,87 @@ public struct ChatView: View {
     public var output: String
     @Binding var isGenerating: Bool
     @Binding var isScrolledToBottom: Bool
+    @State private var contentHeight: CGFloat = 0
+    @State private var newHeight: CGFloat = 0
+    @State private var previousHeight: CGFloat = 0
+    @State private var outerHeight: CGFloat = 0
     @State private var scrollState = ScrollState()
+    @State private var lastAdjustedUserCount: Int = 0
     @StateObject private var keyboardResponder = KeyboardResponder()
-    @State var id = UUID()
-    
+
     public var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 10) {
-                    // History
-                    ForEach(history) { chat in
-                        if !chat.content.isEmpty {
-                            switch chat.role {
-                            case .user:
-                                UserChatBubble(text: chat.content)
-                            case .bot:
-                                BotChatBubble(text: chat.content)
+        GeometryReader { geometry in
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 10) {
+                        // History
+                        ForEach(history) { chat in
+                            if !chat.content.isEmpty {
+                                switch chat.role {
+                                    case .user:
+                                        UserChatBubble(text: chat.content)
+                                            .id(chat.id)
+                                    case .bot:
+                                        BotChatBubble(text: chat.content)
+                                }
+                            }
+                        }
+
+                        // Current output
+                        if isGenerating {
+                            BotChatBubble(text: output, isGenerating: isGenerating)
+                        }
+
+                        Color.clear.frame(height: 1).id(ChatView.BottomID)
+                    }
+                    .font(.body.monospaced())
+                    .foregroundColor(Color("TextColor"))
+                    .background(scrollTracker())
+                    .frame(minHeight: newHeight, alignment: .top)
+                }
+                .background(scrollHeightTracker())
+                .coordinateSpace(name: ScrollState.ScrollSpaceName)
+                .preferredColorScheme(.dark)
+                .onChange(of: history) { oldHistory, newHistory in
+                    if let lastMessage = getLatestUserChat() {
+                        if oldHistory.count < newHistory.count && lastMessage.role == .user {
+                            let userMessagesCount = newHistory.filter { $0.role == .user }.count
+
+                            // Only adjust height if this is a new user message count we haven't handled yet
+                            if userMessagesCount > 1 && userMessagesCount > lastAdjustedUserCount {
+                                // Set new height based on current content plus outer height
+                                self.newHeight = self.contentHeight + self.outerHeight
+                                self.lastAdjustedUserCount = userMessagesCount
+
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    withAnimation {
+                                        proxy.scrollTo(lastMessage.id, anchor: .top)
+                                    }
+                                }
                             }
                         }
                     }
-                    
-                    // Current output
-                    if isGenerating {
-                        BotChatBubble(text: output, isGenerating: isGenerating)
+                }
+                .onChange(of: keyboardResponder.keyboardHeight) { oldKeyboardHeight, newKeyboardHeight in
+                    self.previousHeight = self.newHeight
+                    self.contentHeight = scrollState.contentHeight
+                    let keyboardIsVisible = newKeyboardHeight > 0
+                    if keyboardIsVisible {
+                        let newHeight = self.newHeight - newKeyboardHeight
+                        self.newHeight = max(newHeight, self.outerHeight)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation {
+                                proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
+                            }
+                        }
+                    } else {
+                        self.newHeight = self.previousHeight
                     }
-                    
-                    Color.clear.frame(height: 1).id(ChatView.BottomID)
-                }
-                .font(.body.monospaced())
-                .foregroundColor(Color("TextColor"))
-                .background(scrollTracker())
-            }
-            .background(scrollHeightTracker())
-            .coordinateSpace(name: ScrollState.ScrollSpaceName)
-            .preferredColorScheme(.dark)
-            .onChange(of: keyboardResponder.keyboardHeight) { _,newHeight in
-                let keyboardIsVisible = newHeight > 0
-                if keyboardIsVisible {
-                    id = UUID() // Trigger refresh by changing the id
                 }
             }
-            .onAppear() {
-                // Scroll on refresh
-                proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
+            .onAppear {
+                self.outerHeight = geometry.size.height
             }
-            .id(id)
         }
     }
 
@@ -179,6 +215,10 @@ public struct ChatView: View {
                     scrollState.scrollViewHeight = newHeight
                 }
         }
+    }
+
+    private func getLatestUserChat() -> Chat? {
+        return self.history.last(where: { $0.role == .user })
     }
 }
 
