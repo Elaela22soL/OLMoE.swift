@@ -4,7 +4,7 @@ import llama
 public typealias Token = llama_token
 public typealias Model = OpaquePointer
 
-public struct Chat: Identifiable {
+public struct Chat: Identifiable, Equatable {
     public var id: UUID? // Optional unique identifier
     public var role: Role
     public var content: String
@@ -51,7 +51,7 @@ open class LLM: ObservableObject {
     public var path: [CChar]
     public var loopBackTestResponse: Bool = false
     public var savedState: Data?
-    
+
     @Published public private(set) var output = ""
     @MainActor public func setOutput(to newOutput: consuming String) {
         output = newOutput.trimmingCharacters(in: .whitespaces)
@@ -172,13 +172,13 @@ open class LLM: ObservableObject {
             print("Error: Batch is empty or invalid.")
             return model.endToken
         }
-        
+
         // Check if the batch size is within limits
         guard self.batch.n_tokens < self.maxTokenCount else {
             print("Error: Batch token limit exceeded.")
             return model.endToken
         }
-        
+
         guard let sampler = self.sampler else {
             fatalError("Sampler not initialized")
         }
@@ -217,7 +217,7 @@ open class LLM: ObservableObject {
         }
         for (i, token) in tokens.enumerated() {
             let isLastToken = i == tokens.count - 1
-            
+
             self.batch.add(token, self.nPast, [0], isLastToken)
             nPast += 1
         }
@@ -289,7 +289,7 @@ open class LLM: ObservableObject {
                 guard self.tokenizeAndBatchInput(message: input) else {
                     return output.finish()
                 }
-                
+
                 var token = await self.predictNextToken()
                 while self.emitDecoded(token: token, to: output) {
                     if self.nPast >= self.maxTokenCount {
@@ -301,7 +301,7 @@ open class LLM: ObservableObject {
             }
         }
     }
-    
+
     /**
      Halves the llama_kv_cache by removing the oldest half of tokens and shifting the newer half to the beginning.
      Updates `nPast` to reflect the reduced cache size.
@@ -310,10 +310,10 @@ open class LLM: ObservableObject {
         let seq_id: Int32 = 0
         let beginning: Int32 = 0
         let middle = Int32(self.maxTokenCount / 2)
-        
+
         // Remove the oldest half
         llama_kv_cache_seq_rm(self.context.pointer, seq_id, beginning, middle)
-        
+
         // Shift the newer half to the start
         llama_kv_cache_seq_add(
             self.context.pointer,
@@ -321,7 +321,7 @@ open class LLM: ObservableObject {
             middle,
             Int32(self.maxTokenCount), -middle
         )
-        
+
         // Update nPast
         let kvCacheTokenCount: Int32 = llama_get_kv_cache_token_count(self.context.pointer)
         self.nPast = kvCacheTokenCount
@@ -347,14 +347,8 @@ open class LLM: ObservableObject {
         self.inferenceTask = Task { [weak self] in
             guard let self = self else { return }
 
-            let historyBeforeInput = self.history
-            await MainActor.run {
-                // Append user's message to history prior to response generation
-                self.history.append(Chat(role: .user, content: input))
-            }
-
             self.input = input
-            let processedInput = self.preprocess(input, historyBeforeInput, self)
+            let processedInput = self.preprocess(input, self.history, self)
             let responseStream = self.loopBackTestResponse
                 ? self.getTestLoopbackResponse()
                 : self.generateResponseStream(from: processedInput)
@@ -375,12 +369,12 @@ open class LLM: ObservableObject {
 
                 self.postprocess(output)
             }
-            
+
             // Save the state after generating a response
             if FeatureFlags.useLLMCaching {
                 self.savedState = saveState()
             }
-            
+
             if Task.isCancelled {
                 return
             }
@@ -388,7 +382,7 @@ open class LLM: ObservableObject {
 
         await inferenceTask?.value
     }
-    
+
     /**
      Entry point to generate a model response from the input message
      */
@@ -397,7 +391,7 @@ open class LLM: ObservableObject {
         if let savedState = FeatureFlags.useLLMCaching ? self.savedState : nil {
             restoreState(from: savedState)
         }
-        
+
         await performInference(to: input) { [self] response in
             await setOutput(to: "")
             for await responseDelta in response {
@@ -463,7 +457,7 @@ extension LLM {
                 assert(bytesRead == stateData.count, "Error: Read state size does not match expected size.")
             }
         }
-        
+
         let beginningOfSequenceOffset: Int32 = 1
         self.nPast = llama_get_kv_cache_token_count(self.context.pointer) + beginningOfSequenceOffset
     }

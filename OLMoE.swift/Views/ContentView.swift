@@ -58,7 +58,7 @@ struct BotView: View {
     private var isDeleteButtonDisabled: Bool {
         isInputDisabled || bot.history.isEmpty
     }
-    
+
     private var isChatEmpty: Bool {
         bot.history.isEmpty && !isGenerating && bot.output.isEmpty
     }
@@ -71,13 +71,17 @@ struct BotView: View {
     func shouldShowScrollButton() -> Bool {
         return !isScrolledToBottom
     }
-    
+
     func respond() {
         isGenerating = true
         isTextEditorFocused = false
+        let originalInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        input = "" // Clear the input after sending
+
+        // Add the user message to history immediately
+        bot.history.append(Chat(role: .user, content: originalInput))
+
         Task {
-            let originalInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
-            input = "" // Clear the input after sending
             await bot.respond(to: originalInput)
             await MainActor.run {
                 bot.setOutput(to: "")
@@ -218,20 +222,18 @@ struct BotView: View {
         .disabled(isDeleteButtonDisabled)
         .opacity(isDeleteButtonDisabled ? 0.5 : 1)
     }
-    
+
     @ViewBuilder
     func scrollToBottomButton() -> some View {
         VStack {
             Spacer()
-            
+
             Button(action: {
                 scrollToBottom = true
             }) {
                 Image(systemName: "arrow.down")
-                    .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 30, height: 30)
-                    .padding(12)
+                    .padding(10)
                     .foregroundColor(Color("BackgroundColor"))
                     .background(Color("LightGreen"))
                     .clipShape(Circle())
@@ -262,7 +264,7 @@ struct BotView: View {
         ZStack {
             Color("BackgroundColor")
                 .edgesIgnoringSafeArea(.all)
-            
+
             VStack(alignment: .leading) {
                 if !isChatEmpty {
                     ScrollViewReader { proxy in
@@ -273,13 +275,6 @@ struct BotView: View {
                                 isGenerating: $isGenerating,
                                 isScrolledToBottom: $isScrolledToBottom
                             )
-                                .onChange(of: bot.output) { _, _ in
-                                    if isScrolledToBottom {
-                                        withAnimation {
-                                            proxy.scrollTo(ChatView.BottomID, anchor: .bottom)
-                                        }
-                                    }
-                                }
                                 .onChange(of: scrollToBottom) { _, newValue in
                                     if newValue {
                                         withAnimation {
@@ -291,7 +286,7 @@ struct BotView: View {
                                 .gesture(TapGesture().onEnded({
                                     isTextEditorFocused = false
                                 }))
-                            
+
                             scrollToBottomButton()
                         }
                     }
@@ -308,9 +303,9 @@ struct BotView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                
+
                 Spacer()
-                
+
                 if (isChatEmpty) {
                     BotChatBubble(text: String(localized: "Welcome chat message", comment: "Default chat bubble when conversation is empty"))
                 }
