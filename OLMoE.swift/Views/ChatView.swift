@@ -153,11 +153,11 @@ public struct ChatView: View {
                                 // Set new height based on current content plus outer height
                                 self.newHeight = self.contentHeight + self.outerHeight
                                 self.lastAdjustedUserCount = userMessagesCount
-                            }
 
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                withAnimation {
-                                    proxy.scrollTo(lastMessage.id, anchor: .top)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    withAnimation {
+                                        proxy.scrollTo(lastMessage.id, anchor: .top)
+                                    }
                                 }
                             }
                         }
