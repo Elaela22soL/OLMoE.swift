@@ -58,7 +58,6 @@
 		48971DFB2D14D5E300F0DB43 /* aws-lambda */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "aws-lambda"; sourceTree = "<group>"; };
 		48AA86D92CE688A4000B9138 /* Constants */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Constants; sourceTree = "<group>"; };
 		48AA86DF2CE69622000B9138 /* Extensions */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Extensions; sourceTree = "<group>"; };
-		B26FDB3F2CEAD46F00E1D57C /* Behaviors */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Behaviors; sourceTree = "<group>"; };
 		B26FDB412CEAD48600E1D57C /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
 		B26FDB422CEAD48F00E1D57C /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -103,7 +102,6 @@
 				B26FDB422CEAD48F00E1D57C /* Views */,
 				B26FDB412CEAD48600E1D57C /* Resources */,
 				B26FDB402CEAD47700E1D57C /* Model */,
-				B26FDB3F2CEAD46F00E1D57C /* Behaviors */,
 				48AA86D92CE688A4000B9138 /* Constants */,
 				48AA86DF2CE69622000B9138 /* Extensions */,
 				A04660402CA4017D007BD14C /* OLMoE-swift-Info.plist */,
@@ -163,7 +161,6 @@
 				487932D72CEBB63D00A741C5 /* BuildConfig */,
 				48AA86D92CE688A4000B9138 /* Constants */,
 				48AA86DF2CE69622000B9138 /* Extensions */,
-				B26FDB3F2CEAD46F00E1D57C /* Behaviors */,
 				B26FDB412CEAD48600E1D57C /* Resources */,
 				B26FDB422CEAD48F00E1D57C /* Views */,
 			);
