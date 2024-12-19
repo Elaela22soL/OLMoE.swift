@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		489710A22D14D22600F0DB43 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 489710A12D14D22600F0DB43 /* README.md */; };
 		489FD75C2CF13E4E0011E908 /* AttestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489FD75B2CF13E4E0011E908 /* AttestManager.swift */; };
 		48B806352CF54D9F00E1CC0A /* LambdaResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B806342CF54D9600E1CC0A /* LambdaResponseModel.swift */; };
 		48E37C202D0271610030C57C /* KeyboardResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E37C1F2D02715B0030C57C /* KeyboardResponder.swift */; };
@@ -27,6 +28,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		48194C372D14D7C500E76532 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		489710A12D14D22600F0DB43 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
 		489FD75B2CF13E4E0011E908 /* AttestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttestManager.swift; sourceTree = "<group>"; };
 		48B806342CF54D9600E1CC0A /* LambdaResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LambdaResponseModel.swift; sourceTree = "<group>"; };
 		48E37C1F2D02715B0030C57C /* KeyboardResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardResponder.swift; sourceTree = "<group>"; };
@@ -50,11 +53,11 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		48188E282CEE676800B0EF03 /* Styles */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Styles; sourceTree = "<group>"; };
+		48194C362D14D69300E76532 /* doc_assets */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = doc_assets; sourceTree = "<group>"; };
 		487932D72CEBB63D00A741C5 /* BuildConfig */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = BuildConfig; sourceTree = "<group>"; };
+		48971DFB2D14D5E300F0DB43 /* aws-lambda */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "aws-lambda"; sourceTree = "<group>"; };
 		48AA86D92CE688A4000B9138 /* Constants */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Constants; sourceTree = "<group>"; };
 		48AA86DF2CE69622000B9138 /* Extensions */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Extensions; sourceTree = "<group>"; };
-		A04660392CA1E684007BD14C /* aws_lambda */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = aws_lambda; sourceTree = "<group>"; };
-		B26FDB3F2CEAD46F00E1D57C /* Behaviors */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Behaviors; sourceTree = "<group>"; };
 		B26FDB412CEAD48600E1D57C /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
 		B26FDB422CEAD48F00E1D57C /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -74,7 +77,9 @@
 		A0117FDF2C990EAB00035007 = {
 			isa = PBXGroup;
 			children = (
-				A04660392CA1E684007BD14C /* aws_lambda */,
+				48194C372D14D7C500E76532 /* README.md */,
+				48194C362D14D69300E76532 /* doc_assets */,
+				48971DFB2D14D5E300F0DB43 /* aws-lambda */,
 				A0117FEA2C990EAB00035007 /* OLMoE.swift */,
 				A0117FE92C990EAB00035007 /* Products */,
 			);
@@ -91,12 +96,12 @@
 		A0117FEA2C990EAB00035007 /* OLMoE.swift */ = {
 			isa = PBXGroup;
 			children = (
+				489710A12D14D22600F0DB43 /* README.md */,
 				48188E282CEE676800B0EF03 /* Styles */,
 				487932D72CEBB63D00A741C5 /* BuildConfig */,
 				B26FDB422CEAD48F00E1D57C /* Views */,
 				B26FDB412CEAD48600E1D57C /* Resources */,
 				B26FDB402CEAD47700E1D57C /* Model */,
-				B26FDB3F2CEAD46F00E1D57C /* Behaviors */,
 				48AA86D92CE688A4000B9138 /* Constants */,
 				48AA86DF2CE69622000B9138 /* Extensions */,
 				A04660402CA4017D007BD14C /* OLMoE-swift-Info.plist */,
@@ -156,7 +161,6 @@
 				487932D72CEBB63D00A741C5 /* BuildConfig */,
 				48AA86D92CE688A4000B9138 /* Constants */,
 				48AA86DF2CE69622000B9138 /* Extensions */,
-				B26FDB3F2CEAD46F00E1D57C /* Behaviors */,
 				B26FDB412CEAD48600E1D57C /* Resources */,
 				B26FDB422CEAD48F00E1D57C /* Views */,
 			);
@@ -214,6 +218,7 @@
 			files = (
 				A0117FF42C990EAC00035007 /* Preview Assets.xcassets in Resources */,
 				A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */,
+				489710A22D14D22600F0DB43 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,7 +381,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =  "${BUNDLE_VERSION}";
+				CURRENT_PROJECT_VERSION = "${BUNDLE_VERSION}";
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
 				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM_ID}";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -421,7 +426,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =  "${BUNDLE_VERSION}";
+				CURRENT_PROJECT_VERSION = "${BUNDLE_VERSION}";
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
 				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM_ID}";
 				ENABLE_HARDENED_RUNTIME = YES;

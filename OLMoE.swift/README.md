@@ -47,7 +47,7 @@
 
 1) Run the project
 
-## Trouble-shooting
+## Troubleshooting
 
 ### Ensure the correct configuration is being used
 
