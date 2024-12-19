@@ -158,8 +158,6 @@ public struct ChatView: View {
 
     @ViewBuilder
     private func chatBubble(for chat: Chat, at index: Int, parentWidth: CGFloat) -> some View {
-        // Consider a message recent if it's part of the latest user-bot exchange
-        let isRecentBubble = index >= history.count - 2
         Group {
             switch chat.role {
                 case .user:
