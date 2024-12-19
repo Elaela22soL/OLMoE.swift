@@ -276,7 +276,8 @@ struct BotView: View {
                                 history: bot.history,
                                 output: bot.output.trimmingCharacters(in: .whitespacesAndNewlines),
                                 isGenerating: $isGenerating,
-                                isScrolledToBottom: $isScrolledToBottom
+                                isScrolledToBottom: $isScrolledToBottom,
+                                stopSubmitted: $stopSubmitted
                             )
                                 .onChange(of: scrollToBottom) { _, newValue in
                                     if newValue {
@@ -310,7 +311,7 @@ struct BotView: View {
                 Spacer()
 
                 if (isChatEmpty) {
-                    BotChatBubble(text: String(localized: "Welcome chat message", comment: "Default chat bubble when conversation is empty"))
+                    BotChatBubble(text: String(localized: "Welcome chat message", comment: "Default chat bubble when conversation is empty"), maxWidth: geometry.size.width)
                 }
 
                 MessageInputView(

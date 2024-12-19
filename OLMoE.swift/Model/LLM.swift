@@ -47,7 +47,6 @@ open class LLM: ObservableObject {
     public var topK: Int32
     public var topP: Float
     public var temp: Float
-    public var historyLimit: Int
     public var path: [CChar]
     public var loopBackTestResponse: Bool = false
     public var savedState: Data?
@@ -83,7 +82,6 @@ open class LLM: ObservableObject {
         topK: Int32 = 40,
         topP: Float = 0.95,
         temp: Float = 0.8,
-        historyLimit: Int = 8,
         maxTokenCount: Int32 = 2048
     ) {
         self.path = path.cString(using: .utf8)!
@@ -103,7 +101,6 @@ open class LLM: ObservableObject {
         self.topK = topK
         self.topP = topP
         self.temp = temp
-        self.historyLimit = historyLimit
         self.model = model
         self.history = history
         self.totalTokenCount = Int(llama_n_vocab(model))
@@ -136,7 +133,6 @@ open class LLM: ObservableObject {
         topK: Int32 = 40,
         topP: Float = 0.95,
         temp: Float = 0.8,
-        historyLimit: Int = 8,
         maxTokenCount: Int32 = 2048
     ) {
         self.init(
@@ -147,7 +143,6 @@ open class LLM: ObservableObject {
             topK: topK,
             topP: topP,
             temp: temp,
-            historyLimit: historyLimit,
             maxTokenCount: maxTokenCount
         )
         self.preprocess = template.preprocess
@@ -379,10 +374,6 @@ open class LLM: ObservableObject {
                     self.history.append(Chat(role: .bot, content: output))
                 }
 
-                // Maintain the history limit
-                if self.history.count > self.historyLimit {
-                    self.history.removeFirst(min(2, self.history.count))
-                }
 
                 self.postprocess(output)
             }
