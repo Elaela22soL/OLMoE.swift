@@ -2,10 +2,10 @@
   "sourceLanguage" : "en",
   "strings" : {
     "(The model requires ~6 GB and this device has: %@ GB available.)" : {
-     
+
     },
     "%@ / %@" : {
-     
+
     },
     "%lld%%" : {
 
@@ -61,7 +61,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hello! This can be some kind of default welcome message."
+            "value" : "Hello! I’m OLMoE, a fully open, state-of-the-art language model leveraging sparse Mixture-of-Experts (MoE), running locally on your device."
           }
         }
       }
