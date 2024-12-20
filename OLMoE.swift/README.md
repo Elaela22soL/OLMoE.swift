@@ -5,7 +5,7 @@
 - Xcode 15.4+
 - iOS 17+
 
-## Building the iOS App
+## Building the iOS App to run on-device
 
 1) Log in to [Apple Developer](https://developer.apple.com).
     To find the Team ID, see: [Locate your team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/).
@@ -29,7 +29,7 @@
     This can be assigned your unique identifier or the default value.
 
     ```ini
-    API_KEY=your_api_key_here
+    API_KEY=your_api_key_herex
     API_URL=api_url
     BUNDLE_VERSION=10
     BUNDLE_VERSION_PUBLIC=1.0.0
@@ -45,7 +45,7 @@
 
 1) Run the project
 
-## Enabling the Sharing Feature (Requires an AWS Lambda Function)
+## Enabling the Sharing Feature (Requires an AWS Lambda function)
 
 1) Follow and deploy the lambda function as described in the [lambda README](../aws-lambda/README.md)
 

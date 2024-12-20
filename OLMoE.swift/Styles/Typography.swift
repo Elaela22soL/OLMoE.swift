@@ -6,10 +6,10 @@ extension Font {
     }
 
     static func body() -> Font {
-        .manrope(.medium, size: 14)
+        .manrope(.medium, size: 17)
     }
     
     static func subheader() -> Font {
-        .manrope(.medium, size: 18)
+        .manrope(.medium, size: 22)
     }
 }
