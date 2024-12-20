@@ -23,6 +23,7 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
     private var lastUpdateTime: Date = Date()
     private var hasCheckedDiskSpace = false
     private let updateInterval: TimeInterval = 0.5 // Update UI every 0.5 seconds
+    private var lastDispatchedBytesWritten: Int64 = 0
 
     private override init() {
         super.init()
@@ -41,6 +42,8 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
                 if path.status == .unsatisfied {
                     self.downloadError = "Connection lost. Please check your internet connection."
                     self.isDownloading = false
+                    self.hasCheckedDiskSpace = false
+                    self.isModelReady = false
                     self.downloadTask?.cancel()
                 }
             }
@@ -113,6 +116,10 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         let currentTime = Date()
         if currentTime.timeIntervalSince(lastUpdateTime) >= updateInterval {
             DispatchQueue.main.async {
+                // Due to async nature, older updates might run later; update progress only if data is more recent.
+                guard totalBytesWritten > self.lastDispatchedBytesWritten else { return }
+                self.lastDispatchedBytesWritten = totalBytesWritten
+
                 self.downloadProgress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
                 self.downloadedSize = totalBytesWritten
                 self.totalSize = totalBytesExpectedToWrite
