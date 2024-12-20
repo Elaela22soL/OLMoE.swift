@@ -54,7 +54,7 @@ struct MessageInputView: View {
             }
             .font(.system(size: 24))
             .frame(width: 40, height: 40)
-            .padding(.top, 2)
+            .padding(.top, 4)
             .padding(.trailing, 4)
 
         }
