@@ -61,7 +61,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hello! I’m OLMoE, a fully open, state-of-the-art language model leveraging sparse Mixture-of-Experts (MoE), running locally on your device."
+            "value" : "Hello! I’m OLMoE, a fully open, state-of-the-art language model leveraging sparse Mixture-of-Experts (MoE), running locally on your device. What can I help you with today?"
           }
         }
       }

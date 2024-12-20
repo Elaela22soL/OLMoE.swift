@@ -5,12 +5,10 @@
 - Xcode 15.4+
 - iOS 17+
 
-## Configuration
+## Building the iOS App
 
 1) Log in to [Apple Developer](https://developer.apple.com).
     To find the Team ID, see: [Locate your team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/).
-
-1) Follow and deploy the lambda function as described in the [lambda README](../aws-lambda/README.md)
 
 1) Rename `BuildConfig/build.example.xcconfig` to `build.xcconfig`.
 
@@ -46,6 +44,10 @@
     ![Select Project OLMoE Swift](../doc_assets/Set_Target_Device.png)
 
 1) Run the project
+
+## Enabling the Sharing Feature (Requires an AWS Lambda Function)
+
+1) Follow and deploy the lambda function as described in the [lambda README](../aws-lambda/README.md)
 
 ## Troubleshooting
 
