@@ -18,6 +18,7 @@ struct PrimaryButton: ButtonStyle {
             .background(Color.accentColor)
             .cornerRadius(12)
             .font(.manrope(size: 17))
+            .font(.body())
             .fontWeight(.semibold)
             .foregroundColor(Color("TextColorButton"))
     }
@@ -40,6 +41,7 @@ struct SecondaryButton: ButtonStyle {
             .background(Color.background)
             .cornerRadius(12)
             .font(.manrope(size: 17))
+            .font(.body())
             .fontWeight(.semibold)
             .foregroundColor(Color("AccentColor"))
             .preferredColorScheme(.dark)
