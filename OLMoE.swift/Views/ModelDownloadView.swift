@@ -44,6 +44,7 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
                     self.isDownloading = false
                     self.hasCheckedDiskSpace = false
                     self.isModelReady = false
+                    self.lastDispatchedBytesWritten = 0
                     self.downloadTask?.cancel()
                 }
             }
@@ -64,6 +65,7 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         downloadError = nil
         downloadedSize = 0
         totalSize = 0
+        self.lastDispatchedBytesWritten = 0
 
         downloadTask = backgroundSession.downloadTask(with: url)
         downloadTask?.resume()
