@@ -252,7 +252,7 @@
 		A0117FF52C990EAC00035007 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 487932D72CEBB63D00A741C5 /* BuildConfig */;
-			baseConfigurationReferenceRelativePath = build.xcconfig;
+			baseConfigurationReferenceRelativePath = "project-defaults.xcconfig";
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -317,7 +317,7 @@
 		A0117FF62C990EAC00035007 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 487932D72CEBB63D00A741C5 /* BuildConfig */;
-			baseConfigurationReferenceRelativePath = build.xcconfig;
+			baseConfigurationReferenceRelativePath = "project-defaults.xcconfig";
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -381,7 +381,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.1;
+				CURRENT_PROJECT_VERSION = "${BUNDLE_VERSION}";
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
 				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM_ID}";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -403,8 +403,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
-				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = org.allenai.OLMoE;
+				MARKETING_VERSION = "${BUNDLE_VERSION_PUBLIC}";
+				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_BUNDLE_IDENTIFIER}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
@@ -426,7 +426,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.1;
+				CURRENT_PROJECT_VERSION = "${BUNDLE_VERSION}";
 				DEVELOPMENT_ASSET_PATHS = "\"OLMoE.swift/Preview Content\"";
 				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM_ID}";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -448,8 +448,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
-				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = org.allenai.OLMoE;
+				MARKETING_VERSION = "${BUNDLE_VERSION_PUBLIC}";
+				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_BUNDLE_IDENTIFIER}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
