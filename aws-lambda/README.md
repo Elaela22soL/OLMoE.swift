@@ -66,20 +66,20 @@ To work with this project, ensure the following prerequisites are met:
 
 2. Populate the `.env.json` file with the required environment variables:
 
-|Variable|Data Type|Default|Description|
-|---|---|---|---|
-|`BucketName`|String|None|The name of the S3 bucket where the shared conversation traces will be stored.|
-|`S3LogPrefix`|String|"logs"|The prefix for log files in the S3 bucket.|
-|`S3SharePrefix`|String|"share"|The prefix for shared files in the S3 bucket.|
-|`CertificateAsBytes`|String|None|Apple App Attestation Root CA, added to `.env.json` as a single line of text without comments or newlines.|
-|`HmacShaKey`|String|None|The HMAC SHA key for signing Apple Attest challenges.|
-|`Env`|String|"prod"|The environment (e.g., `prod` or `dev`).|
-|`MaxRequestSizeBytes`|Integer|50KB|The maximum allowed request size in bytes.|
-|`AppId`|String|None|The application ID in the format `{DEVELOPMENT_TEAM_ID}.{PRODUCT_BUNDLE_IDENTIFIER}`. To obtain your team Id refer to [Locate your team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/). Your Product Bundle Identifier should be in this format: com.domain.app_name (See image below). Your `AppId` environment variable value is the concatenation of these two ids joined by a period. For example: "ABC1234567.com.domain.app_name" |
+   |Variable|Data Type|Default|Description|
+   |---|---|---|---|
+   |`BucketName`|String|None|The name of the S3 bucket where the shared conversation traces will be stored.|
+   |`S3LogPrefix`|String|"logs"|The prefix for log files in the S3 bucket.|
+   |`S3SharePrefix`|String|"share"|The prefix for shared files in the S3 bucket.|
+   |`CertificateAsBytes`|String|None|Apple App Attestation Root CA, added to `.env.json` as a single line of text without comments or newlines.|
+   |`HmacShaKey`|String|None|The HMAC SHA key for signing Apple Attest challenges.|
+   |`Env`|String|"prod"|The environment (e.g., `prod` or `dev`).|
+   |`MaxRequestSizeBytes`|Integer|50KB|The maximum allowed request size in bytes.|
+   |`AppId`|String|None|The application ID in the format `{DEVELOPMENT_TEAM_ID}.{PRODUCT_BUNDLE_IDENTIFIER}`. To obtain your team Id refer to [Locate your team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/). Your Product Bundle Identifier should be in this format: com.domain.app_name (See image below). Your `AppId` environment variable value is the concatenation of these two ids joined by a period. For example: "ABC1234567.com.domain.app_name" |
 
-Your PRODUCT_BUNDLE_IDENTIFIER can be found here:
+   Your `PRODUCT_BUNDLE_IDENTIFIER` can be found here:
 
-![Find bundle identifier](https://github.com/user-attachments/assets/45caa505-b699-4283-b561-aa2707078610)
+   ![Find bundle identifier](../doc_assets/Locate_Bundle_ID.png)
 
 ## Build
 
@@ -103,7 +103,7 @@ Your PRODUCT_BUNDLE_IDENTIFIER can be found here:
 
 This Lambda implements [Apple's App Attestation](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity) to ensure requests originate from verified app instances.
 
-[![App Attest Challenge Flow](../doc_assets/AppAttestChallengFlow.png)](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity)
+[![App Attest Challenge Flow](../doc_assets/App_Attest_Challeng_Flow.png)](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity)
 
 ### Testing Execution Paths
 
