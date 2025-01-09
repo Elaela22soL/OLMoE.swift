@@ -1,6 +1,7 @@
 import Foundation
 import llama
 
+
 public typealias Token = llama_token
 public typealias Model = OpaquePointer
 
@@ -16,16 +17,38 @@ public struct Chat: Identifiable, Equatable {
     }
 }
 
+/// An actor that manages access to LLM inference operations to ensure thread safety
 @globalActor public actor InferenceActor {
     static public let shared = InferenceActor()
 }
 
+/// Base class for Large Language Model inference
+/// Provides functionality for text generation, chat history management, and model state control
 open class LLM: ObservableObject {
+    /// The underlying LLaMA model pointer
     public var model: Model
+
+    /// Array of chat messages representing the conversation history
     public var history: [Chat]
+
+    /// Closure to preprocess input before sending to the model
+    /// - Parameters:
+    ///   - input: The raw input string
+    ///   - history: Current chat history
+    ///   - llmInstance: Reference to the LLM instance
+    /// - Returns: Processed input string ready for the model
     public var preprocess: (_ input: String, _ history: [Chat], _ llmInstance: LLM) -> String = { input, _, _ in return input }
-    public var postprocess: (_ output: String) -> Void                    = { print($0) }
-    public var update: (_ outputDelta: String?) -> Void                   = { _ in }
+
+    /// Closure called when generation is complete with the final output
+    /// - Parameter output: The complete generated response
+    public var postprocess: (_ output: String) -> Void = { print($0) }
+
+    /// Closure called during generation with incremental output
+    /// - Parameter outputDelta: New text fragment (nil when generation ends)
+    public var update: (_ outputDelta: String?) -> Void = { _ in }
+
+    /// Template controlling model input/output formatting
+    /// Setting this updates preprocess and stop sequence configuration
     public var template: Template? = nil {
         didSet {
             guard let template else {
@@ -44,13 +67,26 @@ open class LLM: ObservableObject {
             }
         }
     }
+
+    /// Top-K sampling parameter - limits vocabulary to K most likely tokens
     public var topK: Int32
+
+    /// Top-P sampling parameter - limits vocabulary to tokens comprising top P probability mass
     public var topP: Float
+
+    /// Temperature parameter controlling randomness of sampling (higher = more random)
     public var temp: Float
+
+    /// Path to the model file
     public var path: [CChar]
+
+    /// Flag to enable test response mode
     public var loopBackTestResponse: Bool = false
+
+    /// Cached model state for continuation of conversations
     public var savedState: Data?
 
+    /// Current generated output text
     @Published public private(set) var output = ""
     @MainActor public func setOutput(to newOutput: consuming String) {
         output = newOutput.trimmingCharacters(in: .whitespaces)
@@ -109,7 +145,7 @@ open class LLM: ObservableObject {
         self.stopSequenceLength = (self.stopSequence?.count ?? 1) - 1
         self.batch = llama_batch_init(Int32(self.maxTokenCount), 0, 1)
 
-        // sampler to run with default parameters
+        /// sampler to run with default parameters
         let sparams = llama_sampler_chain_default_params()
         self.sampler = llama_sampler_chain_init(sparams)
 
@@ -149,6 +185,7 @@ open class LLM: ObservableObject {
         self.template = template
     }
 
+    /// Stops ongoing text generation
     @InferenceActor
     public func stop() {
         guard self.inferenceTask != nil else { return }
@@ -160,20 +197,20 @@ open class LLM: ObservableObject {
 
     @InferenceActor
     private func predictNextToken() async -> Token {
-        // Ensure context exists; otherwise, return end token
+        /// Ensure context exists; otherwise, return end token
         guard let context = self.context else { return self.model.endToken }
 
-        // Check if the task has been canceled
+        /// Check if the task has been canceled
         guard !Task.isCancelled else { return self.model.endToken }
         guard self.inferenceTask != nil else { return self.model.endToken }
 
-        // Ensure the batch is valid
+        /// Ensure the batch is valid
         guard self.batch.n_tokens > 0 else {
             print("Error: Batch is empty or invalid.")
             return model.endToken
         }
 
-        // Check if the batch size is within limits
+        /// Check if the batch size is within limits
         guard self.batch.n_tokens < self.maxTokenCount else {
             print("Error: Batch token limit exceeded.")
             return model.endToken
@@ -183,7 +220,7 @@ open class LLM: ObservableObject {
             fatalError("Sampler not initialized")
         }
 
-        // Sample the next token with a valid context
+        /// Sample the next token with a valid context
         let token = llama_sampler_sample(sampler, context.pointer, self.batch.n_tokens - 1) // Use batch token count for correct context
 
         self.batch.clear()
@@ -193,17 +230,18 @@ open class LLM: ObservableObject {
         return token
     }
 
+    /// Clears conversation history and resets model state
     @InferenceActor
     public func clearHistory() async {
         history.removeAll()
-        nPast = 0 // Reset token count when clearing history
+        nPast = 0 /// Reset token count when clearing history
         await setOutput(to: "")
         context = nil
         savedState = nil
         self.batch.clear()
-        // Reset any other state variables if necessary
-        // For example, if you have a variable tracking the current conversation context:
-        // currentContext = nil
+        /// Reset any other state variables if necessary
+        /// For example, if you have a variable tracking the current conversation context:
+        /// currentContext = nil
     }
 
     @InferenceActor
@@ -224,17 +262,15 @@ open class LLM: ObservableObject {
             nPast += 1
         }
 
-        // Check batch has not been cleared by a side effect (stop button) at the time of decoding
+        /// Check batch has not been cleared by a side effect (stop button) at the time of decoding
         guard self.batch.n_tokens > 0 else { return false }
 
         self.context.decode(self.batch)
         return true
     }
 
-    /**
-     Decodes a token, checks for the stop sequence, and yields decoded text.
-      If the complete stop sequence is found, it stops yielding and returns false.
-     */
+    /// Decodes a token, checks for the stop sequence, and yields decoded text.
+    /// If the complete stop sequence is found, it stops yielding and returns false.
     @InferenceActor
     private func emitDecoded(token: Token, to output: borrowing AsyncStream<String>.Continuation) -> Bool {
         struct saved {
@@ -244,14 +280,14 @@ open class LLM: ObservableObject {
         guard self.inferenceTask != nil else { return false }
         guard token != model.endToken else { return false }
 
-        let word = decode(token) // Decode the token directly
+        let word = decode(token) /// Decode the token directly
 
         guard let stopSequence else {
             output.yield(word)
             return true
         }
 
-        // Existing stop sequence handling logic
+        /// Existing stop sequence handling logic
         var found = 0 < saved.stopSequenceEndIndex
         var letters: [CChar] = []
         for letter in word.utf8CString {
@@ -286,8 +322,8 @@ open class LLM: ObservableObject {
     private func generateResponseStream(from input: String) -> AsyncStream<String> {
         AsyncStream<String> { output in
             Task { [weak self] in
-                guard let self = self else { return output.finish() } // Safely unwrap `self`
-                // Use `self` safely now that it's unwrapped
+                guard let self = self else { return output.finish() } /// Safely unwrap `self`
+                /// Use `self` safely now that it's unwrapped
 
                 guard self.inferenceTask != nil else { return output.finish() }
 
@@ -313,20 +349,18 @@ open class LLM: ObservableObject {
         }
     }
 
-    /**
-     Halves the llama_kv_cache by removing the oldest half of tokens and shifting the newer half to the beginning.
-     Updates `nPast` to reflect the reduced cache size.
-    */
+    /// Halves the llama_kv_cache by removing the oldest half of tokens and shifting the newer half to the beginning.
+    /// Updates `nPast` to reflect the reduced cache size.
     @InferenceActor
     private func trimKvCache() {
         let seq_id: Int32 = 0
         let beginning: Int32 = 0
         let middle = Int32(self.maxTokenCount / 2)
 
-        // Remove the oldest half
+        /// Remove the oldest half
         llama_kv_cache_seq_rm(self.context.pointer, seq_id, beginning, middle)
 
-        // Shift the newer half to the start
+        /// Shift the newer half to the start
         llama_kv_cache_seq_add(
             self.context.pointer,
             seq_id,
@@ -334,7 +368,7 @@ open class LLM: ObservableObject {
             Int32(self.maxTokenCount), -middle
         )
 
-        // Update nPast
+        /// Update nPast
         let kvCacheTokenCount: Int32 = llama_get_kv_cache_token_count(self.context.pointer)
         self.nPast = kvCacheTokenCount
         print("kv cache trimmed: llama_kv_cache(\(kvCacheTokenCount)    nPast(\(self.nPast))")
@@ -355,7 +389,7 @@ open class LLM: ObservableObject {
 
     @InferenceActor
     public func performInference(to input: String, with makeOutputFrom: @escaping (AsyncStream<String>) async -> String) async {
-        self.inferenceTask?.cancel() // Cancel any ongoing inference task
+        self.inferenceTask?.cancel() /// Cancel any ongoing inference task
         self.inferenceTask = Task { [weak self] in
             guard let self = self else { return }
 
@@ -365,12 +399,12 @@ open class LLM: ObservableObject {
                 ? self.getTestLoopbackResponse()
                 : self.generateResponseStream(from: processedInput)
 
-            // Generate the output string using the async closure
+            /// Generate the output string using the async closure
             let output = (await makeOutputFrom(responseStream)).trimmingCharacters(in: .whitespacesAndNewlines)
 
             await MainActor.run {
                 if !output.isEmpty {
-                    // Update history and process the final output on the main actor
+                    /// Update history and process the final output on the main actor
                     self.history.append(Chat(role: .bot, content: output))
                 }
 
@@ -379,7 +413,7 @@ open class LLM: ObservableObject {
             }
 
             self.inputTokenCount = 0
-            // Save the state after generating a response
+            /// Save the state after generating a response
             if FeatureFlags.useLLMCaching {
                 self.savedState = saveState()
             }
@@ -392,11 +426,11 @@ open class LLM: ObservableObject {
         await inferenceTask?.value
     }
 
-    /**
-     Entry point to generate a model response from the input message
-     */
+    /// Generates a response to the given input
+    /// - Parameter input: User input text to respond to
+    /// - Note: Updates history and output property with generated response
     open func respond(to input: String) async {
-        // Restore the state before generating a response
+        /// Restore the state before generating a response
         if let savedState = FeatureFlags.useLLMCaching ? self.savedState : nil {
             restoreState(from: savedState)
         }
@@ -418,10 +452,8 @@ open class LLM: ObservableObject {
         }
     }
 
-    /**
-     If the model fails to produce a response (empty output), remove the last user input’s tokens
-     from the KV cache to prevent the model’s internal state from being "poisoned" by bad input.
-     */
+    /// If the model fails to produce a response (empty output), remove the last user input’s tokens
+    /// from the KV cache to prevent the model’s internal state from being "poisoned" by bad input.
     private func rollbackLastUserInputIfEmptyResponse(_ response: String) {
         if response.isEmpty && self.inputTokenCount > 0 {
             let seq_id = Int32(0)
@@ -432,10 +464,13 @@ open class LLM: ObservableObject {
     }
 
     private func decode(_ token: Token) -> String {
-        multibyteCharacter.removeAll(keepingCapacity: true) // Reset multibyte buffer
+        multibyteCharacter.removeAll(keepingCapacity: true) /// Reset multibyte buffer
         return model.decode(token, with: &multibyteCharacter)
     }
 
+    /// Encodes text into model tokens
+    /// - Parameter text: Input text to encode
+    /// - Returns: Array of token IDs
     @inlinable
     public func encode(_ text: borrowing String) -> [Token] {
         model.encode(text)
@@ -444,21 +479,24 @@ open class LLM: ObservableObject {
 
 
 extension LLM {
+    /// Saves the current model state
+    /// - Returns: Data object containing serialized state, or nil if saving fails
+    /// - Note: Used for continuing conversations across multiple interactions
     public func saveState() -> Data? {
-        // Ensure the context exists
+        /// Ensure the context exists
         guard let contextPointer = self.context?.pointer else {
             print("Error: llama_context pointer is nil.")
             return nil
         }
 
-        // Get the size of the state
+        /// Get the size of the state
         let stateSize = llama_state_get_size(contextPointer)
         guard stateSize > 0 else {
             print("Error: Unable to retrieve state size.")
             return nil
         }
 
-        // Allocate a buffer for the state data
+        /// Allocate a buffer for the state data
         var stateData = Data(count: stateSize)
         stateData.withUnsafeMutableBytes { (pointer: UnsafeMutableRawBufferPointer) in
             if let baseAddress = pointer.baseAddress {
@@ -469,14 +507,16 @@ extension LLM {
         return stateData
     }
 
+    /// Restores a previously saved model state
+    /// - Parameter stateData: Serialized state data from saveState()
     public func restoreState(from stateData: Data) {
-        // Ensure the context exists
+        /// Ensure the context exists
         guard let contextPointer = self.context?.pointer else {
             print("Error: llama_context pointer is nil.")
             return
         }
 
-        // Set the state data
+        /// Set the state data
         stateData.withUnsafeBytes { (pointer: UnsafeRawBufferPointer) in
             if let baseAddress = pointer.baseAddress {
                 let bytesRead = llama_state_set_data(contextPointer, baseAddress.assumingMemoryBound(to: UInt8.self), stateData.count)

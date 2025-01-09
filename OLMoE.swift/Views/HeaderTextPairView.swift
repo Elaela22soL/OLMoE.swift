@@ -4,6 +4,8 @@
 //
 //  Created by Thomas Jones on 11/26/24.
 //
+
+
 import SwiftUI
 
 struct HeaderTextPair: Identifiable {
@@ -15,7 +17,7 @@ struct HeaderTextPair: Identifiable {
 struct HeaderTextPairView : View {
     let header: String
     let text: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if !header.isEmpty {
@@ -23,7 +25,7 @@ struct HeaderTextPairView : View {
                     .font(.subheader())
                     .multilineTextAlignment(.leading)
             }
-            
+
             Text(.init(text))
                 .font(.body())
                 .multilineTextAlignment(.leading)

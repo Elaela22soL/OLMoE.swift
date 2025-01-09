@@ -6,7 +6,7 @@
 //
 
 enum InfoText {
-    
+
     static let content = [
         HeaderTextPair(
             header: "What is the OLMoE App?",

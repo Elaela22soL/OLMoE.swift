@@ -4,14 +4,13 @@ import Foundation
 @main
 struct OLMoE_swiftApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(\.font, .manrope())
                 .environment(\.colorScheme, .dark)
                 .preferredColorScheme(.dark)
-                
         }
     }
 }

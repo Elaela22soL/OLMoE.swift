@@ -5,6 +5,7 @@
 //  Created by Stanley Jovel on 11/20/24.
 //
 
+
 import SwiftUI
 
 public struct UserChatBubble: View {
@@ -97,20 +98,37 @@ struct ScrollState {
 }
 
 public struct ChatView: View {
+    /// A unique identifier for the bottom of the chat view.
     public static let BottomID = "bottomID"
 
+    /// The history of chat messages.
     public var history: [Chat]
+
+    /// The output text from the bot.
     public var output: String
 
+    /// A binding that indicates whether the bot is currently generating a response.
     @Binding var isGenerating: Bool
+
+    /// A binding that indicates whether the view is scrolled to the bottom.
     @Binding var isScrolledToBottom: Bool
+
+    /// A binding that indicates whether the stop action has been submitted.
     @Binding var stopSubmitted: Bool
 
+    /// The current height of the content area.
     @State private var contentHeight: CGFloat = 0
+
+    /// The new height of the content area after updates.
     @State private var newHeight: CGFloat = 0
+
+    /// The outer height of the chat view.
     @State private var outerHeight: CGFloat = 0
+
+    /// The state of the scroll view.
     @State private var scrollState = ScrollState()
 
+    /// An observable object that tracks keyboard height changes.
     @StateObject private var keyboardResponder = KeyboardResponder()
 
     public var body: some View {
@@ -138,6 +156,11 @@ public struct ChatView: View {
         }
     }
 
+    /// Builds the chat content view.
+    /// - Parameters:
+    ///   - proxy: The scroll view proxy for programmatic scrolling.
+    ///   - parentWidth: The width of the parent view.
+    /// - Returns: A view containing the chat bubbles and other content.
     @ViewBuilder
     private func chatContent(_ proxy: ScrollViewProxy, parentWidth: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -156,6 +179,12 @@ public struct ChatView: View {
         .frame(minHeight: self.newHeight, alignment: .top)
     }
 
+    /// Creates a chat bubble view for a given chat message.
+    /// - Parameters:
+    ///   - chat: The chat message to display.
+    ///   - index: The index of the chat message in the history.
+    ///   - parentWidth: The width of the parent view.
+    /// - Returns: A view representing the chat bubble.
     @ViewBuilder
     private func chatBubble(for chat: Chat, at index: Int, parentWidth: CGFloat) -> some View {
         Group {
@@ -169,6 +198,9 @@ public struct ChatView: View {
         }
     }
 
+    /// Creates a generating bubble view if the bot is generating a response.
+    /// - Parameter parentWidth: The width of the parent view.
+    /// - Returns: A view representing the generating bubble.
     @ViewBuilder
     private func generatingBubble(parentWidth: CGFloat) -> some View {
         if isGenerating {
@@ -176,6 +208,8 @@ public struct ChatView: View {
         }
     }
 
+    /// Tracks the height of the scroll view for scrolling behavior.
+    /// - Returns: A view that updates the scroll state based on the height of the scroll view.
     @ViewBuilder
     private func scrollHeightTracker() -> some View {
         GeometryReader { proxy in
@@ -189,6 +223,8 @@ public struct ChatView: View {
         }
     }
 
+    /// Tracks the scroll position to determine if the view is scrolled to the bottom.
+    /// - Returns: A view that updates the scroll state based on the scroll position.
     @ViewBuilder
     private func scrollTracker() -> some View {
         GeometryReader { geo in
@@ -207,14 +243,23 @@ public struct ChatView: View {
         }
     }
 
+    /// Retrieves the latest user chat message from the history.
+    /// - Returns: The latest user chat message, or nil if none exists.
     private func getLatestUserChat() -> Chat? {
         return getUserChats(history: self.history).last
     }
 
+    /// Filters the chat history to return only user messages.
+    /// - Parameter history: The complete chat history.
+    /// - Returns: An array of user chat messages.
     private func getUserChats(history: [Chat]) -> [Chat] {
         return history.filter { $0.role == .user }
     }
 
+    /// Handles changes in the chat history and scrolls to the latest message if necessary.
+    /// - Parameters:
+    ///   - newHistory: The updated chat history.
+    ///   - proxy: The scroll view proxy for programmatic scrolling.
     private func handleHistoryChange(_ newHistory: [Chat], _ proxy: ScrollViewProxy) {
         if let lastMessage = getLatestUserChat() {
             let newMessagesCount = getUserChats(history: newHistory).count
@@ -231,6 +276,10 @@ public struct ChatView: View {
         }
     }
 
+    /// Handles changes in the keyboard height and adjusts the view accordingly.
+    /// - Parameters:
+    ///   - newKeyboardHeight: The new height of the keyboard.
+    ///   - proxy: The scroll view proxy for programmatic scrolling.
     private func handleKeyboardChange(_ newKeyboardHeight: CGFloat, _ proxy: ScrollViewProxy) {
         self.contentHeight = scrollState.contentHeight
         if newKeyboardHeight > 0 {

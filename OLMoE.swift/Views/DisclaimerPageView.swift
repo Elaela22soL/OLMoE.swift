@@ -5,13 +5,23 @@
 //  Created by Thomas Jones on 11/13/24.
 //
 
+
 import SwiftUI
 
 struct DisclaimerHandlers {
+    /// A closure to set the active disclaimer.
     var setActiveDisclaimer: (Disclaimer?) -> Void
+
+    /// A closure to set whether outside tap dismiss is allowed.
     var setAllowOutsideTapDismiss: (Bool) -> Void
+
+    /// A closure to set the cancel action.
     var setCancelAction: ((() -> Void)?) -> Void
+
+    /// A closure to set the confirm action.
     var setConfirmAction: (@escaping () -> Void) -> Void
+
+    /// A closure to set whether to show the disclaimer page.
     var setShowDisclaimerPage: (Bool) -> Void
 }
 
@@ -21,17 +31,30 @@ class DisclaimerState: ObservableObject {
 #else
     @AppStorage("hasSeenDisclaimer") private var hasSeenDisclaimer : Bool = false
 #endif
-    @Published var showDisclaimerPage : Bool = false
+    /// A published property indicating whether to show the disclaimer page.
+    @Published var showDisclaimerPage: Bool = false
+
+    /// A published property holding the active disclaimer.
     @Published var activeDisclaimer: Disclaimer? = nil
+
+    /// A published property indicating whether outside tap dismiss is allowed.
     @Published var allowOutsideTapDismiss: Bool = false
+
+    /// A closure for the confirmation action.
     var onConfirm: (() -> Void)?
+
+    /// A closure for the cancellation action.
     var onCancel: (() -> Void)?
+
+    /// The index of the current disclaimer page.
     private var disclaimerPageIndex: Int = 0
 
+    /// An array of disclaimers.
     let disclaimers: [Disclaimer] = [
         Disclaimers.FullDisclaimer()
     ]
 
+    /// Displays the initial disclaimer if it hasn't been seen yet.
     func showInitialDisclaimer() {
         if !hasSeenDisclaimer {
             activeDisclaimer = disclaimers[disclaimerPageIndex]
@@ -42,6 +65,7 @@ class DisclaimerState: ObservableObject {
         }
     }
 
+    /// Advances to the next disclaimer page or dismisses the disclaimer if all have been seen.
     private func nextDisclaimerPage() {
         disclaimerPageIndex += 1
         if disclaimerPageIndex >= disclaimers.count {
@@ -60,23 +84,42 @@ class DisclaimerState: ObservableObject {
 }
 
 struct DisclaimerPageData {
+    /// The title of the disclaimer page.
     let title: String
+
+    /// The text content of the disclaimer.
     let text: String
+
+    /// The text for the confirmation button.
     let buttonText: String
 }
 
 struct DisclaimerPage: View {
+    /// A typealias for a button configuration.
     typealias PageButton = (text: String, onTap: () -> Void)
 
+    /// A flag indicating whether outside tap dismiss is allowed.
     let allowOutsideTapDismiss: Bool
+
+    /// A binding that indicates whether the disclaimer page is presented.
     @Binding var isPresented: Bool
+
+    /// The message content of the disclaimer.
     let message: String
+
+    /// The title of the disclaimer.
     let title: String
+
+    /// An array of header-text pairs for additional information.
     let titleText: [HeaderTextPair]
+
+    /// The configuration for the confirmation button.
     let confirm: PageButton
+
+    /// The configuration for the optional cancel button.
     let cancel: PageButton?
 
-    var body: some View {
+    public var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 if !title.isEmpty {
