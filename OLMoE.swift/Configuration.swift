@@ -1,3 +1,11 @@
+//
+//  Configuration.swift
+//  OLMoE.swift
+//
+//  Created by Luca Soldaini on 2024-09-25.
+//
+
+
 import Foundation
 
 enum Configuration {

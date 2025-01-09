@@ -5,18 +5,19 @@
 //  Created by Jon Ryser on 11/13/24.
 //
 
+
 import SwiftUI
 
 struct SpinnerView: View {
     let color: Color
     let size: CGFloat
     @State private var isAnimating = false
-    
+
     init(color: Color = .accentColor, size: CGFloat = 24) {
         self.color = color
         self.size = size
     }
-    
+
     var body: some View {
         Circle()
             .trim(from: 0, to: 0.7)

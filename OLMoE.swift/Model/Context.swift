@@ -19,7 +19,7 @@ public class Context {
     }
     func decode(_ batch: llama_batch) {
         let ret = llama_decode(pointer, batch)
-        
+
         if ret < 0 {
             fatalError("llama_decode failed: \(ret)")
         } else if ret > 0 {

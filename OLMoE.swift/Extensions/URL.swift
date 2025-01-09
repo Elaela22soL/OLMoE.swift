@@ -19,7 +19,7 @@ extension URL {
         let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
         let url = paths[0].appendingPathComponent("Models")
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-        
+
         // Exclude from backup
         do {
             var mutableURL = url
@@ -29,7 +29,7 @@ extension URL {
         } catch {
             print("Error excluding from backup: \(error)")
         }
-        
+
         return url
     }
     public var exists: Bool { FileManager.default.fileExists(atPath: path) }

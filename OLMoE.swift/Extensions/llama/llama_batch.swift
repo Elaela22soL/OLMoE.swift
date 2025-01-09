@@ -13,7 +13,7 @@ extension llama_batch {
     mutating func clear() {
         self.n_tokens = 0
     }
-    
+
     mutating func add(_ token: Token, _ position: Int32, _ ids: [Int], _ logit: Bool) {
         let i = Int(self.n_tokens)
         self.token[i] = token
