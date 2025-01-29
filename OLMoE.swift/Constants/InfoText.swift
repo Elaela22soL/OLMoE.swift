@@ -11,7 +11,7 @@ enum InfoText {
         HeaderTextPair(
             header: "What is the OLMoE App?",
             text: """
-                This application allows you to interact with Ai2’s OLMoE model, a mixture of Mixture-of-Experts model that can run on device.
+                This application allows you to interact with Ai2’s OLMoE model, a Mixture-of-Experts language model that can run completely on-device.
                 """),
         HeaderTextPair(
             header: "What type of data is used to train the models?",
@@ -26,9 +26,9 @@ enum InfoText {
 
         HeaderTextPair(
             header:
-                "How accurate and reliable is generated content on this app?",
+                "How accurate and reliable is the generated content on this app?",
             text: """
-                OLMoE-generated content is built for research and educational purposes only. It is not intended to be accurate or reliable, but rather as a research tool and to help the general public better understand LLMs. Please do not rely on any OMLoE generated content and always use your best judgment, fact-check important information, and consider the context when interpreting content generated in this app.
+                OLMoE is built for research and educational purposes. It is not intended to be highly accurate or reliable, but rather as a research tool and a way to help the community better understand how LLMs are created and how they operate. When interacting with OMLoE, always use your best judgment, fact-check important information, and consider the context when interpreting content generated in this app.
                 """),
 
         HeaderTextPair(

@@ -5,7 +5,14 @@
 
     },
     "%@ / %@" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@"
+          }
+        }
+      }
     },
     "%lld%%" : {
 
@@ -28,13 +35,32 @@
     "Download Model" : {
 
     },
+    "Download Model Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To get started, download the latest OLMoE model."
+          }
+        }
+      }
+    },
     "Downloading..." : {
 
     },
-    "Flush Model" : {
-
+    "Empty Input Prompt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message OLMoE"
+          }
+        }
+      }
     },
-    "Message" : {
+    "Flush Model" : {
 
     },
     "Model is ready to use!" : {
@@ -49,9 +75,6 @@
     "This app requires a device with at least 8GB of RAM." : {
 
     },
-    "To get started, download the latest AI model." : {
-
-    },
     "Welcome" : {
 
     },
@@ -61,7 +84,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hello! I’m OLMoE, a fully open, state-of-the-art language model leveraging sparse Mixture-of-Experts (MoE), running locally on your device. What can I help you with today?"
+            "value" : "Hello! I’m OLMoE, a fully open, state-of-the-art language model running locally on your device."
           }
         }
       }
