@@ -302,7 +302,7 @@ struct BotView: View {
                             Image("Ai2Icon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: max(140, min(geometry.size.width - 160, 290)))
+                                .frame(width: min(geometry.size.width, geometry.size.height) * 0.18)
                             Spacer()
                         }
                     }
