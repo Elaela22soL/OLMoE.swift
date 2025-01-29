@@ -25,7 +25,7 @@ struct Disclaimers {
             HeaderTextPair(
                 header: "Acceptance",
                 text: """
-                By pressing by the “Agree” button below, I agree to Ai2’s [Terms of Use](https://allenai.org/terms) and [Responsible Use Guidelines](https://allenai.org/responsible-use) for this OlmoE App. 
+                By pressing the “Agree” button below, I agree to Ai2’s [Terms of Use](https://allenai.org/terms) and [Responsible Use Guidelines](https://allenai.org/responsible-use) for this OlmoE App. 
                 """),
             HeaderTextPair(
                 header: "Limitations",
