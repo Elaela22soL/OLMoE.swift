@@ -59,10 +59,11 @@ struct MessageInputView: View {
             .padding(.trailing, 4)
 
         }
+        .padding([.leading, .trailing], 8)
         .frame(maxWidth: .infinity)
         .frame(minHeight: UIDevice.current.userInterfaceIdiom == .pad ? 80 : 40)
         .background(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 30)
                 .fill(Color("Surface"))
                 .foregroundStyle(.thinMaterial)
         )
