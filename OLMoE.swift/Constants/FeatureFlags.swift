@@ -8,9 +8,9 @@
 
 enum FeatureFlags {
 
-    static let allowDeviceBypass = true
+    static let allowDeviceBypass = false
 
-    static let allowMockedModel = true
+    static let allowMockedModel = false
 
     static let useLLMCaching = true
 }
