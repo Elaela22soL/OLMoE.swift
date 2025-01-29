@@ -240,7 +240,7 @@ struct ModelDownloadView: View {
                     Text("Welcome")
                         .font(.telegraf(size: 48))
 
-                    Text("To get started, download the latest AI model.")
+                    Text("Download Model Message")
                         .multilineTextAlignment(.center)
                         .font(.body())
                         .padding([.bottom], 4)

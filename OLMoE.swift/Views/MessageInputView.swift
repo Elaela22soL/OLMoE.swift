@@ -20,7 +20,7 @@ struct MessageInputView: View {
 
     var body: some View {
         HStack(alignment: .top) {
-            TextField("Message", text: $input, axis: .vertical)
+            TextField("Empty Input Prompt", text: $input, axis: .vertical)
                 .scrollContentBackground(.hidden)
                 .multilineTextAlignment(.leading)
                 .lineLimit(10)
