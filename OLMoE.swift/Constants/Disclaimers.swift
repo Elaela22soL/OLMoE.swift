@@ -45,7 +45,7 @@ struct Disclaimers {
         let text = """
             When sharing a link to a conversation, you are consenting to share your messages with Ai2 and your conversation will be transmitted and stored on Ai2's servers. Please do not share PII (personally identifiable information) or any other sensitive information in your conversation.
 
-            Once you select “Share” below, your conversation and related interaction data  will be retained by Ai2 as described in our [Terms of Use](https://allenai.org/terms/2024-09-25) and [Privacy Policy](https://allenai.org/privacy-policy). By sharing, you agree to allow Ai2 to collect this interaction data for scientific research and educational purposes and to develop or improve this app as well as  the models and underlying technology presented in this app. If you do not want to share your interaction data with Ai2, please press “Cancel” to cancel sharing.
+            Once you select “Share” below, your conversation and related interaction data will be retained by Ai2 as described in our [Terms of Use](https://allenai.org/terms/2024-09-25) and [Privacy Policy](https://allenai.org/privacy-policy). By sharing, you agree to allow Ai2 to collect this interaction data for scientific research and educational purposes and to develop or improve this app as well as  the models and underlying technology presented in this app. If you do not want to share your interaction data with Ai2, please press “Cancel” to cancel sharing.
             """
         let buttonText = "Share"
         let headerTextContent = [HeaderTextPair]()
