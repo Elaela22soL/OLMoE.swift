@@ -38,6 +38,7 @@ public struct BotChatBubble: View {
                 .padding(4)
                 .background(Color("Surface"))
                 .clipShape(Circle())
+                .padding(.trailing, 12)
 
             if isGenerating && text.isEmpty {
                 TypingIndicator()
@@ -50,6 +51,7 @@ public struct BotChatBubble: View {
             }
             Spacer()
         }
+        .padding([.leading], 12)
     }
 }
 
@@ -298,7 +300,7 @@ public struct ChatView: View {
     let exampleOutput = "This is a bot response that spans multiple lines to better test spacing and alignment in the chat view during development previews in Xcode. This is a bot response that spans multiple lines to better test spacing and alignment in the chat view during development previews in Xcode."
     let exampleHistory: [Chat] = [
         Chat(role: .user, content: "Hi there!"),
-        Chat(role: .bot, content: "Hello! How can I help you?"),
+        Chat(role: .bot, content: "Hello! How can I help you? a b c d e f g h i j k l m n o p"),
         Chat(role: .user, content: "Give me a very long answer (this question has a whole lot of text!)"),
     ]
 
