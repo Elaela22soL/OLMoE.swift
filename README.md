@@ -31,9 +31,9 @@ See [LICENSE](LICENSE) for more information.
     You may obtain a copy of the license at:
     <https://github.com/ggerganov/llama.cpp>
 
-- ggml
+- [ggml](https://github.com/ggerganov/ggml)
 
-    Copyright (c) 2024 The ggml authors
+    Copyright (c) 2023-2024 The ggml authors
 
     Licensed under the MIT License.
 
