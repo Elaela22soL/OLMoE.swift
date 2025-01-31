@@ -14,5 +14,8 @@
             "role": "assistant",
             "content": "An LLM is a type of machine learning model that is designed to generate human-like text."
         }
-    ]
+    ],
+    "system_fingerprint": "{model-name}.{appId}",
+    "key_id": "key_id_mock",
+    "attestation_object": "attestation_object_mock"
 }

@@ -1,0 +1,26 @@
+[MESSAGES CONTROL]
+disable=
+    missing-class-docstring,
+    missing-function-docstring,
+    unused-import,
+    not-callable,
+    import-error,
+    no-member,
+    no-value-for-parameter,
+    multiple-statements,
+    no-self-argument,
+    redefined-builtin,
+    relative-beyond-top-level
+ignore-paths=
+    ^.github/,
+    ^.venv/,
+    ^.vscode/,
+    ^aws-lambda/__tests__/,
+    ^build/,
+    ^coverage/,
+    ^doc_assets/,
+    ^OLMoE.swift/,
+    ^OLMoE.swift.xcodeproj/
+
+[FORMAT]
+max-line-length=240

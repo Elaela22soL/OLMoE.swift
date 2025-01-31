@@ -1,3 +1,11 @@
+//
+//  Configuration.swift
+//  OLMoE.swift
+//
+//  Created by Luca Soldaini on 2024-09-25.
+//
+
+
 import Foundation
 
 enum Configuration {
@@ -34,6 +42,14 @@ extension Configuration {
         } catch {
             print("Failed to retrieve API_KEY: \(error)")
             return "API_KEY_NOT_FOUND"
+        }
+    }
+    static var apiUrl: String {
+        do {
+            return try Configuration.value(for: "API_URL")
+        } catch {
+            print("Failed to retrieve API_URL: \(error)")
+            return "API_URL_NOT_FOUND"
         }
     }
 }

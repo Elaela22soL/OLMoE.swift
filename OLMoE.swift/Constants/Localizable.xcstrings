@@ -1,0 +1,94 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "(The model requires ~6 GB and this device has: %@ GB available.)" : {
+
+    },
+    "%@ / %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@"
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+
+    },
+    "allenai.org" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete history?" : {
+
+    },
+    "Device Not Supported" : {
+
+    },
+    "Download Model" : {
+
+    },
+    "Download Model Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To get started, download the latest OLMoE model."
+          }
+        }
+      }
+    },
+    "Downloading..." : {
+
+    },
+    "Empty Input Prompt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message OLMoE"
+          }
+        }
+      }
+    },
+    "Flush Model" : {
+
+    },
+    "Model is ready to use!" : {
+
+    },
+    "Proceed Anyway" : {
+
+    },
+    "Proceed With Mocked Model" : {
+
+    },
+    "This app requires a device with at least 8GB of RAM." : {
+
+    },
+    "Welcome" : {
+
+    },
+    "Welcome chat message" : {
+      "comment" : "Default chat bubble when conversation is empty",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hello! I’m OLMoE, a fully open, state-of-the-art language model running locally on your device."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

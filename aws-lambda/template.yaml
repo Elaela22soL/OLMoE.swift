@@ -2,10 +2,35 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: S3 Logging Lambda Function
 
+Parameters:
+  BucketName:
+    Type: String
+  S3LogPrefix:
+    Type: String
+  S3SharePrefix:
+    Type: String
+  CertificateAsBytes:
+    Type: String
+  AppId:
+    Type: String
+  HmacShaKey:
+    Type: String
+  Env:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+      - test
+    Default: prod
+  MaxRequestSizeBytes:
+    Type: Number
+    Default: 51200 # 50KB
+
 Resources:
-  S3LoggingFunction:
+  OlmoeAttestS3LoggingFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: olmoe-attest-s3-share-logging-function
       CodeUri: src/
       Handler: lambda_function.lambda_handler
       Runtime: python3.11
@@ -13,12 +38,19 @@ Resources:
       MemorySize: 256
       Environment:
         Variables:
-          BUCKET_NAME: olmo-interactions-share
+          BUCKET_NAME: !Ref BucketName
+          S3_LOG_PREFIX: !Ref S3LogPrefix
+          S3_SHARE_PREFIX: !Ref S3SharePrefix
+          CERTIFICATE_AS_BYTES: !Ref CertificateAsBytes
+          APP_ID: !Ref AppId
+          HMAC_SHA_KEY: !Ref HmacShaKey
+          ENV: !Ref Env
+          MAX_REQUEST_SIZE_BYTES: !Ref MaxRequestSizeBytes
       Policies:
         - S3CrudPolicy:
-            BucketName: olmo-interactions-share
+            BucketName: !Ref BucketName
 
 Outputs:
-  S3LoggingFunction:
+  OlmoeAttestS3LoggingFunction:
     Description: "S3 Logging Lambda Function ARN"
-    Value: !GetAtt S3LoggingFunction.Arn
+    Value: !GetAtt OlmoeAttestS3LoggingFunction.Arn

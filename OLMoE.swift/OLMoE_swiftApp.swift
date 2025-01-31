@@ -1,20 +1,16 @@
-//
-//  OLMoE_swiftApp.swift
-//  OLMoE.swift
-//
-//  Created by Luca Soldaini on 2024-09-16.
-//
-
 import SwiftUI
+import Foundation
 
 @main
 struct OLMoE_swiftApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .font(.manrope())
+                .environment(\.font, .manrope())
+                .environment(\.colorScheme, .dark)
+                .preferredColorScheme(.dark)
         }
     }
 }

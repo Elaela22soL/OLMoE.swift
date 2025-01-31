@@ -1,8 +1,8 @@
 version = 0.1
 [default.deploy.parameters]
-stack_name = "ai2-model-trace"
+stack_name = "ai2-model-trace-attest"
 resolve_s3 = true
-s3_prefix = "ai2-model-trace"
+s3_prefix = "ai2-model-trace-attest"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"

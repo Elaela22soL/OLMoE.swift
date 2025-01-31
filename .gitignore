@@ -8,14 +8,21 @@ __pycache__/
 
 # Environment
 .env
+.env.json
+.venv/
 
 # IDEs
-.vscode/
+.vscode/*
+!.vscode/cspell.json
+!.vscode/extensions.json
+!.vscode/tasks.json
 .idea/
 
 # OS
 .DS_Store
 
+# Xcode
+build/
 
 # user data in xcode
 *.xcuserstate
@@ -25,3 +32,14 @@ __pycache__/
 
 # ignore secrets
 *.xcconfig
+!*.example.xcconfig
+!project-defaults.xcconfig
+
+OLMoE.swift.xcodeproj/project.xcworkspace/xcuserdata/
+OLMoE.swift.xcodeproj/xcuserdata
+
+# Cursor
+.cursorrules
+
+# Misc
+no_commit/

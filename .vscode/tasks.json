@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Lambda",
+            "type": "shell",
+            "command": "sam build",
+            "options": {
+                "cwd": "${workspaceFolder}/aws-lambda"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Deploy Lambda",
+            "type": "shell",
+            "command": "sam deploy --parameter-overrides $(cat .env.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
+            "options": {
+                "cwd": "${workspaceFolder}/aws-lambda"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test GetChallenge",
+            "type": "shell",
+            "command": "sam build && sam local invoke OlmoeAttestS3LoggingFunction -e tests/get_challenge.json --parameter-overrides $(cat .env.test.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
+            "options": {
+                "cwd": "${workspaceFolder}/aws-lambda"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test ShareTrace",
+            "type": "shell",
+            "command": "sam build && sam local invoke OlmoeAttestS3LoggingFunction -e tests/prod_attest.json --parameter-overrides $(cat .env.test.json | jq -r 'to_entries | map(\"\\(.key)=\\(.value|tostring)\") | .[]')",
+            "options": {
+                "cwd": "${workspaceFolder}/aws-lambda"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
