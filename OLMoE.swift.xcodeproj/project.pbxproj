@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4895CE9C2D4D427A00476373 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4895CE9B2D4D427A00476373 /* MarkdownUI */; };
 		489710A22D14D22600F0DB43 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 489710A12D14D22600F0DB43 /* README.md */; };
 		489FD75C2CF13E4E0011E908 /* AttestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489FD75B2CF13E4E0011E908 /* AttestManager.swift */; };
 		48B806352CF54D9F00E1CC0A /* LambdaResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B806342CF54D9600E1CC0A /* LambdaResponseModel.swift */; };
@@ -68,6 +69,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A0117FFF2C990F5600035007 /* llama in Frameworks */,
+				4895CE9C2D4D427A00476373 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +169,7 @@
 			name = OLMoE.swift;
 			packageProductDependencies = (
 				A0117FFE2C990F5600035007 /* llama */,
+				4895CE9B2D4D427A00476373 /* MarkdownUI */,
 			);
 			productName = OLMoE.swift;
 			productReference = A0117FE82C990EAB00035007 /* OLMoE.swift.app */;
@@ -201,6 +204,7 @@
 			mainGroup = A0117FDF2C990EAB00035007;
 			packageReferences = (
 				A0117FFD2C990F5600035007 /* XCRemoteSwiftPackageReference "llama" */,
+				4895CE9A2D4D427A00476373 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			productRefGroup = A0117FE92C990EAB00035007 /* Products */;
 			projectDirPath = "";
@@ -404,7 +408,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = org.allenai.OLMoE;
+				PRODUCT_BUNDLE_IDENTIFIER = com.genui.ai2.olmoe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
@@ -484,6 +488,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		4895CE9A2D4D427A00476373 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
 		A0117FFD2C990F5600035007 /* XCRemoteSwiftPackageReference "llama" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ggerganov/llama.cpp/";
@@ -495,6 +507,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4895CE9B2D4D427A00476373 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4895CE9A2D4D427A00476373 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
 		A0117FFE2C990F5600035007 /* llama */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A0117FFD2C990F5600035007 /* XCRemoteSwiftPackageReference "llama" */;

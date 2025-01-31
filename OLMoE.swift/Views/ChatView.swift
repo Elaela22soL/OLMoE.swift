@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MarkdownUI
 
 public struct UserChatBubble: View {
     var text: String
@@ -41,11 +42,28 @@ public struct BotChatBubble: View {
             if isGenerating && text.isEmpty {
                 TypingIndicator()
             } else {
-                Text(text)
+                Markdown(text)
                     .padding(.top, -2)
                     .background(Color("BackgroundColor"))
                     .frame(maxWidth: maxWidth * 0.75, alignment: .leading)
                     .font(.body())
+                    .markdownTextStyle(\.code) {
+                        FontFamilyVariant(.monospaced)
+                        FontSize(.em(0.85))
+                        BackgroundColor(Color("Surface").opacity(0.35))
+                    }
+                    .markdownBlockStyle(\.codeBlock) { configuration in
+                        configuration.label
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color("Surface").opacity(0.35))
+                            .markdownTextStyle {
+                                FontFamilyVariant(.monospaced)
+                                FontSize(.em(0.85))
+                            }
+                            .markdownMargin(top: 8, bottom: 8)
+                    }
             }
             Spacer()
         }
@@ -243,6 +261,106 @@ public struct ChatView: View {
             }
         }
     }
+}
+
+#Preview("Markdown Features") {
+    let exampleHistory: [Chat] = [
+        Chat(role: .user, content: "Show me what markdown features you support"),
+        Chat(role: .bot, content: """
+        # Markdown Showcase
+        Let me demonstrate the various markdown features I support:
+
+        ## Text Formatting
+        You can use **bold**, *italic*, or ***both***. You can also ~~strikethrough~~ text.
+
+        ## Code Examples
+        Here's a code sample:
+        ```swift
+        struct Example {
+            let value: String
+            func process() -> String {
+                return "Processed: \\(value)"
+            }
+        }
+        ```
+        You can also use `inline code` or ``nested `backticks` ``.
+
+        ## Lists and Tasks
+        Here's what I can do:
+        1. Ordered lists
+           * Nested bullets
+             * Deep nesting
+
+        And task lists:
+        - [x] Completed task
+        - [ ] Pending task
+          - [x] Nested task
+        """),
+
+        Chat(role: .user, content: "That's cool! What about tables and quotes?"),
+        Chat(role: .bot, content: """
+        ## Tables
+        | Feature | Support | Notes |
+        |---------|:-------:|-------|
+        | Tables  | ✅ | With alignment |
+        | Lists   | ✅ | Nested too |
+
+        ## Blockquotes
+        > Single quote
+        >> Nested quote
+        >>> Triple nested with **bold** and *italic*
+
+        ## Links and References
+        [External Link](https://example.com)
+        <https://auto-link.com>
+
+        Reference-style [link][ref] and footnotes[^1]
+
+        [^1]: This is a footnote
+        [ref]: https://example.com
+        """),
+
+        Chat(role: .user, content: "Any special features?"),
+        Chat(role: .bot, content: """
+        ## Special Elements
+        <details>
+        <summary>Expandable Section</summary>
+
+        * Hidden content
+        * More items
+        </details>
+
+        ## Math and Diagrams
+        Math: $E = mc^2$
+
+        ```mermaid
+        graph TD;
+            A-->B;
+            B-->C;
+            C-->D;
+        ```
+
+        ## Definition Lists
+        Term 1
+        : First definition
+        : Another definition
+
+        Term 2
+        : With nested list
+          * Item 1
+          * Item 2
+        """)
+    ]
+
+    ChatView(
+        history: exampleHistory,
+        output: "",
+        isGenerating: .constant(false),
+        isScrolledToBottom: .constant(true),
+        stopSubmitted: .constant(false)
+    )
+    .padding(12)
+    .background(Color("BackgroundColor"))
 }
 
 #Preview("Replying") {
