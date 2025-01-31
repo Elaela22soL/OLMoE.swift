@@ -4,7 +4,11 @@ This enum class contains all the response messages that are used in the lambda f
 from enum import Enum
 from typing import Dict, Any
 
+
 class ResponseMessages(Enum):
+    """
+    Enum for defining the response messages.
+    """
     # Success messages
     OUTCOME_SUCCESS = "success"
 
@@ -21,5 +25,14 @@ class ResponseMessages(Enum):
 
     @classmethod
     def format(cls, message: 'ResponseMessages', **kwargs: Dict[str, Any]) -> str:
-        """Format message with dynamic values"""
+        """
+        Format message with dynamic values
+
+        Args:
+            message (ResponseMessages): The message to format.
+            **kwargs (Dict[str, Any]): The dynamic values to format the message with.
+
+        Returns:
+            str: The formatted message.
+        """
         return message.value.format(**kwargs)

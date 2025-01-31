@@ -5,6 +5,7 @@
 //  Created by Luca Soldaini on 2024-09-16.
 //
 
+
 import SwiftUI
 import os
 
@@ -301,7 +302,7 @@ struct BotView: View {
                             Image("Ai2Icon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: max(140, min(geometry.size.width - 160, 290)))
+                                .frame(width: min(geometry.size.width, geometry.size.height) * 0.18)
                             Spacer()
                         }
                     }
@@ -367,16 +368,28 @@ struct ActivityViewController: UIViewControllerRepresentable {
 }
 
 struct ContentView: View {
+    /// A shared instance of the background download manager.
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
+
+    /// The state of the disclaimer handling.
     @StateObject private var disclaimerState = DisclaimerState()
+
+    /// The bot instance used for conversation.
     @State private var bot: Bot?
-    @State private var showInfoPage : Bool = false
+
+    /// A flag indicating whether to show the info page.
+    @State private var showInfoPage: Bool = false
+
+    /// A flag indicating whether the device is supported.
     @State private var isSupportedDevice: Bool = isDeviceSupported()
+
+    /// A flag indicating whether to use mocked model responses.
     @State private var useMockedModelResponse: Bool = false
 
+    /// Logger for tracking events in the ContentView.
     let logger = Logger(subsystem: "com.allenai.olmoe", category: "ContentView")
 
-    var body: some View {
+    public var body: some View {
         ZStack {
             NavigationStack {
                 VStack {
@@ -452,6 +465,7 @@ struct ContentView: View {
         }
     }
 
+    /// Checks if the model is ready and initializes the bot if it is.
     private func checkModelAndInitializeBot() {
         if FileManager.default.fileExists(atPath: Bot.modelFileURL.path) {
             downloadManager.isModelReady = true
@@ -459,6 +473,7 @@ struct ContentView: View {
         }
     }
 
+    /// Initializes the bot instance and sets the loopback test response flag.
     private func initializeBot() {
         bot = Bot()
         bot?.loopBackTestResponse = useMockedModelResponse

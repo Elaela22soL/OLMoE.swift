@@ -1,8 +1,8 @@
 //
-//  build.example.xcconfig
+//  project-defaults.xcconfig
 //  OLMoE.swift
 //
-//  Created by Stanley Jovel on 11/15/24.
+//  Created by Jon Ryser on 12/23/24.
 //
 
 API_KEY=Use_Your_Own_Key
@@ -10,8 +10,5 @@ API_URL=https:/$()/use_your_own_endpoint
 
 BUNDLE_VERSION=1
 BUNDLE_VERSION_PUBLIC=1.1
-
-// To find the Team ID, see: https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/
-DEVELOPMENT_TEAM_ID=use_your_team_id
 
 PRODUCT_BUNDLE_IDENTIFIER=com.example.apple-samplecode.OLMoE.swift.${DEVELOPMENT_TEAM_ID}

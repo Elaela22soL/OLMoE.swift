@@ -1,3 +1,11 @@
+//
+//  ModelDownloadView.swift
+//  OLMoE.swift
+//
+//  Created by Luca Soldaini on 2024-09-19.
+//
+
+
 import SwiftUI
 import Combine
 import Network
@@ -54,6 +62,7 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         networkMonitor?.start(queue: queue)
     }
 
+    /// Starts the download process.
     func startDownload() {
         if networkMonitor?.currentPath.status == .unsatisfied {
             return
@@ -71,6 +80,11 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         downloadTask?.resume()
     }
 
+    /// Handles the completion of the download task.
+    /// - Parameters:
+    ///   - session: The URL session that completed the task.
+    ///   - downloadTask: The download task that completed.
+    ///   - location: The temporary location of the downloaded file.
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let destination = Bot.modelFileURL
 
@@ -91,6 +105,11 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         }
     }
 
+    /// Handles errors that occur during the download task.
+    /// - Parameters:
+    ///   - session: The URL session that completed the task.
+    ///   - task: The task that completed.
+    ///   - error: The error that occurred, if any.
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         DispatchQueue.main.async {
             if let error = error {
@@ -103,6 +122,13 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         }
     }
 
+    /// Updates the download progress and checks for disk space during the download.
+    /// - Parameters:
+    ///   - session: The URL session managing the download.
+    ///   - downloadTask: The download task that is writing data.
+    ///   - bytesWritten: The number of bytes written in this update.
+    ///   - totalBytesWritten: The total number of bytes written so far.
+    ///   - totalBytesExpectedToWrite: The total number of bytes expected to be written.
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         if !hasCheckedDiskSpace {
             hasCheckedDiskSpace = true
@@ -130,6 +156,7 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         }
     }
 
+    /// Deletes the downloaded model file, marking it as not ready.
     func flushModel() {
         do {
             try FileManager.default.removeItem(at: Bot.modelFileURL)
@@ -139,6 +166,9 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
         }
     }
 
+    /// Checks if there is enough disk space available for the required space.
+    /// - Parameter requiredSpace: The amount of space required in bytes.
+    /// - Returns: A boolean indicating whether there is enough disk space.
     private func hasEnoughDiskSpace(requiredSpace: Int64) -> Bool {
         let fileURL = URL(fileURLWithPath: NSHomeDirectory())
         do {
@@ -171,16 +201,16 @@ struct Ai2Logo: View {
     }
 }
 
+/// A view that displays the model download progress and status.
 struct ModelDownloadView: View {
     @StateObject private var downloadManager = BackgroundDownloadManager.shared
 
-    var body: some View {
+    public var body: some View {
         ZStack {
             Color("BackgroundColor")
                 .edgesIgnoringSafeArea(.all)
 
             VStack {
-
                 if downloadManager.isModelReady {
                     Text("Model is ready to use!")
                         .foregroundColor(Color("TextColor"))
@@ -210,7 +240,7 @@ struct ModelDownloadView: View {
                     Text("Welcome")
                         .font(.telegraf(size: 48))
 
-                    Text("To get started, download the latest AI model.")
+                    Text("Download Model Message")
                         .multilineTextAlignment(.center)
                         .font(.body())
                         .padding([.bottom], 4)

@@ -13,6 +13,8 @@ __pycache__/
 
 # IDEs
 .vscode/*
+!.vscode/cspell.json
+!.vscode/extensions.json
 !.vscode/tasks.json
 .idea/
 
@@ -31,7 +33,7 @@ build/
 # ignore secrets
 *.xcconfig
 !*.example.xcconfig
-
+!project-defaults.xcconfig
 
 OLMoE.swift.xcodeproj/project.xcworkspace/xcuserdata/
 OLMoE.swift.xcodeproj/xcuserdata

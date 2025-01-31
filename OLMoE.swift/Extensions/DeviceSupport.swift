@@ -5,6 +5,7 @@
 //  Created by Ken Adamson on 11/15/24.
 //
 
+
 import SwiftUI
 import os
 
@@ -14,13 +15,13 @@ func isDeviceSupported() -> Bool {
     return true
     #else
     let deviceModel = UIDevice.current.modelName
-    
+
     // Model identifiers for devices with 8GB of RAM or more (iPhones and iPads)
     let supportedModels = [
         // iPhone models with 8GB RAM
         "iPhone16,1", "iPhone16,2", // iPhone 15 Pro and Pro Max
         "iPhone17,1", "iPhone17,2", "iPhone17,3", "iPhone17,4", // all iPhone 16 models
-        
+
         // iPad models with 8GB or more RAM
         "iPad14,3", "iPad14,4", // iPad Pro 11" 4th Gen
         "iPad14,5", "iPad14,6", // iPad Pro 12.9" 6th Gen
@@ -29,7 +30,7 @@ func isDeviceSupported() -> Bool {
         "iPad14,8", "iPad14,9", // iPad Air 6th Gen
         "iPad15,1", "iPad15,2", // Hypothetical future iPad models with 8GB RAM
     ]
-    
+
     return supportedModels.contains(deviceModel)
     #endif
 }

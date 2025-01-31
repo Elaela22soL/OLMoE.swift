@@ -5,6 +5,7 @@
 //  Created by Stanley Jovel on 11/19/24.
 //
 
+
 import SwiftUI
 
 struct MessageInputView: View {
@@ -19,7 +20,7 @@ struct MessageInputView: View {
 
     var body: some View {
         HStack(alignment: .top) {
-            TextField("Message", text: $input, axis: .vertical)
+            TextField("Empty Input Prompt", text: $input, axis: .vertical)
                 .scrollContentBackground(.hidden)
                 .multilineTextAlignment(.leading)
                 .lineLimit(10)
@@ -58,10 +59,11 @@ struct MessageInputView: View {
             .padding(.trailing, 4)
 
         }
+        .padding([.leading, .trailing], 8)
         .frame(maxWidth: .infinity)
         .frame(minHeight: UIDevice.current.userInterfaceIdiom == .pad ? 80 : 40)
         .background(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 30)
                 .fill(Color("Surface"))
                 .foregroundStyle(.thinMaterial)
         )

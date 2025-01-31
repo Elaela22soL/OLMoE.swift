@@ -8,6 +8,9 @@
 		"editor.formatOnSave": true,
 		"editor.tabSize": 2,
 		"editor.wordWrap": "on",
+		"files.associations": {
+			"*.xcconfig": "swift"
+		},
 		"[markdown]": {
 			"editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
 		},
@@ -22,8 +25,8 @@
 			".venv/lib/python3.11/site-packages"
 		],
 		"python.languageServer": "Default",
+		"svg.preview.background": "editor",
 		"trailing-spaces.trimOnSave": true,
-		"workbench.editor.highlightModifiedTabs": true,
-		"svg.preview.background": "editor"
+		"workbench.editor.highlightModifiedTabs": true
 	}
 }
