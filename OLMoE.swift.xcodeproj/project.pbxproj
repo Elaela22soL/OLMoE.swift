@@ -12,6 +12,7 @@
 		489FD75C2CF13E4E0011E908 /* AttestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489FD75B2CF13E4E0011E908 /* AttestManager.swift */; };
 		48B806352CF54D9F00E1CC0A /* LambdaResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B806342CF54D9600E1CC0A /* LambdaResponseModel.swift */; };
 		48E37C202D0271610030C57C /* KeyboardResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E37C1F2D02715B0030C57C /* KeyboardResponder.swift */; };
+		58A7F8BC2D4C16F20041AA70 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 58A7F8BB2D4C16F20041AA70 /* LICENSE */; };
 		A0117FEC2C990EAB00035007 /* OLMoE_swiftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */; };
 		A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0117FEF2C990EAC00035007 /* Assets.xcassets */; };
 		A0117FF42C990EAC00035007 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0117FF32C990EAC00035007 /* Preview Assets.xcassets */; };
@@ -34,6 +35,7 @@
 		489FD75B2CF13E4E0011E908 /* AttestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttestManager.swift; sourceTree = "<group>"; };
 		48B806342CF54D9600E1CC0A /* LambdaResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LambdaResponseModel.swift; sourceTree = "<group>"; };
 		48E37C1F2D02715B0030C57C /* KeyboardResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardResponder.swift; sourceTree = "<group>"; };
+		58A7F8BB2D4C16F20041AA70 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A0117FE82C990EAB00035007 /* OLMoE.swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OLMoE.swift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0117FEB2C990EAB00035007 /* OLMoE_swiftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OLMoE_swiftApp.swift; sourceTree = "<group>"; };
 		A0117FEF2C990EAC00035007 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 				48971DFB2D14D5E300F0DB43 /* aws-lambda */,
 				A0117FEA2C990EAB00035007 /* OLMoE.swift */,
 				A0117FE92C990EAB00035007 /* Products */,
+				58A7F8BB2D4C16F20041AA70 /* LICENSE */,
 			);
 			sourceTree = "<group>";
 		};
@@ -220,6 +223,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				58A7F8BC2D4C16F20041AA70 /* LICENSE in Resources */,
 				A0117FF42C990EAC00035007 /* Preview Assets.xcassets in Resources */,
 				A0117FF02C990EAC00035007 /* Assets.xcassets in Resources */,
 				489710A22D14D22600F0DB43 /* README.md in Resources */,
