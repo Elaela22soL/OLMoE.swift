@@ -49,6 +49,9 @@ struct BotView: View {
     @FocusState private var isTextEditorFocused: Bool
     let disclaimerHandlers: DisclaimerHandlers
 
+    // Add new state for text sharing
+    @State private var showTextShareSheet = false
+
     private var hasValidInput: Bool {
         !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -104,6 +107,33 @@ struct BotView: View {
             bot.setOutput(to: "")
              input = "" // Clear the input
         }
+    }
+
+    private func formatConversationForSharing() -> String {
+        let deviceName = UIDevice.current.model
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMMM d, yyyy 'at' h:mm a"
+        let timestamp = dateFormatter.string(from: Date())
+
+        let header = """
+        Conversation with OLMoE (Open Language Mixture of Expert)
+        ----------------------------------------
+
+        """
+
+        let conversation = bot.history.map { chat in
+            let role = chat.role == .user ? "User" : "OLMoE"
+            return "\(role): \(chat.content)"
+        }.joined(separator: "\n\n")
+
+        let footer = """
+
+        ----------------------------------------
+        Shared from OLMoE - AI2's Open Language Model
+        https://github.com/allenai/OLMoE
+        """
+
+        return header + conversation + footer
     }
 
     func shareConversation() {
@@ -189,11 +219,12 @@ struct BotView: View {
     func shareButton() -> some View {
         Button(action: {
             isTextEditorFocused = false
-            disclaimerHandlers.setActiveDisclaimer(Disclaimers.ShareDisclaimer())
-            disclaimerHandlers.setCancelAction({ disclaimerHandlers.setShowDisclaimerPage(false) })
-            disclaimerHandlers.setAllowOutsideTapDismiss(true)
-            disclaimerHandlers.setConfirmAction({ shareConversation() })
-            disclaimerHandlers.setShowDisclaimerPage(true)
+            // disclaimerHandlers.setActiveDisclaimer(Disclaimers.ShareDisclaimer())
+            // disclaimerHandlers.setCancelAction({ disclaimerHandlers.setShowDisclaimerPage(false) })
+            // disclaimerHandlers.setAllowOutsideTapDismiss(true)
+            // disclaimerHandlers.setConfirmAction({ shareConversation() })
+            // disclaimerHandlers.setShowDisclaimerPage(true)
+            showTextShareSheet = true
         }) {
             HStack {
                 if isSharing {
@@ -257,11 +288,6 @@ struct BotView: View {
         GeometryReader { geometry in
             contentView(in: geometry)
         }
-        .sheet(isPresented: $showShareSheet, content: {
-            if let url = shareURL {
-                ActivityViewController(activityItems: [url])
-            }
-        })
     }
 
     private func contentView(in geometry: GeometryProxy) -> some View {
@@ -328,11 +354,14 @@ struct BotView: View {
             }
             .padding(12)
         }
-        .sheet(isPresented: $showShareSheet, content: {
+        .sheet(isPresented: $showShareSheet) {
             if let url = shareURL {
                 ActivityViewController(activityItems: [url])
             }
-        })
+        }
+        .sheet(isPresented: $showTextShareSheet) {
+            ActivityViewController(activityItems: [formatConversationForSharing()])
+        }
         .gesture(TapGesture().onEnded({
             isTextEditorFocused = false
         }))
