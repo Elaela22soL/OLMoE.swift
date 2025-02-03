@@ -43,7 +43,7 @@ enum InfoText {
             text: """
                 Please do not include PII (personally identifiable information) in model prompts or elsewhere in this app.
                 """),
-        
+
         HeaderTextPair(
             header: "Open Source Licenses",
             text: """
@@ -52,12 +52,18 @@ enum InfoText {
                 Licensed under the MIT License.
                 You may obtain a copy of the license at:
                 [LlamaCPP Repository](https://github.com/ggerganov/llama.cpp)
-                
+
                 ggml
                 Copyright (c) 2023-2024 The ggml authors
                 Licensed under the MIT License.
                 You may obtain a copy of the license at:
                 [ggml Repository](https://github.com/ggerganov/ggml)
+
+                MarkdownUI
+                Copyright (c) 2020 Guillermo Gonzalez
+                Licensed under the MIT License.
+                You may obtain a copy of the license at:
+                [MarkdownUI Repository](https://github.com/gonzalezreal/swift-markdown-ui)
                 """)
     ]
 }
