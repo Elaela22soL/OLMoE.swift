@@ -40,5 +40,12 @@ See [LICENSE](LICENSE) for more information.
     You may obtain a copy of the license at:
     <https://github.com/ggerganov/ggml>
 
+- [MarkdownUI](https://github.com/gonzalezreal/swift-markdown-ui)
 
+    Copyright (c) 2020 Guillermo Gonzalez
+
+    Licensed under the MIT License.
+
+    You may obtain a copy of the license at:
+    <https://github.com/gonzalezreal/swift-markdown-ui>
 
