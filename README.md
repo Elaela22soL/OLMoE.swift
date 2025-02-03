@@ -13,3 +13,32 @@ See [OLMoE.swift/README.md](OLMoE.swift/README.md) for more information.
 This is a lambda function used for the "sharing" feature of the OLMoE app.
 
 See [aws-lambda/README.md](aws-lambda/README.md) for more information.
+
+## License
+
+This project is open source.
+
+See [LICENSE](LICENSE) for more information.
+
+## Open Source Dependencies
+
+- [LlamaCPP](https://github.com/ggerganov/llama.cpp)
+
+    Copyright (c) 2023-2024 The ggml authors
+
+    Licensed under the MIT License.
+
+    You may obtain a copy of the license at:
+    <https://github.com/ggerganov/llama.cpp>
+
+- [ggml](https://github.com/ggerganov/ggml)
+
+    Copyright (c) 2023-2024 The ggml authors
+
+    Licensed under the MIT License.
+
+    You may obtain a copy of the license at:
+    <https://github.com/ggerganov/ggml>
+
+
+
