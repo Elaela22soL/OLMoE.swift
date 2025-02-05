@@ -21,11 +21,10 @@ struct UnsupportedDeviceView: View {
     var body: some View {
         let availableMemoryInGB = Double(os_proc_available_memory()) / (1024 * 1024 * 1024)
         let formattedMemory = String(format: "%.2f", availableMemoryInGB)
-        ZStack {
-            ScrollView {
-                Spacer()
-                VStack(spacing: 20) {
 
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 20) {
                     Image("Exclamation")
                         .foregroundColor(Color("AccentColor"))
 
@@ -40,7 +39,11 @@ struct UnsupportedDeviceView: View {
                         })
                         .multilineTextAlignment(.center)
 
-                    Text("This device does not have the 8GB physical RAM required to run OLMoE locally. OLMoE can run locally on iPhone 15 Pro/Max, iPhone 16 models, iPad Pro 4th Gen and newer, or iPad Air 5th Gen and newer.")
+                    Text("This device does not have the 8GB physical RAM required to run OLMoE locally.")
+                        .multilineTextAlignment(.center)
+                        .font(.body())
+
+                    Text("OLMoE can run locally on iPhone 15 Pro/Max, iPhone 16 models, iPad Pro 4th Gen and newer, or iPad Air 5th Gen and newer.")
                         .multilineTextAlignment(.center)
                         .font(.body())
 
@@ -96,11 +99,12 @@ struct UnsupportedDeviceView: View {
                 }
                 .frame(maxWidth: 512)
                 .padding(.horizontal, 24)
-
-                Spacer()
+                .frame(minHeight: geometry.size.height)
+                .frame(maxWidth: .infinity)
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: geometry.size.height)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color("BackgroundColor"))
     }
 }
