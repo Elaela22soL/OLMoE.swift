@@ -21,6 +21,37 @@ struct WebView: UIViewRepresentable {
         init(_ parent: WebView) {
             self.parent = parent
         }
+        
+        // MARK: - WKNavigationDelegate
+
+        /// Intercepts navigation actions in the WKWebView.
+        func webView(_ webView: WKWebView,
+                     decidePolicyFor navigationAction: WKNavigationAction,
+                     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            
+            print("Navigation action type: \(navigationAction.navigationType)")
+            
+            // Log the destination URL if available.
+            if let url = navigationAction.request.url {
+                print("Destination URL: \(url.absoluteString)")
+            }
+
+            // Check if the navigation action is triggered by a link click or form submission,
+            // and the URL contains "http"
+            if let url = navigationAction.request.url,
+               url.absoluteString.contains("http") ||
+               navigationAction.navigationType == .linkActivated || navigationAction.navigationType == .formSubmitted,
+               !url.absoluteString.contains("https://playground.allenai.org") {
+                // Open the URL in Safari.
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                // Cancel the navigation within the web view.
+                decisionHandler(.cancel)
+                return
+            }
+            
+            // Allow all other types of navigation.
+            decisionHandler(.allow)
+        }
     }
 
     func makeCoordinator() -> Coordinator {
