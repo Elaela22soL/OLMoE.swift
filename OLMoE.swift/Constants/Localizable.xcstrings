@@ -17,6 +17,9 @@
     "%lld%%" : {
 
     },
+    "⚠️ Running on AI2's servers - not on your device" : {
+
+    },
     "allenai.org" : {
 
     },
@@ -27,9 +30,6 @@
 
     },
     "Delete history?" : {
-
-    },
-    "Device Not Supported" : {
 
     },
     "Download Model" : {
@@ -63,7 +63,13 @@
     "Flush Model" : {
 
     },
+    "However, you can try using OLMoE at the Ai2 Playground. This option does not download the model file to your device, but instead submits user input to a hosted version of OLMoE to remotely generate responses." : {
+
+    },
     "Model is ready to use!" : {
+
+    },
+    "On-Device OLMoE Not Available" : {
 
     },
     "Proceed Anyway" : {
@@ -72,7 +78,10 @@
     "Proceed With Mocked Model" : {
 
     },
-    "This app requires a device with at least 8GB of RAM." : {
+    "This device does not have the 8GB physical RAM required to run OLMoE locally. OLMoE can run locally on iPhone 15 Pro/Max, iPhone 16 models, iPad Pro 4th Gen and newer, or iPad Air 5th Gen and newer." : {
+
+    },
+    "Try OLMoE at the Ai2 Playground" : {
 
     },
     "Welcome" : {
