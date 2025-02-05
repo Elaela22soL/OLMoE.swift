@@ -12,7 +12,7 @@ import os
 // Device support check function
 func isDeviceSupported() -> Bool {
     #if targetEnvironment(simulator)
-    return true
+    return false
     #else
     let deviceModel = UIDevice.current.modelName
 
