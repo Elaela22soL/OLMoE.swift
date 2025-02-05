@@ -97,10 +97,9 @@ struct UnsupportedDeviceView: View {
                     }
 
                 }
+                .frame(minHeight: geometry.size.height)
                 .frame(maxWidth: 512)
                 .padding(.horizontal, 24)
-                .frame(minHeight: geometry.size.height)
-                .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity)
             .frame(height: geometry.size.height)
