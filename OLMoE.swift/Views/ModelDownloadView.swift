@@ -68,7 +68,7 @@ class BackgroundDownloadManager: NSObject, ObservableObject, URLSessionDownloadD
             return
         }
 
-        guard let url = URL(string: "https://dolma-artifacts.org/app/olmoe-1b-7b-0924-instruct-q4_k_m.gguf") else { return }
+        guard let url = URL(string: AppConstants.Model.downloadURL) else { return }
 
         isDownloading = true
         downloadError = nil

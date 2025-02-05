@@ -10,8 +10,7 @@ import SwiftUI
 import os
 
 class Bot: LLM {
-    static let modelFileName = "olmoe-1b-7b-0924-instruct-q4_k_m.gguf"
-    static let modelFileURL = URL.modelsDirectory.appendingPathComponent(modelFileName)
+    static let modelFileURL = URL.modelsDirectory.appendingPathComponent(AppConstants.Model.filename).appendingPathExtension("gguf")
 
     convenience init() {
         let deviceName = UIDevice.current.model
@@ -147,7 +146,7 @@ struct BotView: View {
                 let apiKey = Configuration.apiKey
                 let apiUrl = Configuration.apiUrl
 
-                let modelName = "olmoe-1b-7b-0924-instruct-q4_k_m"
+                let modelName = AppConstants.Model.filename
                 let systemFingerprint = "\(modelName)-\(AppInfo.shared.appId)"
 
                 let messages = bot.history.map { chat in
