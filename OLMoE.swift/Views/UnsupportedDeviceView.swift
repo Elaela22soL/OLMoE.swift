@@ -59,7 +59,7 @@ struct UnsupportedDeviceView: View {
                     .sheet(isPresented: $showWebView, onDismiss: nil) {
                         SheetWrapper {
                             WebViewWithBanner(
-                                url: URL(string: "https://playground.allenai.org/?model=olmoe-0125")!,
+                                url: URL(string: AppConstants.Model.playgroundURL)!,
                                 onDismiss: { showWebView = false }
                             )
                         }

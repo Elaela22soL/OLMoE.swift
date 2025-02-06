@@ -16,16 +16,36 @@ struct InfoButton: View {
             Image(systemName: "info.circle")
                 .foregroundColor(Color("TextColor"))
         }
+        .buttonStyle(.plain)
         .clipShape(Circle())
-        .background(
-            RadialGradient(
-                gradient: Gradient(colors: [
-                    Color("BackgroundColor").opacity(0.9), Color.clear,
-                ]),
-                center: .center,
-                startRadius: 20,
-                endRadius: 40)
-        )
+        .background(Color.clear)
+    }
+}
+
+struct CloseButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "xmark.circle")
+                .font(.system(size: 20))
+                .frame(width: 40, height: 40)
+                .foregroundColor(Color("TextColor"))
+        }
+        .buttonStyle(.plain)
+        .clipShape(Circle())
+    }
+}
+
+struct InfoContent: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            ForEach(InfoText.content) { text in
+                HeaderTextPairView(header: text.header, text: text.text)
+                    .padding([.horizontal], 12)
+            }
+        }
+        .padding([.bottom], 24)
     }
 }
 
@@ -33,26 +53,33 @@ struct InfoView: View {
     @Binding var isPresented: Bool
 
     var body: some View {
+        #if targetEnvironment(macCatalyst)
+        VStack(spacing: 0) {
+            // Fixed header
+            HStack {
+                Spacer()
+                CloseButton(action: { isPresented = false })
+            }
+            .padding([.top, .horizontal], 12)
+
+            // Scrollable content
+            ScrollView {
+                InfoContent()
+            }
+        }
+        #else
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 HStack {
                     Spacer()
-                    Button(action: { isPresented = false }) {
-                        Image(systemName: "xmark.circle")
-                            .font(.system(size: 20))
-                            .frame(width: 40, height: 40)
-                            .foregroundColor(Color("TextColor"))
-                    }
-                    .clipShape(Circle())
+                    CloseButton(action: { isPresented = false })
                 }
 
-                ForEach(InfoText.content) { text in
-                    HeaderTextPairView(header: text.header, text: text.text)
-                        .padding([.horizontal], 12)
-                }
+                InfoContent()
             }
             .padding([.bottom], 24)
         }
+        #endif
     }
 }
 

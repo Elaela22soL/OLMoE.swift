@@ -81,6 +81,12 @@
     "Proceed With Mocked Model" : {
 
     },
+    "Start Download" : {
+
+    },
+    "The model requires 4.21GB of storage space. Would you like to proceed with the download?" : {
+
+    },
     "This device does not have the 8GB physical RAM required to run OLMoE locally." : {
 
     },
