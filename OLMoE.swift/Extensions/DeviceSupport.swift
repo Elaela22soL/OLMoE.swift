@@ -27,6 +27,7 @@ func isDeviceSupported() -> Bool {
         "iPad14,5", "iPad14,6", // iPad Pro 12.9" 6th Gen
         "iPad16,3", "iPad16,4", // iPad Pro 11" 5th Gen
         "iPad16,5", "iPad16,6", // iPad Pro 12.9" 7th Gen
+        "iPad13,16", "iPad13,17", // iPad Air 5th Gen
         "iPad14,8", "iPad14,9", // iPad Air 6th Gen
         "iPad15,1", "iPad15,2", // Hypothetical future iPad models with 8GB RAM
     ]
