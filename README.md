@@ -25,7 +25,7 @@ Clone the repository in your respective directory by
 git clone https://github.com/allenai/OLMoE.swift.git
 ```
 
-- The project uses .xcconfig files for build configurations.
+- The project uses `.xcconfig` files for build configurations.
 Open Xcode and select OLMoE project, navigate to Info → Configurations Ensure that both Debug and Release use `build.xcconfig`.
 
 - Open **Signing & Capabilities** in Xcode. Check ✅ **Automatically manage signing** and select your Apple Developer Team. Update the **Bundle Identifier** to something like `com.domain.app`.  
