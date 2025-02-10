@@ -4,8 +4,7 @@
   <img src="./doc_assets/App_Main.png" alt="App Main" width="250"/>
 </p>
 
-Ai2 OLMoE is an AI chatbot powered by the [OLMoE](https://huggingface.co/collections/allenai/olmoe-66cf678c047657a30c8cd3da) model.  
-Unlike cloud-based AI assistants, **OLMoE runs entirely on your device**, ensuring complete **privacy** and **offline accessibility**—even in **Flight Mode**.
+Ai2 OLMoE is an AI chatbot powered by the [OLMoE](https://huggingface.co/collections/allenai/olmoe-66cf678c047657a30c8cd3da) model. Unlike cloud-based AI assistants, **OLMoE runs entirely on your device**, ensuring complete **privacy** and **offline accessibility**—even in **Flight Mode**.
 
 
 ## Getting started with OLMoE app
@@ -40,17 +39,33 @@ Open Xcode and select OLMoE project, navigate to Info → Configurations Ensure 
 
 See [OLMoE.swift/README.md](OLMoE.swift/README.md) for more information.
 
+## Running OLMoE with Hugging Face
+
+Install `transformers` (version 4.45.0 or greater) & `torch` and run:
+
+```python
+from transformers import OlmoeForCausalLM, AutoTokenizer
+import torch
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+# Load different ckpts via passing e.g. `revision=step10000-tokens41B`
+model = OlmoeForCausalLM.from_pretrained("allenai/OLMoE-1B-7B-0125").to(DEVICE)
+tokenizer = AutoTokenizer.from_pretrained("allenai/OLMoE-1B-7B-0125")
+inputs = tokenizer("Bitcoin is", return_tensors="pt")
+inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
+out = model.generate(**inputs, max_length=64)
+print(tokenizer.decode(out[0]))
+# > # Bitcoin is a digital currency that is created and held electronically. No one controls it. Bitcoins aren’t printed, like dollars or euros – they’re produced by people and businesses running computers all around the world, using software that solves mathematical
+```
+
 ## aws-lambda
 
-This is a lambda function used for the "sharing" feature of the OLMoE app.
-
-See [aws-lambda/README.md](aws-lambda/README.md) for more information.
+This is a lambda function used for the "sharing" feature of the OLMoE app. See [aws-lambda/README.md](aws-lambda/README.md) for more information.
 
 ## License
 
-This project is open source.
-
-See [LICENSE](LICENSE) for more information.
+This project is open source. See [LICENSE](LICENSE) for more information.
 
 ## Open Source Dependencies
 
