@@ -69,30 +69,21 @@ This project is open source. See [LICENSE](LICENSE) for more information.
 
 ## Open Source Dependencies
 
-- [LlamaCPP](https://github.com/ggerganov/llama.cpp)
+This project relies on the following open-source libraries, each licensed under the **MIT License**:  
 
-    Copyright (c) 2023-2024 The ggml authors
+### [LlamaCPP](https://github.com/ggerganov/llama.cpp)  
+- **Author(s):** The ggml authors (2023-2024)  
+- **License:** MIT  
+- **Repository:** [LlamaCPP](https://github.com/ggerganov/llama.cpp)  
 
-    Licensed under the MIT License.
+### [ggml](https://github.com/ggerganov/ggml)  
+- **Author(s):** The ggml authors (2023-2024)  
+- **License:** MIT  
+- **Repository:** [ggml](https://github.com/ggerganov/ggml)  
 
-    You may obtain a copy of the license at:
-    <https://github.com/ggerganov/llama.cpp>
+### [MarkdownUI](https://github.com/gonzalezreal/swift-markdown-ui)  
+- **Author(s):** Guillermo Gonzalez (2020)  
+- **License:** MIT  
+- **Repository:** [MarkdownUI](https://github.com/gonzalezreal/swift-markdown-ui)  
 
-- [ggml](https://github.com/ggerganov/ggml)
-
-    Copyright (c) 2023-2024 The ggml authors
-
-    Licensed under the MIT License.
-
-    You may obtain a copy of the license at:
-    <https://github.com/ggerganov/ggml>
-
-- [MarkdownUI](https://github.com/gonzalezreal/swift-markdown-ui)
-
-    Copyright (c) 2020 Guillermo Gonzalez
-
-    Licensed under the MIT License.
-
-    You may obtain a copy of the license at:
-    <https://github.com/gonzalezreal/swift-markdown-ui>
-
+For more details on each license, visit the respective repositories linked above.
