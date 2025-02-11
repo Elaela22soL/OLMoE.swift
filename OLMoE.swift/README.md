@@ -69,7 +69,7 @@ Default values are provided in `BuildConfig/project-defaults.xcconfig`.
 
 Requires an _AWS Lambda function_
 
-1) Follow and deploy the lambda function as described in the [lambda README](../aws-lambda/README.md)
+1) Follow and deploy the lambda function as described in the [lambda README](../aws-lambda/README.md).
 
 ## Troubleshooting
 
@@ -99,4 +99,6 @@ Requires an _AWS Lambda function_
 
     ![Select Device](../doc_assets/Select_Device.png)
 
-1) Run the project.
+1) Run the project by hiting **Run** ▶️ or press `Cmd + R`.
+
+    ![Run App](../doc_assets/Run_App.png)
