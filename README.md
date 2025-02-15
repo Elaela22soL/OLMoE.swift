@@ -1,11 +1,20 @@
-# Ai2 OLMoE
-
-<p align="center">
+<div align="center">
   <img src="./doc_assets/App_Main.png" alt="App Main" width="250"/>
+  <br>
+  <br>
+  <h1>Ai2 OLMoE</h1>
+</div>
+<p align="center">
+  <a href="https://github.com/allenai/OLMo/blob/main/LICENSE">
+    <img alt="GitHub License" src="https://img.shields.io/github/license/allenai/OLMo">
+  </a>
+  <a href="https://playground.allenai.org">
+    <img alt="Playground" src="https://img.shields.io/badge/Ai2-Playground-F0529C">
+  </a>
+  <a href="https://discord.gg/sZq3jTNVNG">
+    <img alt="Discord" src="https://img.shields.io/badge/Discord%20-%20blue?style=flat&logo=discord&label=Ai2&color=%235B65E9">
+  </a>
 </p>
-
-Ai2 OLMoE is an AI chatbot powered by the [OLMoE](https://huggingface.co/collections/allenai/olmoe-66cf678c047657a30c8cd3da) model. Unlike cloud-based AI assistants, **OLMoE runs entirely on your device**, ensuring complete **privacy** and **offline accessibility**—even in **Flight Mode**.
-
 
 ## Getting started with OLMoE app
 
