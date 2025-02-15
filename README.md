@@ -1,7 +1,6 @@
 <div align="center">
   <img src="./doc_assets/App_Main.png" alt="App Main" width="250"/>
   <br>
-  <br>
   <h1>Ai2 OLMoE</h1>
 </div>
 <p align="center">
